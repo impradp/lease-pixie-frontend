@@ -1,0 +1,54 @@
+# Configuration for Dependabot version updates
+version: 2
+updates:
+  # NPM dependencies (including Next.js, React, and related packages)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "UTC"
+    groups:
+      # Group all Next.js related updates together
+      nextjs-packages:
+        patterns:
+          - "next"
+          - "@next/*"
+      # Group React updates together
+      react-packages:
+        patterns:
+          - "react"
+          - "react-dom"
+      # Group testing library updates
+      testing-packages:
+        patterns:
+          - "@testing-library/*"
+          - "jest"
+          - "@jest/*"
+    # Ignore major version updates for packages that might cause breaking changes
+    # ignore:
+    #   - dependency-name: "*"
+    #     update-types: ["version-update:semver-major"]
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "chore"
+      include: "scope"
+    open-pull-requests-limit: 10
+    versioning-strategy: increase
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily" # Check for updates daily
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
