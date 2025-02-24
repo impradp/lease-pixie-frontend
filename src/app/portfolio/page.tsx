@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
 import { sampleUsers } from "@/data/users";
-import { User } from "@/types/user";
+import { DropdownOption } from "@/types/user";
 import PixieButton from "@/components/buttons/PixieButton";
 import ConfirmationDialog from "@/src/components/popups/ConfirmationDialog";
 
@@ -13,7 +13,9 @@ export default function PortfolioPage() {
   const isExistingPortfolio = !!portfolioId;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | undefined>();
+  const [selectedUser, setSelectedUser] = useState<
+    DropdownOption | undefined
+  >();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [portfolioName, setPortfolioName] = useState(
     isExistingPortfolio ? "Grizwald Realty Company" : ""

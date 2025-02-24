@@ -4,7 +4,6 @@ import { PlusCircle } from "lucide-react";
 interface IconLinkButtonProps {
   label: string;
   onClick: () => void;
-  icon?: React.ReactNode;
   className?: string;
 }
 

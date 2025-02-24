@@ -19,13 +19,20 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   useEffect(() => {
     if (isOpen) {
+      // Get the current scrollbar width before hiding it
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
+
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "";
+      document.body.style.overflow = "";
     }
 
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "";
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -33,19 +40,17 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className="w-[262px] relative z-50 bg-white rounded-2xl shadow-[20px_20px_20px_0px_rgba(0,0,0,0.08)] border border-black/10">
-        {/* X Icon Button - Positioned absolutely */}
+      <div className="fixed inset-0 bg-black/50" aria-label="Close dialog" />
+      <div className="w-[262px] relative z-50 bg-white rounded-2xl shadow-lg border border-black/10">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 cursor-pointer"
+          className="absolute right-4 top-4 cursor-pointer text-[#475467] hover:text-[#101828] transition-colors"
+          aria-label="Close dialog"
         >
-          <X size={24} className="text-[#475467]" strokeWidth={2} />
+          <X size={24} strokeWidth={2} />
         </button>
 
-        {/* Content Container */}
         <div className="flex flex-col items-center pt-14 pb-6 px-8">
-          {/* Text Content */}
           <div className="w-full flex flex-col items-center gap-4 mb-6">
             <h3 className="text-[#101828] text-base font-medium font-['Inter']">
               {title}
@@ -55,7 +60,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             </p>
           </div>
 
-          {/* Button */}
           <PixieButton
             onClick={onClose}
             label={buttonLabel}

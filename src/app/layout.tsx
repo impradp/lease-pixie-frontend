@@ -9,9 +9,9 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en" className={`${inter.variable} ${myanmarKhyay.variable}`}>
       <body className="min-h-screen bg-custom-gradient">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { NewUserFormData } from "@/types/user";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -22,6 +22,22 @@ export const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
     email: "",
     mobilePhone: "",
   });
+
+  // Add the scroll lock with scrollbar width compensation
+  useEffect(() => {
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
+    const originalPadding = window.getComputedStyle(document.body).paddingRight;
+
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.paddingRight = originalPadding;
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { CustomInput } from "@/components/ui/CustomInput";
 import { NewVendorFormData } from "@/types/vendor";
@@ -26,6 +26,22 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
     send1099: false,
     getInsuranceCert: false,
   });
+
+  // Add the scroll lock with scrollbar width compensation
+  useEffect(() => {
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
+    const originalPadding = window.getComputedStyle(document.body).paddingRight;
+
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.paddingRight = originalPadding;
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

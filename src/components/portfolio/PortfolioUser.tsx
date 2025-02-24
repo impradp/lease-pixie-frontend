@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { User } from "@/types/user";
-import { NewUserFormData } from "@/types/user";
+
+import { NewVendorFormData } from "@/types/vendor";
+import { NewUserFormData, DropdownOption } from "@/types/user";
+import { NewVendor } from "@/components/portfolio/NewVendor";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
-import { NewPortfolioUser } from "@/src/components/portfolio/NewPortfolioUser";
 import { IconLinkButton } from "@/components/buttons/IconLinkButton";
-import { NewVendorFormData } from "@/src/types/vendor";
-import { NewVendor } from "@/components/portfolio/NewVendor";
+import { NewPortfolioUser } from "@/components/portfolio/NewPortfolioUser";
+import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
 
 interface PortfolioUserProps {
   label?: string;
-  selectedUser?: User;
-  onUserChange?: (user: User) => void;
+  selectedUser?: DropdownOption;
+  onUserChange?: (user: DropdownOption) => void;
   onEdit?: () => void;
   isExistingPortfolio?: boolean;
-  users: User[];
+  users: DropdownOption[];
   onAddUser?: (userData: NewUserFormData) => void;
   onAddVendor?: (vendorData: NewVendorFormData) => void;
   showInfo?: boolean;
@@ -37,11 +38,16 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showNewVendorModal, setShowNewVendorModal] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationContent, setConfirmationContent] = useState({
+    title: "",
+    message: "",
+  });
   const isEditing = !isExistingPortfolio || !!onUserChange;
 
   // Add useEffect to handle body scroll
   useEffect(() => {
-    if (showNewUserModal || showNewVendorModal) {
+    if (showNewUserModal || showNewVendorModal || showConfirmation) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -51,13 +57,18 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showNewUserModal, showNewVendorModal]);
+  }, [showNewUserModal, showNewVendorModal, showConfirmation]);
 
   const handleAddUser = (userData: NewUserFormData) => {
     if (onAddUser) {
       onAddUser(userData);
     }
     setShowNewUserModal(false);
+    setConfirmationContent({
+      title: "User Added",
+      message: "User successfully added.",
+    });
+    setShowConfirmation(true);
   };
 
   const handleAddVendor = (vendorData: NewVendorFormData) => {
@@ -65,6 +76,11 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
       onAddVendor(vendorData);
     }
     setShowNewVendorModal(false);
+    setConfirmationContent({
+      title: "Vendor Added",
+      message: "Vendor successfully added.",
+    });
+    setShowConfirmation(true);
   };
 
   const handleCloseUserModal = () => {
@@ -73,6 +89,10 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 
   const handleCloseVendorModal = () => {
     setShowNewVendorModal(false);
+  };
+
+  const handleConfirmationClose = () => {
+    setShowConfirmation(false);
   };
 
   return (
@@ -87,7 +107,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
         />
         <CustomDropdown
           options={users}
-          value={selectedUser}
+          value={selectedUser?.value}
           onChange={onUserChange}
           readOnly={isExistingPortfolio && !onUserChange}
           isEditing={isEditing}
@@ -108,10 +128,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
       {/* Modal overlays */}
       {showNewUserModal && (
         <div className="fixed inset-0 z-50">
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={handleCloseUserModal}
-          />
           <div className="relative z-50">
             <NewPortfolioUser
               onClose={handleCloseUserModal}
@@ -123,10 +139,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 
       {showNewVendorModal && (
         <div className="fixed inset-0 z-50">
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={handleCloseVendorModal}
-          />
           <div className="relative z-50">
             <NewVendor
               onClose={handleCloseVendorModal}
@@ -135,6 +147,13 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
           </div>
         </div>
       )}
+
+      <ConfirmationDialog
+        isOpen={showConfirmation}
+        onClose={handleConfirmationClose}
+        title={confirmationContent.title}
+        message={confirmationContent.message}
+      />
     </>
   );
 };

@@ -10,3 +10,8 @@ export interface NewUserFormData {
   email: string;
   mobilePhone: string;
 }
+
+export interface DropdownOption {
+  label: string;
+  value: string;
+}
