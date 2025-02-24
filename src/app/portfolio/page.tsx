@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
@@ -9,8 +8,8 @@ import { User } from "@/types/user";
 import PixieButton from "@/components/buttons/PixieButton";
 
 export default function PortfolioPage() {
-  const searchParams = useSearchParams();
-  const portfolioId = searchParams.get("id");
+  //TODO: Implement logic to check if portfolio exists
+  const portfolioId = "123";
   const isExistingPortfolio = !!portfolioId;
 
   const [isEditing, setIsEditing] = useState(false);

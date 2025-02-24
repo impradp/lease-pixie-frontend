@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 
 const Navbar = () => {
@@ -36,14 +35,5 @@ const Navbar = () => {
     </nav>
   );
 };
-
-const BreadcrumbLink = ({ href, text }: { href: string; text: string }) => (
-  <Link
-    href={href}
-    className="text-[#0f1728] text-base font-medium font-inter leading-normal hover:text-blue-600 transition-colors"
-  >
-    {text}
-  </Link>
-);
 
 export default Navbar;

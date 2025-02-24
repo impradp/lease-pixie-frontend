@@ -18,10 +18,9 @@ const PixieButton: React.FC<PixieButtonProps> = ({
   type = "button",
   formId,
 }) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (type !== "submit" && onClick) {
-      onClick();
-    } else if (type === "submit" && onClick) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleClick = (_e: React.MouseEvent<HTMLButtonElement>) => {
+    if (onClick) {
       onClick();
     }
   };
