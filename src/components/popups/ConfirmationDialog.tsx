@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
-import PixieButton from "../buttons/PixieButton";
+import PixieButton from "@/components/buttons/PixieButton";
 
 interface ConfirmationDialogProps {
   isOpen: boolean;

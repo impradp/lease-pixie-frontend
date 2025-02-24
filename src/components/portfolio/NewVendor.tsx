@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-import { CustomInput } from "@/components/ui/CustomInput";
 import { NewVendorFormData } from "@/types/vendor";
+import { CustomInput } from "@/components/ui/CustomInput";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import PixieButton from "@/components/buttons/PixieButton";
 import CancelButton from "@/components/buttons/CancelButton";
 import { CustomCheckbox } from "@/components/ui/CustomCheckbox";
+import { getMessages } from "@/locales/loader";
+import { Locale } from "@/locales";
 
 interface NewVendorProps {
   onClose: () => void;
@@ -26,6 +28,9 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
     send1099: false,
     getInsuranceCert: false,
   });
+
+  const [locale] = useState<Locale>("en");
+  const messages = getMessages(locale);
 
   // Add the scroll lock with scrollbar width compensation
   useEffect(() => {
@@ -62,7 +67,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
         <div className="p-6 flex-shrink-0">
           <div className="flex justify-between items-center">
             <SectionHeader
-              title="Create Vendor"
+              title={messages?.portfolio?.vendor?.modal?.title}
               showCloseButton={true}
               onClose={onClose}
             />
@@ -182,9 +187,9 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
         <div className="p-6 border-t border-gray-200 flex-shrink-0">
           <div className="flex flex-col gap-3">
             <PixieButton
-              label="Create Vendor"
+              label={messages?.portfolio?.vendor?.modal?.button?.label}
               disabled={false}
-              type="submit"
+              type={messages?.portfolio?.vendor?.modal?.button?.type}
               formId="new-vendor-form"
             />
             <CancelButton onClick={onClose} />

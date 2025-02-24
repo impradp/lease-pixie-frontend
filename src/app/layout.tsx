@@ -2,11 +2,6 @@ import { inter, myanmarKhyay } from "./fonts";
 import Navbar from "@/components/layout/Navbar";
 import "./globals.css";
 
-export const metadata = {
-  title: "Lease Pixie Dashboard",
-  description: "Property management dashboard",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{

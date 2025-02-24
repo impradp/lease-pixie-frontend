@@ -8,6 +8,8 @@ import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { IconLinkButton } from "@/components/buttons/IconLinkButton";
 import { NewPortfolioUser } from "@/components/portfolio/NewPortfolioUser";
 import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
+import { getMessages } from "@/locales/loader";
+import { Locale } from "@/locales";
 
 interface PortfolioUserProps {
   label?: string;
@@ -45,6 +47,9 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   });
   const isEditing = !isExistingPortfolio || !!onUserChange;
 
+  const [locale] = useState<Locale>("en");
+  const messages = getMessages(locale);
+
   // Add useEffect to handle body scroll
   useEffect(() => {
     if (showNewUserModal || showNewVendorModal || showConfirmation) {
@@ -65,8 +70,8 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     }
     setShowNewUserModal(false);
     setConfirmationContent({
-      title: "User Added",
-      message: "User successfully added.",
+      title: messages?.portfolio?.user?.confirmModal?.title,
+      message: messages?.portfolio?.user?.confirmModal?.message,
     });
     setShowConfirmation(true);
   };
@@ -77,8 +82,8 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     }
     setShowNewVendorModal(false);
     setConfirmationContent({
-      title: "Vendor Added",
-      message: "Vendor successfully added.",
+      title: messages?.portfolio?.vendor?.confirmModal?.title,
+      message: messages?.portfolio?.vendor?.confirmModal?.message,
     });
     setShowConfirmation(true);
   };
@@ -117,7 +122,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
           <IconLinkButton
             label={`Add ${userType}`}
             onClick={() =>
-              userType === "Portfolio User"
+              userType === messages?.portfolio?.user?.commonName
                 ? setShowNewUserModal(true)
                 : setShowNewVendorModal(true)
             }

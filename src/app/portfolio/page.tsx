@@ -6,16 +6,23 @@ import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
 import { sampleUsers } from "@/data/users";
 import { DropdownOption } from "@/types/user";
 import PixieButton from "@/components/buttons/PixieButton";
-import ConfirmationDialog from "@/src/components/popups/ConfirmationDialog";
+import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
+import { getMessages } from "@/locales/loader";
+import { Locale } from "@/locales";
 
 export default function PortfolioPage() {
   const portfolioId = "";
   const isExistingPortfolio = !!portfolioId;
 
+  const [locale] = useState<Locale>("en");
+  const messages = getMessages(locale);
+
   const [isEditing, setIsEditing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<
     DropdownOption | undefined
   >();
+
+  //TODO: Fetch portfolio data
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [portfolioName, setPortfolioName] = useState(
     isExistingPortfolio ? "Grizwald Realty Company" : ""
@@ -27,7 +34,6 @@ export default function PortfolioPage() {
 
   const handleSubmit = () => {
     //TODO: Implement submit logic
-    console.log("Portfolio submitted");
     setIsPopupOpen(true);
   };
 
@@ -46,7 +52,7 @@ export default function PortfolioPage() {
             />
 
             <PortfolioUser
-              label="Primary Portfolio User"
+              label={messages?.portfolio?.user?.title}
               users={sampleUsers}
               selectedUser={selectedUser}
               onUserChange={isEditing ? setSelectedUser : undefined}
@@ -55,7 +61,7 @@ export default function PortfolioPage() {
             />
 
             <PortfolioUser
-              label="Secondary Portfolio User"
+              label={messages?.portfolio?.user?.titleSecondary}
               users={sampleUsers}
               selectedUser={selectedUser}
               onUserChange={isEditing ? setSelectedUser : undefined}
@@ -64,7 +70,7 @@ export default function PortfolioPage() {
             />
 
             <PortfolioUser
-              label="Preferred Tax Reporting Seat"
+              label={messages?.portfolio?.vendor?.title}
               users={sampleUsers}
               selectedUser={selectedUser}
               onUserChange={isEditing ? setSelectedUser : undefined}
@@ -72,11 +78,11 @@ export default function PortfolioPage() {
               isExistingPortfolio={isExistingPortfolio}
               showInfo={true}
               userType="Vendor"
-              infoContent="Accounting Seat: included in workflows to provide tax related reports to file taxes"
+              infoContent={messages?.portfolio?.vendor?.primaryInfo}
             />
 
             <PortfolioUser
-              label="Preferred Insurance Seat"
+              label={messages?.portfolio?.vendor?.titleSecondary}
               users={sampleUsers}
               selectedUser={selectedUser}
               onUserChange={isEditing ? setSelectedUser : undefined}
@@ -84,11 +90,11 @@ export default function PortfolioPage() {
               isExistingPortfolio={isExistingPortfolio}
               showInfo={true}
               userType="Vendor"
-              infoContent="Property Insurance Seat: included in workflows related to property insurance coverage"
+              infoContent={messages?.portfolio?.vendor?.secondaryInfo}
             />
 
             <PortfolioUser
-              label="Preferred Attorney Seat"
+              label={messages?.portfolio?.vendor?.titleTertiary}
               users={sampleUsers}
               selectedUser={selectedUser}
               onUserChange={isEditing ? setSelectedUser : undefined}
@@ -96,13 +102,13 @@ export default function PortfolioPage() {
               isExistingPortfolio={isExistingPortfolio}
               showInfo={true}
               userType="Vendor"
-              infoContent="Attorney Seat: included in workflows related to legal lease document production and tenant defaults. This seat will be requested to produce legal documents and must be licensed to practice law in the state in which the property is located."
+              infoContent={messages?.portfolio?.vendor?.tertiaryInfo}
             />
           </div>
 
           <div className="pt-8">
             <PixieButton
-              label="Create Portfolio"
+              label={messages?.portfolio?.button?.label}
               disabled={false}
               onClick={handleSubmit}
               className="w-full"
@@ -114,8 +120,8 @@ export default function PortfolioPage() {
       <ConfirmationDialog
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
-        title="Portfolio Created"
-        message="Portfolio successfully created."
+        title={messages?.portfolio?.confirmModal?.title}
+        message={messages?.portfolio?.confirmModal?.message}
       />
     </>
   );

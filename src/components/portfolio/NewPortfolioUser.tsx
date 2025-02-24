@@ -4,7 +4,9 @@ import { NewUserFormData } from "@/types/user";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import PixieButton from "@/components/buttons/PixieButton";
 import CancelButton from "@/components/buttons/CancelButton";
-import ConfirmationDialog from "../popups/ConfirmationDialog";
+import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
+import { getMessages } from "@/locales/loader";
+import { Locale } from "@/locales";
 
 interface NewPortfolioUserProps {
   onClose: () => void;
@@ -22,6 +24,9 @@ export const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
     email: "",
     mobilePhone: "",
   });
+
+  const [locale] = useState<Locale>("en");
+  const messages = getMessages(locale);
 
   // Add the scroll lock with scrollbar width compensation
   useEffect(() => {
@@ -57,7 +62,7 @@ export const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <SectionHeader
-                title="Create Portfolio User"
+                title={messages?.portfolio?.user?.modal?.title}
                 showCloseButton={true}
                 onClose={onClose}
               />
@@ -103,9 +108,9 @@ export const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
 
               <div className="pt-4 flex flex-col gap-3">
                 <PixieButton
-                  label="Create User"
+                  label={messages?.portfolio?.user?.modal?.button?.label}
                   disabled={false}
-                  type="submit"
+                  type={messages?.portfolio?.user?.modal?.button?.type}
                 />
                 <CancelButton onClick={onClose} />
               </div>
@@ -117,8 +122,8 @@ export const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
       <ConfirmationDialog
         isOpen={showConfirmation}
         onClose={handleConfirmationClose}
-        title="User Added"
-        message="User successfully added."
+        title={messages?.portfolio?.user?.confirmModal?.title}
+        message={messages?.portfolio?.user?.confirmModal?.message}
       />
     </>
   );

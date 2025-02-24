@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { getMessages } from "@/locales/loader";
+import { Locale } from "@/locales";
 
 interface PortfolioCardProps {
   portfolioName: string;
@@ -17,15 +19,18 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
 }) => {
   const isEditing = !isExistingPortfolio || !!onNameChange;
 
+  const [locale] = useState<Locale>("en");
+  const messages = getMessages(locale);
+
   return (
     <div className=" bg-[#f2f2f2] rounded-xl p-6 flex flex-col gap-4">
       <SectionHeader
-        title="Portfolio Name"
+        title={messages?.portfolio?.name}
         onEdit={onEdit}
         showEditButton={isExistingPortfolio}
       />
       <CustomInput
-        label="Portfolio name"
+        label={messages?.portfolio?.name}
         value={portfolioName}
         onChange={onNameChange}
         readOnly={isExistingPortfolio && !onNameChange}
