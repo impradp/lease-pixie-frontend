@@ -1,0 +1,76 @@
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import CancelButton from "@/components/buttons/CancelButton";
+
+describe("CancelButton Component", () => {
+  const defaultProps = {
+    onClick: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders with the text "Cancel"', () => {
+    render(<CancelButton {...defaultProps} />);
+
+    expect(screen.getByText("Cancel")).toBeInTheDocument();
+  });
+
+  it("calls onClick handler when clicked", () => {
+    render(<CancelButton {...defaultProps} />);
+
+    const button = screen.getByRole("button");
+    fireEvent.click(button);
+
+    expect(defaultProps.onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('has type="button" attribute', () => {
+    render(<CancelButton {...defaultProps} />);
+
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("type", "button");
+  });
+
+  it("applies default classes", () => {
+    render(<CancelButton {...defaultProps} />);
+
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("text-[#475466]");
+    expect(button).toHaveClass("text-sm");
+    expect(button).toHaveClass("font-semibold");
+    expect(button).toHaveClass("underline");
+    expect(button).toHaveClass("leading-[1.43]");
+  });
+
+  it("applies additional custom classes when provided", () => {
+    render(<CancelButton {...defaultProps} className="custom-class" />);
+
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("custom-class");
+  });
+
+  it("renders as a button element", () => {
+    render(<CancelButton {...defaultProps} />);
+
+    const button = screen.getByText("Cancel");
+    expect(button.tagName).toBe("BUTTON");
+  });
+
+  it("applies all classes together in the correct order", () => {
+    const customClass = "mt-4 ml-2";
+    render(<CancelButton {...defaultProps} className={customClass} />);
+
+    const button = screen.getByRole("button");
+    const classNames = button.className.split(" ");
+
+    // Check that default classes come before custom classes
+    const defaultClassesIndex = classNames.findIndex(
+      (c) => c === "text-[#475466]"
+    );
+    const customClassIndex = classNames.findIndex((c) => c === "mt-4");
+
+    expect(defaultClassesIndex).toBeLessThan(customClassIndex);
+  });
+});

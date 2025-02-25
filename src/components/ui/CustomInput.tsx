@@ -1,3 +1,5 @@
+import React from "react";
+
 interface CustomInputProps {
   label: string;
   value: string;
@@ -15,6 +17,11 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   isEditing = false,
   placeholder = "",
 }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEditing || readOnly) return; // Prevent onChange when readOnly or not editing
+    onChange?.(e.target.value);
+  };
+
   return (
     <div className="flex flex-col gap-1.5 w-full">
       <label className="text-[#344053] text-sm font-medium font-['Inter'] leading-tight">
@@ -25,7 +32,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           placeholder={placeholder}
           type="text"
           value={value}
-          onChange={(e) => onChange?.(e.target.value)}
+          onChange={handleChange}
           readOnly={!isEditing || readOnly}
           className="w-full text-[#0f1728] text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent"
         />
