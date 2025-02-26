@@ -48,10 +48,14 @@ describe("IconLinkButton Component", () => {
     expect(button).toHaveClass("flex");
     expect(button).toHaveClass("items-center");
     expect(button).toHaveClass("gap-2");
-    expect(button).toHaveClass("text-[#344053]");
+    expect(button).toHaveClass(
+      "flex items-center gap-2 text-card-open-link text-sm font-medium font-['Inter'] leading-tight"
+    );
     expect(button).toHaveClass("text-sm");
     expect(button).toHaveClass("font-medium");
-    expect(button).toHaveClass("hover:text-[#1D2939]");
+    expect(button).toHaveClass(
+      "flex items-center gap-2 text-card-open-link text-sm font-medium font-['Inter'] leading-tight"
+    );
   });
 
   it("applies additional custom classes when provided", () => {

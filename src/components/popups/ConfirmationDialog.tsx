@@ -44,7 +44,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <div className="w-[262px] relative z-50 bg-white rounded-2xl shadow-lg border border-black/10">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 cursor-pointer text-[#475467] hover:text-[#101828] transition-colors"
+          className="absolute right-4 top-4 cursor-pointer text-card-open-icon"
           aria-label="Close dialog"
         >
           <X size={24} strokeWidth={2} />
@@ -52,10 +52,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
         <div className="flex flex-col items-center pt-14 pb-6 px-8">
           <div className="w-full flex flex-col items-center gap-4 mb-6">
-            <h3 className="text-[#101828] text-base font-medium font-['Inter']">
+            <h3 className="text-card-open-regular text-base font-medium font-['Inter']">
               {title}
             </h3>
-            <p className="text-[#101828] text-sm font-normal font-['Inter'] text-center">
+            <p className="text-card-open-regular text-sm font-normal font-['Inter'] text-center">
               {message}
             </p>
           </div>

@@ -15,14 +15,16 @@ interface CustomDropdownProps {
 export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   label = "",
   options,
-  value,
+  value = "",
   onChange,
   readOnly = false,
   isEditing,
   labelSuffix = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<string | undefined>(value);
+  const [selectedValue, setSelectedValue] = useState<string | "undefined">(
+    value
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
   const inputId = useId();
@@ -33,9 +35,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   }, [value]);
 
   // Find the selected option based on the selectedValue state
-  const selectedOption = options.find(
-    (option) => option.value === selectedValue
-  );
+  const selectedOption = selectedValue
+    ? options.find((option) => option.value === selectedValue)
+    : options.find((option) => option.value === "");
 
   const handleClick = () => {
     if (!readOnly && isEditing) {
@@ -89,22 +91,11 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Determine default text based on label suffix
-  const getDefaultText = () => {
-    if (labelSuffix === "Vendor") {
-      return "Select vendor";
-    }
-    return "Select user";
-  };
-
-  // Determine display text
-  const displayText = selectedOption ? selectedOption.label : getDefaultText();
-
   return (
     <div className="flex flex-col gap-1.5 w-full" ref={dropdownRef}>
       <label
         htmlFor={inputId}
-        className="text-[#344053] text-sm font-medium font-['Inter'] leading-tight"
+        className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
       >
         {label || `Selected ${labelSuffix}`}
       </label>
@@ -114,7 +105,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           tabIndex={!readOnly && isEditing ? 0 : -1}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
-          className={`px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#cfd4dc] flex items-center justify-between ${
+          className={`px-3.5 py-2.5 bg-card-input-fill min-h-[76px] rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center justify-between ${
             isEditing && !readOnly ? "cursor-pointer" : "cursor-default"
           }`}
           aria-label={label || `Selected ${labelSuffix}`}
@@ -122,11 +113,18 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           aria-expanded={isOpen}
           aria-controls={`${inputId}-options`}
         >
-          <span className="text-[#0f1728] text-base font-normal font-['Inter'] leading-normal">
-            {displayText}
-          </span>
+          <div className="flex flex-col gap-2">
+            <div className="text-card-input-semibold text-base font-semibold font-['Inter'] leading-normal">
+              {selectedOption?.label}
+            </div>
+            {selectedOption?.label && (
+              <div className="text-card-input-regular text-base font-normal font-['Inter'] leading-normal">
+                {selectedOption.value}
+              </div>
+            )}
+          </div>
           {isEditing && !readOnly && (
-            <ChevronDown className="w-5 h-5 text-[#667085]" />
+            <ChevronDown className="w-5 h-5 text-card-icon" />
           )}
         </div>
 
@@ -140,7 +138,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             aria-activedescendant={
               selectedValue ? `option-${selectedValue}` : undefined
             }
-            className="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg border border-[#cfd4dc] max-h-60 overflow-auto p-0 m-0 list-none"
+            className="absolute z-10 w-full mt-1 bg-dropdown-fill rounded-lg shadow-lg border border-dropdown-stroke max-h-60 overflow-auto p-0 m-0 list-none"
           >
             {options.map((option, index) => {
               const isSelected = option.value === selectedValue;
@@ -154,16 +152,16 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   onClick={() => handleOptionClick(option)}
                   onKeyDown={(e) => handleOptionKeyDown(e, option)}
                   tabIndex={0}
-                  className={`px-4 py-3 hover:bg-[#f2f2f2] cursor-pointer ${
-                    isSelected ? "bg-[#f8f9fa] font-medium" : ""
-                  } ${!isLast ? "border-b border-[#d0d5dd]" : ""}`}
+                  className={`px-4 py-3 hover:bg-dropdown-selected cursor-pointer ${
+                    isSelected ? "bg-dropdown-selected font-medium" : ""
+                  } ${!isLast ? "border-b border-dropdown-stroke" : ""}`}
                 >
                   <div className="flex flex-col gap-2">
-                    <div className="text-[#101828] text-base font-semibold font-['Inter'] leading-normal">
+                    <div className="text-dropdown-semibold text-base font-semibold font-['Inter'] leading-normal">
                       {option.label}
                     </div>
                     {option.value !== option.label && (
-                      <div className="text-[#667085] text-base font-normal font-['Inter'] leading-normal">
+                      <div className="text-dropdown-regular text-base font-normal font-['Inter'] leading-normal">
                         {option.value}
                       </div>
                     )}

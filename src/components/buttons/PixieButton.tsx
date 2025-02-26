@@ -29,7 +29,7 @@ const PixieButton: React.FC<PixieButtonProps> = ({
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={`${buttonStyles.base} ${buttonStyles.shadow} ${buttonStyles.states} ${className}`}
+      className={`${buttonStyles.base} ${buttonStyles.shadow} ${className}`}
       type={type}
       form={formId}
     >

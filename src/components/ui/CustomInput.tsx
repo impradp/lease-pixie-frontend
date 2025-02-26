@@ -24,17 +24,17 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-[#344053] text-sm font-medium font-['Inter'] leading-tight">
+      <label className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight">
         {label}
       </label>
-      <div className="px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#cfd4dc] flex items-center">
+      <div className="px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center">
         <input
           placeholder={placeholder}
           type="text"
           value={value}
           onChange={handleChange}
           readOnly={!isEditing || readOnly}
-          className="w-full text-[#0f1728] text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent"
+          className="w-full text-card-input-semibold text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent"
         />
       </div>
     </div>

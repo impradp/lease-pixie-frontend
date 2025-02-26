@@ -23,7 +23,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
   const messages = getMessages(locale);
 
   return (
-    <div className=" bg-[#f2f2f2] rounded-xl p-6 flex flex-col gap-4">
+    <div className=" bg-card-open-fill rounded-xl p-6 flex flex-col gap-4">
       <SectionHeader
         title={messages?.portfolio?.name}
         onEdit={onEdit}

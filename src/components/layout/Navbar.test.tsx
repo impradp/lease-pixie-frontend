@@ -1,9 +1,10 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Navbar from "@/components/layout/Navbar";
+import Navbar from "@/components/layout/Navbar"; // Adjust path as needed
+import { useRouter } from "next/navigation";
 
-// Mock the next/image component
+// Mock next/image
 jest.mock("next/image", () => ({
   __esModule: true,
   default: ({
@@ -28,7 +29,29 @@ jest.mock("next/image", () => ({
   ),
 }));
 
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+  })),
+}));
+
+// Mock SidebarMenu component
+jest.mock("@/components/menus/SidebarMenu", () => {
+  return jest.fn(({ isOpen, onClose }) =>
+    isOpen ? (
+      <div data-testid="sidebar-menu">
+        <button onClick={onClose}>Close</button>
+      </div>
+    ) : null
+  );
+});
+
 describe("Navbar Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("renders the component with logo and title", () => {
     render(<Navbar />);
 
@@ -42,33 +65,65 @@ describe("Navbar Component", () => {
     const titleText = screen.getByText("Lease Pixie");
     expect(titleText).toBeInTheDocument();
     expect(titleText).toHaveClass("font-myanmar-khyay");
+    expect(titleText).toHaveClass("text-primary-button");
   });
 
   it("renders the hamburger menu button", () => {
     render(<Navbar />);
 
     // Check for the menu button
-    const menuButton = screen.getByRole("button");
+    const menuButton = screen.getByRole("button", { name: /menu/i });
     expect(menuButton).toBeInTheDocument();
 
     // Check for the hamburger icon
-    const hamburgerIcon = screen.getByTestId("image-menu-01");
+    const hamburgerIcon = screen.getByTestId("image-menu");
     expect(hamburgerIcon).toBeInTheDocument();
     expect(hamburgerIcon).toHaveAttribute("src", "/icons/hamburger.svg");
+    expect(hamburgerIcon).toHaveAttribute("alt", "Menu");
   });
 
-  it("applies hover styles to the menu button on hover", () => {
+  it("navigates to dashboard when logo is clicked", () => {
+    const mockPush = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+
     render(<Navbar />);
 
-    const menuButton = screen.getByRole("button");
+    const logoContainer = screen.getByText("Lease Pixie").parentElement!;
+    fireEvent.click(logoContainer);
 
-    // Check initial styles
-    expect(menuButton).toHaveClass("p-2");
-    expect(menuButton).toHaveClass("hover:bg-gray-100");
-    expect(menuButton).toHaveClass("rounded-lg");
-    expect(menuButton).toHaveClass("transition-colors");
+    expect(mockPush).toHaveBeenCalledWith("/account/dashboard");
+  });
 
-    // Note: We can't directly test CSS pseudo-classes like :hover with React Testing Library
+  it("toggles the sidebar menu when hamburger button is clicked", () => {
+    render(<Navbar />);
+
+    const menuButton = screen.getByRole("button", { name: /menu/i });
+
+    // Initially, sidebar should be closed
+    expect(screen.queryByTestId("sidebar-menu")).not.toBeInTheDocument();
+
+    // Click to open
+    fireEvent.click(menuButton);
+    expect(screen.getByTestId("sidebar-menu")).toBeInTheDocument();
+
+    // Click to close
+    fireEvent.click(menuButton);
+    expect(screen.queryByTestId("sidebar-menu")).not.toBeInTheDocument();
+  });
+
+  it("closes the sidebar menu when the close button is clicked", () => {
+    render(<Navbar />);
+
+    const menuButton = screen.getByRole("button", { name: /menu/i });
+
+    // Open the menu
+    fireEvent.click(menuButton);
+    expect(screen.getByTestId("sidebar-menu")).toBeInTheDocument();
+
+    // Click the close button in the mocked SidebarMenu
+    const closeButton = screen.getByText("Close");
+    fireEvent.click(closeButton);
+    expect(screen.queryByTestId("sidebar-menu")).not.toBeInTheDocument();
   });
 
   it("has the correct layout structure and classes", () => {
@@ -85,26 +140,9 @@ describe("Navbar Component", () => {
     // Check for the main container div
     const mainContainer = navElement.firstChild as HTMLElement;
     expect(mainContainer).toHaveClass("h-[92px]");
-    expect(mainContainer).toHaveClass("flex-col");
-
-    // Check for the inner container
-    const innerContainer = mainContainer.firstChild as HTMLElement;
-    expect(innerContainer).toHaveClass("self-stretch");
-    expect(innerContainer).toHaveClass("h-[52px]");
-    expect(innerContainer).toHaveClass("py-3.5");
-    expect(innerContainer).toHaveClass("rounded-xl");
-  });
-
-  it("behaves correctly when menu button is clicked", () => {
-    render(<Navbar />);
-
-    const menuButton = screen.getByRole("button");
-
-    // Simulate click event
-    fireEvent.click(menuButton);
-
-    // Note: Currently there's no state change or callback to test
-    expect(menuButton).toBeInTheDocument();
+    expect(mainContainer).toHaveClass("flex");
+    expect(mainContainer).toHaveClass("items-center");
+    expect(mainContainer).toHaveClass("justify-between");
   });
 
   it("has proper accessibility attributes", () => {
@@ -115,9 +153,11 @@ describe("Navbar Component", () => {
     expect(logoImage).toHaveAttribute("alt", "Lease Pixie Logo");
 
     // Hamburger icon should have proper alt text
-    const hamburgerIcon = screen.getByTestId("image-menu-01");
-    expect(hamburgerIcon).toHaveAttribute("alt", "menu-01");
+    const hamburgerIcon = screen.getByTestId("image-menu");
+    expect(hamburgerIcon).toHaveAttribute("alt", "Menu");
 
-    // Note: Consider adding aria-label to the menu button for better accessibility
+    // Menu button should be accessible
+    const menuButton = screen.getByRole("button", { name: /menu/i });
+    expect(menuButton).toBeInTheDocument();
   });
 });

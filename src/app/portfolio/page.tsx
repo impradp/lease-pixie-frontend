@@ -3,12 +3,17 @@
 import { useState } from "react";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
-import { sampleUsers } from "@/data/users";
+import {
+  samplePrimaryUsers,
+  sampleSecondaryUsers,
+  sampleVendorUsers,
+} from "@/data/users";
 import { DropdownOption } from "@/types/user";
 import PixieButton from "@/components/buttons/PixieButton";
 import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
 import { getMessages } from "@/locales/loader";
 import { Locale } from "@/locales";
+import Link from "next/link";
 
 export default function PortfolioPage() {
   const portfolioId = "";
@@ -39,81 +44,100 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <div className="min-h-screen py-8 px-4">
-        <div className="max-w-[560px] mx-auto space-y-8">
-          <div className="space-y-8">
-            <PortfolioCard
-              portfolioName={portfolioName}
-              onEdit={handleEdit}
-              isExistingPortfolio={isExistingPortfolio}
-              onNameChange={
-                isEditing || !isExistingPortfolio ? setPortfolioName : undefined
-              }
-            />
+      {/* Breadcrumb navigation - at the top of the main content */}
+      <div className="hidden xs:flex flex-col items-end text-xs mb-8">
+        <div className="text-right mt-1">
+          <span className="text-primary-fade font-normal font-['Inter'] leading-tight ">
+            Account Dashboard
+          </span>
+          <Link
+            href="/account/dashboard"
+            className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
+          >
+            -&gt;
+          </Link>
+        </div>
 
-            <PortfolioUser
-              label={messages?.portfolio?.user?.title}
-              users={sampleUsers}
-              selectedUser={selectedUser}
-              onUserChange={isEditing ? setSelectedUser : undefined}
-              onEdit={handleEdit}
-              isExistingPortfolio={isExistingPortfolio}
-            />
+        <div className="text-right mt-1">
+          <span className="text-primary-regular font-normal font-['Inter'] leading-tight">
+            Add Portfolio
+          </span>
+        </div>
+      </div>
 
-            <PortfolioUser
-              label={messages?.portfolio?.user?.titleSecondary}
-              users={sampleUsers}
-              selectedUser={selectedUser}
-              onUserChange={isEditing ? setSelectedUser : undefined}
-              onEdit={handleEdit}
-              isExistingPortfolio={isExistingPortfolio}
-            />
+      <div className="max-w-[1180px] mx-auto space-y-8">
+        <div className="space-y-8">
+          <PortfolioCard
+            portfolioName={portfolioName}
+            onEdit={handleEdit}
+            isExistingPortfolio={isExistingPortfolio}
+            onNameChange={
+              isEditing || !isExistingPortfolio ? setPortfolioName : undefined
+            }
+          />
 
-            <PortfolioUser
-              label={messages?.portfolio?.vendor?.title}
-              users={sampleUsers}
-              selectedUser={selectedUser}
-              onUserChange={isEditing ? setSelectedUser : undefined}
-              onEdit={handleEdit}
-              isExistingPortfolio={isExistingPortfolio}
-              showInfo={true}
-              userType="Vendor"
-              infoContent={messages?.portfolio?.vendor?.primaryInfo}
-            />
+          <PortfolioUser
+            label={messages?.portfolio?.user?.title}
+            users={samplePrimaryUsers}
+            selectedUser={selectedUser}
+            onUserChange={isEditing ? setSelectedUser : undefined}
+            onEdit={handleEdit}
+            isExistingPortfolio={isExistingPortfolio}
+          />
 
-            <PortfolioUser
-              label={messages?.portfolio?.vendor?.titleSecondary}
-              users={sampleUsers}
-              selectedUser={selectedUser}
-              onUserChange={isEditing ? setSelectedUser : undefined}
-              onEdit={handleEdit}
-              isExistingPortfolio={isExistingPortfolio}
-              showInfo={true}
-              userType="Vendor"
-              infoContent={messages?.portfolio?.vendor?.secondaryInfo}
-            />
+          <PortfolioUser
+            label={messages?.portfolio?.user?.titleSecondary}
+            users={sampleSecondaryUsers}
+            selectedUser={selectedUser}
+            onUserChange={isEditing ? setSelectedUser : undefined}
+            onEdit={handleEdit}
+            isExistingPortfolio={isExistingPortfolio}
+          />
 
-            <PortfolioUser
-              label={messages?.portfolio?.vendor?.titleTertiary}
-              users={sampleUsers}
-              selectedUser={selectedUser}
-              onUserChange={isEditing ? setSelectedUser : undefined}
-              onEdit={handleEdit}
-              isExistingPortfolio={isExistingPortfolio}
-              showInfo={true}
-              userType="Vendor"
-              infoContent={messages?.portfolio?.vendor?.tertiaryInfo}
-            />
-          </div>
+          <PortfolioUser
+            label={messages?.portfolio?.vendor?.title}
+            users={sampleVendorUsers}
+            selectedUser={selectedUser}
+            onUserChange={isEditing ? setSelectedUser : undefined}
+            onEdit={handleEdit}
+            isExistingPortfolio={isExistingPortfolio}
+            showInfo={true}
+            userType="Vendor"
+            infoContent={messages?.portfolio?.vendor?.primaryInfo}
+          />
 
-          <div className="pt-8">
-            <PixieButton
-              label={messages?.portfolio?.button?.label}
-              disabled={false}
-              onClick={handleSubmit}
-              className="w-full"
-            />
-          </div>
+          <PortfolioUser
+            label={messages?.portfolio?.vendor?.titleSecondary}
+            users={sampleVendorUsers}
+            selectedUser={selectedUser}
+            onUserChange={isEditing ? setSelectedUser : undefined}
+            onEdit={handleEdit}
+            isExistingPortfolio={isExistingPortfolio}
+            showInfo={true}
+            userType="Vendor"
+            infoContent={messages?.portfolio?.vendor?.secondaryInfo}
+          />
+
+          <PortfolioUser
+            label={messages?.portfolio?.vendor?.titleTertiary}
+            users={sampleVendorUsers}
+            selectedUser={selectedUser}
+            onUserChange={isEditing ? setSelectedUser : undefined}
+            onEdit={handleEdit}
+            isExistingPortfolio={isExistingPortfolio}
+            showInfo={true}
+            userType="Vendor"
+            infoContent={messages?.portfolio?.vendor?.tertiaryInfo}
+          />
+        </div>
+
+        <div className="pt-8">
+          <PixieButton
+            label={messages?.portfolio?.button?.label}
+            disabled={false}
+            onClick={handleSubmit}
+            className="w-full"
+          />
         </div>
       </div>
 

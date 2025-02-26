@@ -8,6 +8,48 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: "431px", // Custom breakpoint for mobile devices
+      },
+      colors: {
+        primary: {
+          fill: "#F9F9F9",
+          fade: "#D6D6D6",
+          regular: "#FDFDFD",
+          button: "#0C111D",
+        },
+        secondary: {
+          regular: "#000000",
+          button: "#475467",
+        },
+        tertiary: {
+          fill: "#DDDDDD",
+          regular: "#FCFCFD",
+        },
+        card: {
+          open: {
+            regular: "#101828",
+            fill: "#F9F9F9",
+            stroke: "#D0D5DD",
+            icon: "#475467",
+            link: "#0C111D",
+          },
+          input: {
+            fill: "#FFFFFF",
+            stroke: "#D0D5DD",
+            regular: "#667085",
+            semibold: "#101828",
+            label: "#344054",
+          },
+        },
+        dropdown: {
+          fill: "#FDFDFD",
+          semibold: "#101828",
+          regular: "#667085",
+          selected: "#ECECEC",
+          stroke: "#D0D5DD",
+        },
+      },
       fontFamily: {
         inter: ["var(--font-inter)"],
         "myanmar-khyay": ["var(--font-myanmar-khyay)"],

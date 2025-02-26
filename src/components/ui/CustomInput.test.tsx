@@ -94,13 +94,13 @@ describe("CustomInput", () => {
 
     expect(container).toHaveClass("flex flex-col gap-1.5 w-full");
     expect(label).toHaveClass(
-      "text-[#344053] text-sm font-medium font-['Inter'] leading-tight"
+      "text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
     );
     expect(inputContainer).toHaveClass(
-      "px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#cfd4dc] flex items-center"
+      "px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center"
     );
     expect(input).toHaveClass(
-      "w-full text-[#0f1728] text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent"
+      "w-full text-card-input-semibold text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent"
     );
   });
 

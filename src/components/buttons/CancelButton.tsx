@@ -13,7 +13,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({
     <button
       onClick={onClick}
       type="button"
-      className={`text-[#475466] text-sm font-semibold underline leading-[1.43] ${className}`}
+      className={`text-secondary-button text-sm font-semibold underline leading-[1.43] ${className}`}
     >
       Cancel
     </button>

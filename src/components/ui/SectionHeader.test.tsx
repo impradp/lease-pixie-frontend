@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 // Mock dependencies
@@ -7,7 +7,6 @@ const mockX = jest.fn((props: { className?: string }) => (
 ));
 jest.mock("lucide-react", () => ({
   X: (props: { className?: string }) => {
-    console.log("X called with props:", props); // Debug log
     return mockX(props);
   },
 }));
@@ -136,8 +135,12 @@ describe("SectionHeader", () => {
     let tooltipContainer = screen.getByText("Test:").closest(".absolute");
     expect(tooltipContainer).toHaveClass("left-0");
 
-    Object.defineProperty(window, "innerWidth", { value: 300 });
-    window.dispatchEvent(new Event("resize"));
+    // Wrap resize event in act
+    act(() => {
+      Object.defineProperty(window, "innerWidth", { value: 300 });
+      window.dispatchEvent(new Event("resize"));
+    });
+
     rerender(
       <SectionHeader
         {...defaultProps}

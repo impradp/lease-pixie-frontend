@@ -1,37 +1,52 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import SidebarMenu from "@/components/menus/SidebarMenu";
 
 const Navbar = () => {
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogoClick = () => {
+    router.push("/account/dashboard");
+  };
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
+
   return (
     <nav className="w-full max-w-[1328px] mx-auto px-4">
-      <div className="h-[92px] flex-col justify-start items-start gap-4">
-        <div className="self-stretch h-[52px] py-3.5 rounded-xl">
-          <div className="self-stretch justify-between items-end flex">
-            <div className="flex items-center gap-2">
-              <div>
-                <Image
-                  src="/icons/lease-pixie-logo.svg"
-                  alt="Lease Pixie Logo"
-                  width={16}
-                  height={18}
-                />
-              </div>
-              <span className="font-myanmar-khyay text-lg text-[#0b111d]">
-                Lease Pixie
-              </span>
-            </div>
-
-            {/* Menu Button */}
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Image
-                src="/icons/hamburger.svg"
-                alt="menu-01"
-                width={24}
-                height={24}
-              />
-            </button>
-          </div>
+      <div className="h-[92px] flex items-center justify-between">
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={handleLogoClick}
+        >
+          <Image
+            src="/icons/lease-pixie-logo.svg"
+            alt="Lease Pixie Logo"
+            width={16}
+            height={18}
+            priority
+          />
+          <span className="font-myanmar-khyay text-lg text-primary-button">
+            Lease Pixie
+          </span>
         </div>
+
+        <button className="p-2 rounded-lg" onClick={handleMenuToggle}>
+          <Image
+            src="/icons/hamburger.svg"
+            alt="Menu"
+            width={24}
+            height={24}
+            priority // Ensure consistent SSR behavior
+          />
+        </button>
       </div>
+      <SidebarMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </nav>
   );
 };

@@ -15,7 +15,7 @@ export const IconLinkButton: React.FC<IconLinkButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 text-[#344053] text-sm font-medium hover:text-[#1D2939] ${className}`}
+      className={`flex items-center gap-2 text-card-open-link text-sm font-medium font-['Inter'] leading-tight ${className}`}
     >
       <PlusCircle size={20} />
       <span>{label}</span>

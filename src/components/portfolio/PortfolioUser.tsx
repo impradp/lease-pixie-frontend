@@ -102,7 +102,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 
   return (
     <>
-      <div className="bg-[#f2f2f2] rounded-xl p-6 flex flex-col gap-4">
+      <div className="bg-card-open-fill rounded-xl p-6 flex flex-col gap-4">
         <SectionHeader
           title={label}
           onEdit={onEdit}

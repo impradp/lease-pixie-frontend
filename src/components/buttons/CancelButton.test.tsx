@@ -37,7 +37,9 @@ describe("CancelButton Component", () => {
     render(<CancelButton {...defaultProps} />);
 
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("text-[#475466]");
+    expect(button).toHaveClass(
+      "text-secondary-button text-sm font-semibold underline leading-[1.43]"
+    );
     expect(button).toHaveClass("text-sm");
     expect(button).toHaveClass("font-semibold");
     expect(button).toHaveClass("underline");
@@ -67,7 +69,9 @@ describe("CancelButton Component", () => {
 
     // Check that default classes come before custom classes
     const defaultClassesIndex = classNames.findIndex(
-      (c) => c === "text-[#475466]"
+      (c) =>
+        c ===
+        "text-secondary-button text-sm font-semibold underline leading-[1.43]"
     );
     const customClassIndex = classNames.findIndex((c) => c === "mt-4");
 

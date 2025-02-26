@@ -45,7 +45,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   return (
     <div className="flex items-center gap-4 w-full">
       <div className="flex items-center">
-        <div className="text-[#0f1728] text-xl font-bold font-['Inter'] leading-[30px]">
+        <div className="text-card-open-regular text-xl font-bold font-['Inter'] leading-[30px]">
           {title}
         </div>
         {showInfo && (
@@ -83,7 +83,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
                     <path d="M10 0L20 16H0L10 0Z" fill="white" />
                   </svg>
                   <div className="p-4">
-                    <div className="text-[#101828] text-xs font-['Inter']">
+                    <div className="text-card-open-regular text-xs font-['Inter']">
                       <span className="font-bold">
                         {infoContent.split(":")[0]}:{" "}
                       </span>
@@ -96,11 +96,11 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           </div>
         )}
       </div>
-      <div className="grow h-px bg-[#cfd4dc]" />
+      <div className="grow h-px bg-card-open-stroke" />
       {showEditButton && onEdit && (
         <button
           onClick={onEdit}
-          className="text-[#475466] text-sm font-semibold font-['Inter'] underline leading-tight"
+          className="text-card-open-icon text-sm font-semibold font-['Inter'] underline leading-tight"
         >
           Edit
         </button>
@@ -108,7 +108,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {showCloseButton && onClose && (
         <button
           onClick={onClose}
-          className="text-[#667085] hover:text-[#101828]"
+          className="text-card-open-icon hover:text-card-open-regular"
         >
           <X className="w-5 h-5" />
         </button>
