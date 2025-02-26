@@ -15,7 +15,6 @@ interface PortfolioUserProps {
   label?: string;
   selectedUser?: DropdownOption;
   onUserChange?: (user: DropdownOption) => void;
-  onEdit?: () => void;
   isExistingPortfolio?: boolean;
   users: DropdownOption[];
   onAddUser?: (userData: NewUserFormData) => void;
@@ -23,13 +22,14 @@ interface PortfolioUserProps {
   showInfo?: boolean;
   infoContent?: string;
   userType?: string;
+  isLocked: boolean;
+  lockMessage?: string;
 }
 
 export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   label = "",
   selectedUser,
   onUserChange,
-  onEdit,
   isExistingPortfolio = false,
   users,
   onAddUser,
@@ -37,6 +37,8 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   showInfo,
   infoContent,
   userType = "Portfolio User",
+  isLocked = false,
+  lockMessage = "Seat not active",
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showNewVendorModal, setShowNewVendorModal] = useState(false);
@@ -45,20 +47,18 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     title: "",
     message: "",
   });
+  const [isEditMode, setIsEditMode] = useState(false);
   const isEditing = !isExistingPortfolio || !!onUserChange;
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
 
-  // Add useEffect to handle body scroll
   useEffect(() => {
     if (showNewUserModal || showNewVendorModal || showConfirmation) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
-
-    // Cleanup function
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -100,13 +100,24 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     setShowConfirmation(false);
   };
 
+  const handleEdit = () => {
+    setIsEditMode(true);
+  };
+
+  const handleTextClose = () => {
+    setIsEditMode(false);
+  };
+
   return (
     <>
       <div className="bg-card-open-fill rounded-xl p-6 flex flex-col gap-4">
         <SectionHeader
           title={label}
-          onEdit={onEdit}
-          showEditButton={isExistingPortfolio}
+          onEdit={handleEdit}
+          onTextCancel={handleTextClose}
+          showEditButton={!isEditMode}
+          showTextCloseButton={isEditMode}
+          showCloseButton={false}
           showInfo={showInfo}
           infoContent={infoContent}
         />
@@ -117,8 +128,10 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
           readOnly={isExistingPortfolio && !onUserChange}
           isEditing={isEditing}
           labelSuffix={userType}
+          isLocked={isLocked}
+          lockMessage={lockMessage}
         />
-        {isEditing && (
+        {isEditing && isEditMode && (
           <IconLinkButton
             label={`Add ${userType}`}
             onClick={() =>
@@ -130,7 +143,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
         )}
       </div>
 
-      {/* Modal overlays */}
       {showNewUserModal && (
         <div className="fixed inset-0 z-50">
           <div className="relative z-50">

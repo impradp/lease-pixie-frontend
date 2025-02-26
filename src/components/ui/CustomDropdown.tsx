@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { DropdownOption } from "@/types/user";
+import { X } from "lucide-react";
 
 interface CustomDropdownProps {
   label?: string;
@@ -10,6 +11,8 @@ interface CustomDropdownProps {
   readOnly?: boolean;
   isEditing: boolean;
   labelSuffix?: string;
+  isLocked: boolean;
+  lockMessage: string;
 }
 
 export const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -20,6 +23,8 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   readOnly = false,
   isEditing,
   labelSuffix = "",
+  lockMessage,
+  isLocked,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | "undefined">(
@@ -35,7 +40,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   }, [value]);
 
   // Find the selected option based on the selectedValue state
-  const selectedOption = selectedValue
+  const selectedOption = isLocked
+    ? { label: lockMessage, value: "" }
+    : selectedValue
     ? options.find((option) => option.value === selectedValue)
     : options.find((option) => option.value === "");
 
@@ -106,7 +113,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           className={`px-3.5 py-2.5 bg-card-input-fill min-h-[76px] rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center justify-between ${
-            isEditing && !readOnly ? "cursor-pointer" : "cursor-default"
+            isEditing && !readOnly && !isLocked
+              ? "cursor-pointer"
+              : "cursor-default"
           }`}
           aria-label={label || `Selected ${labelSuffix}`}
           aria-haspopup="listbox"
@@ -123,12 +132,14 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
               </div>
             )}
           </div>
-          {isEditing && !readOnly && (
-            <ChevronDown className="w-5 h-5 text-card-icon" />
+          {isEditing && !readOnly && !isLocked && (
+            <ChevronDown className="w-5 h-5 text-card-open-icon " />
           )}
+
+          {isLocked && <X className="w-5 h-5 text-card-open-icon " />}
         </div>
 
-        {isOpen && (
+        {isOpen && !isLocked && (
           <ul
             id={`${inputId}-options`}
             role="listbox"

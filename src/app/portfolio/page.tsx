@@ -23,11 +23,26 @@ export default function PortfolioPage() {
   const messages = getMessages(locale);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<
+  const [isSecondaryUserLocked, setIsSecondaryUserLocked] = useState(true);
+  const [isSecondaryVendorLocked, setIsSecondaryVendorLocked] = useState(true);
+  const [isTertiaryVendorLocked, setIsTertiaryVendorLocked] = useState(true);
+  const [primarySelectedUser, setPrimarySelectedUser] = useState<
+    DropdownOption | undefined
+  >();
+  const [secondarySelectedUser, setSecondarySelectedUser] = useState<
+    DropdownOption | undefined
+  >();
+  const [primarySelectedVendor, setPrimarySelectedVendor] = useState<
+    DropdownOption | undefined
+  >();
+  const [secondarySelectedVendor, setSecondarySelectedVendor] = useState<
+    DropdownOption | undefined
+  >();
+  const [tertiarySelectedVendor, setTertiarySelectedVendor] = useState<
     DropdownOption | undefined
   >();
 
-  //TODO: Fetch portfolio data
+  // TODO: Fetch portfolio data
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [portfolioName, setPortfolioName] = useState(
     isExistingPortfolio ? "Grizwald Realty Company" : ""
@@ -38,8 +53,33 @@ export default function PortfolioPage() {
   };
 
   const handleSubmit = () => {
-    //TODO: Implement submit logic
+    // TODO: Implement submit logic
     setIsPopupOpen(true);
+  };
+
+  // Automatically select the empty option in secondary when primary is selected
+  const handlePrimaryUserChange = (user: DropdownOption) => {
+    setPrimarySelectedUser(user);
+    if (user && user.value != "") {
+      setIsSecondaryUserLocked(false);
+      const emptyOption = sampleSecondaryUsers.find((opt) => opt.value === "");
+      if (emptyOption) {
+        setSecondarySelectedUser(emptyOption);
+      }
+    }
+  };
+
+  const handlePrimaryVendorChange = (user: DropdownOption) => {
+    setPrimarySelectedVendor(user);
+    if (user && user.value != "") {
+      setIsSecondaryVendorLocked(false);
+      setIsTertiaryVendorLocked(false);
+      const emptyOption = sampleVendorUsers.find((opt) => opt.value === "");
+      if (emptyOption) {
+        setSecondarySelectedVendor(emptyOption);
+        setTertiarySelectedVendor(emptyOption);
+      }
+    }
   };
 
   return (
@@ -79,55 +119,58 @@ export default function PortfolioPage() {
           <PortfolioUser
             label={messages?.portfolio?.user?.title}
             users={samplePrimaryUsers}
-            selectedUser={selectedUser}
-            onUserChange={isEditing ? setSelectedUser : undefined}
-            onEdit={handleEdit}
+            selectedUser={primarySelectedUser}
+            onUserChange={handlePrimaryUserChange}
             isExistingPortfolio={isExistingPortfolio}
+            isLocked={false}
           />
 
           <PortfolioUser
             label={messages?.portfolio?.user?.titleSecondary}
             users={sampleSecondaryUsers}
-            selectedUser={selectedUser}
-            onUserChange={isEditing ? setSelectedUser : undefined}
-            onEdit={handleEdit}
+            selectedUser={secondarySelectedUser}
+            onUserChange={isEditing ? setSecondarySelectedUser : undefined}
             isExistingPortfolio={isExistingPortfolio}
+            isLocked={isSecondaryUserLocked}
+            lockMessage={"Secondary user is not active"}
           />
 
           <PortfolioUser
             label={messages?.portfolio?.vendor?.title}
             users={sampleVendorUsers}
-            selectedUser={selectedUser}
-            onUserChange={isEditing ? setSelectedUser : undefined}
-            onEdit={handleEdit}
+            selectedUser={primarySelectedVendor}
+            onUserChange={handlePrimaryVendorChange}
             isExistingPortfolio={isExistingPortfolio}
             showInfo={true}
             userType="Vendor"
             infoContent={messages?.portfolio?.vendor?.primaryInfo}
+            isLocked={false}
           />
 
           <PortfolioUser
             label={messages?.portfolio?.vendor?.titleSecondary}
             users={sampleVendorUsers}
-            selectedUser={selectedUser}
-            onUserChange={isEditing ? setSelectedUser : undefined}
-            onEdit={handleEdit}
+            selectedUser={secondarySelectedVendor}
+            onUserChange={setSecondarySelectedVendor}
             isExistingPortfolio={isExistingPortfolio}
             showInfo={true}
             userType="Vendor"
             infoContent={messages?.portfolio?.vendor?.secondaryInfo}
+            isLocked={isSecondaryVendorLocked}
+            lockMessage={"Seat not active"}
           />
 
           <PortfolioUser
             label={messages?.portfolio?.vendor?.titleTertiary}
             users={sampleVendorUsers}
-            selectedUser={selectedUser}
-            onUserChange={isEditing ? setSelectedUser : undefined}
-            onEdit={handleEdit}
+            selectedUser={tertiarySelectedVendor}
+            onUserChange={setTertiarySelectedVendor}
             isExistingPortfolio={isExistingPortfolio}
             showInfo={true}
             userType="Vendor"
             infoContent={messages?.portfolio?.vendor?.tertiaryInfo}
+            isLocked={isTertiaryVendorLocked}
+            lockMessage={"Seat not active"}
           />
         </div>
 

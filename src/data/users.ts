@@ -10,7 +10,7 @@ export const samplePrimaryUsers: DropdownOption[] = [
 ];
 
 export const sampleSecondaryUsers: DropdownOption[] = [
-  { label: "Secondary user not active", value: "" },
+  { label: "Select user", value: "" },
   { label: "John Doe", value: "johndoe@email.com" },
   { label: "Simon Cowell", value: "simoncowell@email.com" },
   { label: "Ms Roxy", value: "ms.roxy@email.com" },
@@ -18,7 +18,7 @@ export const sampleSecondaryUsers: DropdownOption[] = [
 ];
 
 export const sampleVendorUsers: DropdownOption[] = [
-  { label: "Seat not active", value: "" },
+  { label: "Select vendor", value: "" },
   { label: "John Doe", value: "A TLC, North Texas" },
   { label: "Simon Cowell", value: "B LLC, New York, Santa Monica" },
   { label: "Ms Roxy", value: "X Technologies, Smith Fort" },

@@ -63,7 +63,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-xl w-full max-w-lg mx-4 min-h-screen max-h-[90vh] overflow-y-auto flex flex-col">
         <div className="p-6 flex-shrink-0">
           <div className="flex justify-between items-center">
             <SectionHeader
@@ -181,19 +181,16 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 label="Get insurance certificate"
               />
             </div>
+            <div className="flex flex-col gap-3 pb-6">
+              <PixieButton
+                label={messages?.portfolio?.vendor?.modal?.button?.label}
+                disabled={false}
+                type={messages?.portfolio?.vendor?.modal?.button?.type}
+                formId="new-vendor-form"
+              />
+              <CancelButton onClick={onClose} />
+            </div>
           </form>
-        </div>
-
-        <div className="p-6 border-t border-gray-200 flex-shrink-0">
-          <div className="flex flex-col gap-3">
-            <PixieButton
-              label={messages?.portfolio?.vendor?.modal?.button?.label}
-              disabled={false}
-              type={messages?.portfolio?.vendor?.modal?.button?.type}
-              formId="new-vendor-form"
-            />
-            <CancelButton onClick={onClose} />
-          </div>
         </div>
       </div>
     </div>

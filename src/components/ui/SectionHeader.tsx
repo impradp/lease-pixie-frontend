@@ -5,9 +5,11 @@ import Image from "next/image";
 interface SectionHeaderProps {
   title: string;
   onEdit?: () => void;
-  onClose?: () => void;
+  onClose?: () => void; // For the X button
+  onTextCancel?: () => void; // For the new text-based Close button
   showEditButton?: boolean;
-  showCloseButton?: boolean;
+  showCloseButton?: boolean; // For the X button
+  showTextCloseButton?: boolean; // For the new text-based Close button
   showInfo?: boolean;
   infoContent?: string;
 }
@@ -16,8 +18,10 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   onEdit,
   onClose,
+  onTextCancel,
   showEditButton = false,
   showCloseButton = false,
+  showTextCloseButton = false,
   showInfo = false,
   infoContent = "",
 }) => {
@@ -32,7 +36,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
         const spaceOnRight = window.innerWidth - rect.right;
-        //Automate proper positioning where there is space.
         setTooltipPosition(spaceOnRight < 350 ? "right" : "left");
       }
     };
@@ -103,6 +106,14 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           className="text-card-open-icon text-sm font-semibold font-['Inter'] underline leading-tight"
         >
           Edit
+        </button>
+      )}
+      {showTextCloseButton && onTextCancel && (
+        <button
+          onClick={onTextCancel}
+          className="text-card-open-icon text-sm font-semibold font-['Inter'] underline leading-tight"
+        >
+          Cancel
         </button>
       )}
       {showCloseButton && onClose && (
