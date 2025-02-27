@@ -128,7 +128,8 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             </div>
             {selectedOption?.label && (
               <div className="text-card-input-regular text-base font-normal font-['Inter'] leading-normal">
-                {selectedOption.value}
+                {selectedOption.value || "\u00A0"}{" "}
+                {/* Non-breaking space if empty */}
               </div>
             )}
           </div>
@@ -173,7 +174,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                     </div>
                     {option.value !== option.label && (
                       <div className="text-dropdown-regular text-base font-normal font-['Inter'] leading-normal">
-                        {option.value}
+                        {option.value || "\u00A0"}
                       </div>
                     )}
                   </div>

@@ -16,13 +16,11 @@ import { Locale } from "@/locales";
 import Link from "next/link";
 
 export default function PortfolioPage() {
-  const portfolioId = "";
-  const isExistingPortfolio = !!portfolioId;
-
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isSecondaryUserLocked, setIsSecondaryUserLocked] = useState(true);
   const [isSecondaryVendorLocked, setIsSecondaryVendorLocked] = useState(true);
   const [isTertiaryVendorLocked, setIsTertiaryVendorLocked] = useState(true);
@@ -42,25 +40,19 @@ export default function PortfolioPage() {
     DropdownOption | undefined
   >();
 
-  // TODO: Fetch portfolio data
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [portfolioName, setPortfolioName] = useState(
-    isExistingPortfolio ? "Grizwald Realty Company" : ""
-  );
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
   const handleSubmit = () => {
-    // TODO: Implement submit logic
     setIsPopupOpen(true);
   };
 
-  // Automatically select the empty option in secondary when primary is selected
   const handlePrimaryUserChange = (user: DropdownOption) => {
     setPrimarySelectedUser(user);
-    if (user && user.value != "") {
+    if (user && user.value !== "") {
       setIsSecondaryUserLocked(false);
       const emptyOption = sampleSecondaryUsers.find((opt) => opt.value === "");
       if (emptyOption) {
@@ -71,7 +63,7 @@ export default function PortfolioPage() {
 
   const handlePrimaryVendorChange = (user: DropdownOption) => {
     setPrimarySelectedVendor(user);
-    if (user && user.value != "") {
+    if (user && user.value !== "") {
       setIsSecondaryVendorLocked(false);
       setIsTertiaryVendorLocked(false);
       const emptyOption = sampleVendorUsers.find((opt) => opt.value === "");
@@ -80,6 +72,14 @@ export default function PortfolioPage() {
         setTertiarySelectedVendor(emptyOption);
       }
     }
+  };
+
+  const handleSectionEdit = (section: string) => {
+    setEditingSection(section);
+  };
+
+  const handleSectionClose = () => {
+    setEditingSection(null);
   };
 
   return (
@@ -96,14 +96,12 @@ export default function PortfolioPage() {
               </span>
             </Link>
           </div>
-
           <div className="text-right mt-1">
             <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
               Add Portfolio
             </span>
           </div>
         </div>
-        {/* Layout for screens <= 431px (single line, right-aligned) */}
         <div className="flex xs:hidden items-center justify-end w-full">
           <Link
             href="/account/dashboard"
@@ -122,12 +120,12 @@ export default function PortfolioPage() {
       <div className="max-w-[800px] mx-auto space-y-8">
         <div className="space-y-8">
           <PortfolioCard
-            portfolioName={portfolioName}
+            portfolioName=""
             onEdit={handleEdit}
-            isExistingPortfolio={isExistingPortfolio}
-            onNameChange={
-              isEditing || !isExistingPortfolio ? setPortfolioName : undefined
-            }
+            sectionId="portfolioCard"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
 
           <PortfolioUser
@@ -135,8 +133,11 @@ export default function PortfolioPage() {
             users={samplePrimaryUsers}
             selectedUser={primarySelectedUser}
             onUserChange={handlePrimaryUserChange}
-            isExistingPortfolio={isExistingPortfolio}
             isLocked={false}
+            sectionId="primaryUser" // Unique identifier for this section
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
 
           <PortfolioUser
@@ -144,9 +145,12 @@ export default function PortfolioPage() {
             users={sampleSecondaryUsers}
             selectedUser={secondarySelectedUser}
             onUserChange={isEditing ? setSecondarySelectedUser : undefined}
-            isExistingPortfolio={isExistingPortfolio}
             isLocked={isSecondaryUserLocked}
             lockMessage={"Secondary user is not active"}
+            sectionId="secondaryUser"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
 
           <PortfolioUser
@@ -154,11 +158,14 @@ export default function PortfolioPage() {
             users={sampleVendorUsers}
             selectedUser={primarySelectedVendor}
             onUserChange={handlePrimaryVendorChange}
-            isExistingPortfolio={isExistingPortfolio}
             showInfo={true}
             userType="Vendor"
             infoContent={messages?.portfolio?.vendor?.primaryInfo}
             isLocked={false}
+            sectionId="primaryVendor"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
 
           <PortfolioUser
@@ -166,12 +173,15 @@ export default function PortfolioPage() {
             users={sampleVendorUsers}
             selectedUser={secondarySelectedVendor}
             onUserChange={setSecondarySelectedVendor}
-            isExistingPortfolio={isExistingPortfolio}
             showInfo={true}
             userType="Vendor"
             infoContent={messages?.portfolio?.vendor?.secondaryInfo}
             isLocked={isSecondaryVendorLocked}
             lockMessage={"Seat not active"}
+            sectionId="secondaryVendor"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
 
           <PortfolioUser
@@ -179,12 +189,15 @@ export default function PortfolioPage() {
             users={sampleVendorUsers}
             selectedUser={tertiarySelectedVendor}
             onUserChange={setTertiarySelectedVendor}
-            isExistingPortfolio={isExistingPortfolio}
             showInfo={true}
             userType="Vendor"
             infoContent={messages?.portfolio?.vendor?.tertiaryInfo}
             isLocked={isTertiaryVendorLocked}
             lockMessage={"Seat not active"}
+            sectionId="tertiaryVendor"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
         </div>
 

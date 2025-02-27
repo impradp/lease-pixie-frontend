@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import { NewVendorFormData } from "@/types/vendor";
 import { NewUserFormData, DropdownOption } from "@/types/user";
 import { NewVendor } from "@/components/portfolio/NewVendor";
@@ -10,12 +9,13 @@ import { NewPortfolioUser } from "@/components/portfolio/NewPortfolioUser";
 import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
 import { getMessages } from "@/locales/loader";
 import { Locale } from "@/locales";
+import PixieButton from "@/components/buttons/PixieButton";
+import CancelButton from "@/components/buttons/CancelButton";
 
 interface PortfolioUserProps {
   label?: string;
   selectedUser?: DropdownOption;
   onUserChange?: (user: DropdownOption) => void;
-  isExistingPortfolio?: boolean;
   users: DropdownOption[];
   onAddUser?: (userData: NewUserFormData) => void;
   onAddVendor?: (vendorData: NewVendorFormData) => void;
@@ -24,13 +24,16 @@ interface PortfolioUserProps {
   userType?: string;
   isLocked: boolean;
   lockMessage?: string;
+  sectionId: string;
+  editingSection: string | null;
+  onSectionEdit: (section: string) => void;
+  onSectionClose: () => void;
 }
 
 export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   label = "",
   selectedUser,
   onUserChange,
-  isExistingPortfolio = false,
   users,
   onAddUser,
   onAddVendor,
@@ -39,6 +42,10 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   userType = "Portfolio User",
   isLocked = false,
   lockMessage = "Seat not active",
+  sectionId,
+  editingSection,
+  onSectionEdit,
+  onSectionClose,
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showNewVendorModal, setShowNewVendorModal] = useState(false);
@@ -48,7 +55,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     message: "",
   });
   const [isEditMode, setIsEditMode] = useState(false);
-  const isEditing = !isExistingPortfolio || !!onUserChange;
+  const isEditing = isEditMode; // Editing is only true when in edit mode
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
@@ -101,45 +108,67 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   };
 
   const handleEdit = () => {
-    setIsEditMode(true);
+    if (editingSection === null || editingSection === sectionId) {
+      setIsEditMode(true);
+      onSectionEdit(sectionId);
+    }
   };
 
   const handleTextClose = () => {
     setIsEditMode(false);
+    onSectionClose();
   };
+
+  const isEditDisabled =
+    editingSection !== null && editingSection !== sectionId;
 
   return (
     <>
-      <div className="bg-card-open-fill rounded-xl p-6 flex flex-col gap-4">
+      <div
+        className={`rounded-xl p-6 flex flex-col gap-4 ${
+          isEditMode ? "bg-card-open-fill" : "bg-card-close-fill"
+        }`}
+      >
         <SectionHeader
           title={label}
           onEdit={handleEdit}
           onTextCancel={handleTextClose}
-          showEditButton={!isEditMode}
-          showTextCloseButton={isEditMode}
-          showCloseButton={false}
+          showEditButton={!isEditMode} // Show Edit button when not in edit mode
+          showTextCloseButton={isEditMode} // Show Cancel button when in edit mode
           showInfo={showInfo}
           infoContent={infoContent}
+          editDisabled={isEditDisabled}
         />
         <CustomDropdown
           options={users}
           value={selectedUser?.value}
           onChange={onUserChange}
-          readOnly={isExistingPortfolio && !onUserChange}
-          isEditing={isEditing}
+          readOnly={!isEditing} // Read-only unless in edit mode
+          isEditing={isEditing} // Enable editing UI only when in edit mode
           labelSuffix={userType}
           isLocked={isLocked}
           lockMessage={lockMessage}
         />
-        {isEditing && isEditMode && (
-          <IconLinkButton
-            label={`Add ${userType}`}
-            onClick={() =>
-              userType === messages?.portfolio?.user?.commonName
-                ? setShowNewUserModal(true)
-                : setShowNewVendorModal(true)
-            }
-          />
+        {isEditMode && (
+          <>
+            <IconLinkButton
+              label={`Add ${userType}`}
+              onClick={() =>
+                userType === messages?.portfolio?.user?.commonName
+                  ? setShowNewUserModal(true)
+                  : setShowNewVendorModal(true)
+              }
+            />
+            <div className="flex flex-col gap-3">
+              <PixieButton
+                label="Update"
+                disabled={false}
+                onClick={handleTextClose}
+                className="w-full"
+              />
+              <CancelButton onClick={handleTextClose} />
+            </div>
+          </>
         )}
       </div>
 

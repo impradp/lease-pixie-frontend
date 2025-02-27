@@ -12,6 +12,7 @@ interface SectionHeaderProps {
   showTextCloseButton?: boolean; // For the new text-based Close button
   showInfo?: boolean;
   infoContent?: string;
+  editDisabled?: boolean; // New prop to disable the Edit button
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -24,6 +25,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   showTextCloseButton = false,
   showInfo = false,
   infoContent = "",
+  editDisabled = false, // Default to false
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<"left" | "right">(
@@ -103,7 +105,10 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {showEditButton && onEdit && (
         <button
           onClick={onEdit}
-          className="text-card-open-icon text-sm font-semibold font-['Inter'] underline leading-tight"
+          className={`text-card-open-icon text-sm font-semibold font-['Inter'] underline leading-tight ${
+            editDisabled ? "cursor-not-allowed" : ""
+          }`}
+          disabled={editDisabled}
         >
           Edit
         </button>

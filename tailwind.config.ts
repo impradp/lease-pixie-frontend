@@ -29,10 +29,13 @@ const config: Config = {
         card: {
           open: {
             regular: "#101828",
-            fill: "#F9F9F9",
+            fill: "#FDFDFD",
             stroke: "#D0D5DD",
             icon: "#475467",
             link: "#0C111D",
+          },
+          close: {
+            fill: "#F9F9F9",
           },
           input: {
             fill: "#FFFFFF",
