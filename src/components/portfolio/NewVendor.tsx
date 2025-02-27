@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import { NewVendorFormData } from "@/types/vendor";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -8,6 +7,7 @@ import CancelButton from "@/components/buttons/CancelButton";
 import { CustomCheckbox } from "@/components/ui/CustomCheckbox";
 import { getMessages } from "@/locales/loader";
 import { Locale } from "@/locales";
+import { AddressAutocompleteInput } from "@/components/ui/AddressAutoCompleteInput";
 
 interface NewVendorProps {
   onClose: () => void;
@@ -32,11 +32,9 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
 
-  // Add the scroll lock with scrollbar width compensation
   useEffect(() => {
     const scrollbarWidth =
       window.innerWidth - document.documentElement.clientWidth;
-
     const originalPadding = window.getComputedStyle(document.body).paddingRight;
 
     document.body.style.paddingRight = `${scrollbarWidth}px`;
@@ -99,13 +97,15 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               placeholder="i.e. Electrician"
             />
 
-            <CustomInput
+            <AddressAutocompleteInput
               label="Company Address"
               value={formData.companyAddress}
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, companyAddress: value }))
               }
               isEditing={true}
+              placeholder="Start typing address..."
+              inputId="company-address-input"
             />
 
             <CustomInput
