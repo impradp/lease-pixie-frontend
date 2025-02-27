@@ -23,3 +23,29 @@ body {
 .bg-custom-gradient {
   background: linear-gradient(to top, #81bbbb, #2d566d);
 }
+
+/* Wrapper for the entire autocomplete input */
+.autocomplete-input-wrapper {
+  position: relative;
+}
+
+/* Container for input and suggestions */
+.autocomplete-input-container {
+  position: relative;
+}
+
+/* Loading state */
+.autocomplete-loading {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Error message */
+.autocomplete-error {
+  color: #721c24;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: block;
+}
