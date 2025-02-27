@@ -84,28 +84,42 @@ export default function PortfolioPage() {
 
   return (
     <>
-      {/* Breadcrumb navigation - at the top of the main content */}
-      <div className="hidden xs:flex flex-col items-end text-xs mb-8">
-        <div className="text-right mt-1">
-          <span className="text-primary-fade font-normal font-['Inter'] leading-tight ">
-            Account Dashboard
-          </span>
+      <div className="flex items-end justify-end text-xs mb-8 mt-2">
+        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-end">
+          <div className="text-right mt-1">
+            <Link
+              href="/account/dashboard"
+              className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
+            >
+              <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
+                Account Dashboard -&gt;
+              </span>
+            </Link>
+          </div>
+
+          <div className="text-right mt-1">
+            <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
+              Add Portfolio
+            </span>
+          </div>
+        </div>
+        {/* Layout for screens <= 431px (single line, right-aligned) */}
+        <div className="flex xs:hidden items-center justify-end w-full">
           <Link
             href="/account/dashboard"
             className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
           >
-            -&gt;
+            <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
+              Account Dashboard -&gt;
+            </span>
           </Link>
-        </div>
-
-        <div className="text-right mt-1">
-          <span className="text-primary-regular font-normal font-['Inter'] leading-tight">
+          <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
             Add Portfolio
           </span>
         </div>
       </div>
 
-      <div className="max-w-[1180px] mx-auto space-y-8">
+      <div className="max-w-[800px] mx-auto space-y-8">
         <div className="space-y-8">
           <PortfolioCard
             portfolioName={portfolioName}
