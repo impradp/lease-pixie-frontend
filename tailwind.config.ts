@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       screens: {
-        xs: "431px", // Custom breakpoint for mobile devices
+        xs: "431px",
       },
       colors: {
         primary: {
@@ -51,6 +51,12 @@ const config: Config = {
           regular: "#667085",
           selected: "#ECECEC",
           stroke: "#D0D5DD",
+        },
+        menu: {
+          background: "rgba(255, 255, 255, 0.6)",
+          header: "#292e33",
+          signout: "#292e33",
+          text: "#000000",
         },
       },
       fontFamily: {

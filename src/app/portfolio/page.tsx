@@ -86,9 +86,9 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <div className="flex items-end justify-end text-xs mb-8 mt-2">
-        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-end">
-          <div className="text-right mt-1">
+      <div className="flex items-end justify-end text-xs mb-8">
+        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-end pr-1">
+          <div className="text-right">
             <Link
               href="/account/dashboard"
               className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
@@ -203,12 +203,12 @@ export default function PortfolioPage() {
           />
         </div>
 
-        <div className="pt-8">
+        <div className="pt-8 flex justify-center">
           <PixieButton
             label={messages?.portfolio?.button?.label}
             disabled={false}
             onClick={handleSubmit}
-            className="w-full"
+            className="w-1/2"
           />
         </div>
       </div>

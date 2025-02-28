@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { DropdownOption } from "@/types/user";
-import { X } from "lucide-react";
 
 interface CustomDropdownProps {
   label?: string;
@@ -137,7 +136,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             <ChevronDown className="w-5 h-5 text-card-open-icon " />
           )}
 
-          {isLocked && <X className="w-5 h-5 text-card-open-icon " />}
+          {isLocked && <ChevronDown className="w-5 h-5 text-card-open-icon " />}
         </div>
 
         {isOpen && !isLocked && (

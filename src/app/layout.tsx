@@ -2,6 +2,10 @@ import "./globals.css";
 import { inter, myanmarKhyay } from "./fonts";
 import PixieNavbar from "@/components/layout/PixieNavbar";
 
+export const metadata = {
+  title: "Lease Pixie",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -11,7 +15,6 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${myanmarKhyay.variable}`}>
       <body className="min-h-screen bg-custom-gradient">
         <PixieNavbar />
-
         <main className="max-w-[1180px] mx-auto px-auto pb-6">{children}</main>
       </body>
     </html>
