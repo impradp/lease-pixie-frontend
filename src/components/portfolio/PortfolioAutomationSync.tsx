@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from "react";
 
 import { RefreshCcw } from "lucide-react";
-import PixieButton from "@/components/buttons/PixieButton";
-import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
-import CancelButton from "@/components/buttons/CancelButton";
-import { PixieDropdown } from "@/components/ui/PixieDropdown";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { PixieMonthPicker } from "@/components/ui/PixieMonthPicker";
+import PixieButton from "@/components/ui/buttons/PixieButton";
+import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
+import CancelButton from "@/components/ui/buttons/CancelButton";
+import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
+import { SectionHeader } from "@/components/ui/header/SectionHeader";
+import { PixieMonthPicker } from "@/components/ui/datePicker/PixieMonthPicker";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
 
 interface PortfolioAutomationSyncProps {
@@ -52,7 +52,7 @@ export const PortfolioAutomationSync: React.FC<
   const [operatingExpenseProcessing, setOperatingExpenseProcessing] =
     useState(false);
   const [operatingExpenseProcessingValue, setOperatingExpenseProcessingValue] =
-    useState("January 20");
+    useState("January 7");
   const [realEstateTaxRequests, setRealEstateTaxRequests] = useState(false);
   const [realEstateTaxRequestsValue, setRealEstateTaxRequestsValue] =
     useState("Select");
@@ -89,7 +89,7 @@ export const PortfolioAutomationSync: React.FC<
   ] = useState("$5,000");
   const [vendor1099Processing, setVendor1099Processing] = useState(false);
   const [vendor1099ProcessingValue, setVendor1099ProcessingValue] =
-    useState("July 1");
+    useState("January 7");
 
   // Temporary state (all strings)
   const [tempSyncAutomation, setTempSyncAutomation] = useState(syncAutomation);
@@ -836,6 +836,7 @@ export const PortfolioAutomationSync: React.FC<
             </div>
 
             <div className="flex flex-col gap-4">
+              {/* Row 1: Maintenance work approvals and Property group approval */}
               <div className="flex flex-col gap-4 xs:flex-row xs:items-center xs:justify-between xs:gap-[50px]">
                 <div className="flex items-center gap-3">
                   <span className="text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
@@ -851,7 +852,7 @@ export const PortfolioAutomationSync: React.FC<
                     Maintenance work approvals in workflows
                   </span>
                 </div>
-                <div className="flex flex-col gap-4 w-full xs:w-auto">
+                <div className="w-full xs:w-auto">
                   <PixieDropdown
                     label="Property group approval over"
                     options={maintenanceWorkApprovalsPropertyGroupOptions}
@@ -862,17 +863,20 @@ export const PortfolioAutomationSync: React.FC<
                     isEditing={isEditing}
                     readOnly={!isEditing}
                   />
-                  <PixieDropdown
-                    label="Portfolio user approval over"
-                    options={maintenanceWorkApprovalsPortfolioUserOptions}
-                    value={tempMaintenanceWorkApprovalsPortfolioUserValue}
-                    onChange={handleDropdownChange(
-                      setTempMaintenanceWorkApprovalsPortfolioUserValue
-                    )}
-                    isEditing={isEditing}
-                    readOnly={!isEditing}
-                  />
                 </div>
+              </div>
+              {/* Row 2: Portfolio user approval */}
+              <div className="w-full xs:w-auto flex justify-end">
+                <PixieDropdown
+                  label="Portfolio user approval over"
+                  options={maintenanceWorkApprovalsPortfolioUserOptions}
+                  value={tempMaintenanceWorkApprovalsPortfolioUserValue}
+                  onChange={handleDropdownChange(
+                    setTempMaintenanceWorkApprovalsPortfolioUserValue
+                  )}
+                  isEditing={isEditing}
+                  readOnly={!isEditing}
+                />
               </div>
             </div>
 

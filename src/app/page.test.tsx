@@ -10,9 +10,9 @@ describe("Home Page", () => {
     jest.clearAllMocks();
   });
 
-  it("redirects to portfolio page", () => {
+  it("redirects to login page", () => {
     Home(); // Call the function directly, not as JSX
-    expect(redirect).toHaveBeenCalledWith("/portfolio");
+    expect(redirect).toHaveBeenCalledWith("/login");
   });
 
   // If PixieButton is supposed to exist, it’s not in this version of Home,

@@ -130,3 +130,10 @@ body {
 .animate-spin-5s {
   animation: spinClockwise 5s linear infinite;
 }
+
+.workflow-item-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

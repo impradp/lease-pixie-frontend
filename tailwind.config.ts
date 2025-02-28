@@ -13,6 +13,9 @@ const config: Config = {
       },
       screens: {
         xs: "431px",
+        md: "600px", // Matches old build's @media (max-width: 600px)
+        lg: "1360px", // Matches old build's desktop layout
+        custom: "1180px",
       },
       colors: {
         primary: {
@@ -36,6 +39,22 @@ const config: Config = {
           light: "#475466",
           stroke: "#cfd4dc",
           space: "#f5f6f5",
+          charcoalGrey: "#424242",
+          blueTint: "#D0D5DD",
+          midnightBlue: "#0C111D",
+          charcoalBlue: "#475467",
+          offWhite: "#FDFDFD",
+          mediumGrey: "#BBBBBB",
+          tealBlue: "#2790ac",
+          mutedSalmon: "#C76961",
+          cornflowerBlue: "#5CA0FF",
+          saffronYellow: "#F5D654",
+          silverGray: "#CECECE",
+          vermilion: "#d92c20",
+          slateBlue: "#344053",
+          deepNavy: "#0f1728",
+          ghostWhite: "#eaecf0",
+          slateMist: "#667084",
         },
         card: {
           open: {
