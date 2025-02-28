@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { CustomInput } from "@/components/ui/CustomInput";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { getMessages } from "@/locales/loader";
+
 import { Locale } from "@/locales";
+import { getMessages } from "@/locales/loader";
+import { CustomInput } from "@/components/ui/CustomInput";
 import PixieButton from "@/components/buttons/PixieButton";
 import CancelButton from "@/components/buttons/CancelButton";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 interface PortfolioCardProps {
   portfolioName: string;
@@ -26,7 +27,9 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
   onSectionClose,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const isEditing = isEditMode; // Editing is only true when in edit mode
+  const [originalName, setOriginalName] = useState(portfolioName); // Store original value
+  const [editedName, setEditedName] = useState(portfolioName); // Track edited value
+  const isEditing = isEditMode;
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
@@ -41,7 +44,19 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
 
   const handleTextClose = () => {
     setIsEditMode(false);
+    setEditedName(originalName); // Revert to original value
     onSectionClose();
+  };
+
+  const handleTextUpdate = () => {
+    setIsEditMode(false);
+    setOriginalName(editedName); // Update original value with edited value
+    onSectionClose();
+  };
+
+  const handleNameChange = (value: string) => {
+    setEditedName(value);
+    if (onNameChange) onNameChange(value);
   };
 
   const isEditDisabled =
@@ -57,23 +72,23 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
         title={messages?.portfolio?.name}
         onEdit={handleEdit}
         onTextCancel={handleTextClose}
-        showEditButton={!isEditMode} // Show Edit button when not in edit mode
-        showTextCloseButton={isEditMode} // Show Cancel button when in edit mode
+        showEditButton={!isEditMode}
+        showTextCloseButton={isEditMode}
         editDisabled={isEditDisabled}
       />
       <CustomInput
         label={messages?.portfolio?.name}
-        value={portfolioName}
-        onChange={onNameChange}
-        readOnly={!isEditing} // Read-only unless in edit mode
-        isEditing={isEditing} // Enable editing UI only when in edit mode
+        value={editedName} // Use edited value
+        onChange={handleNameChange}
+        readOnly={!isEditing}
+        isEditing={isEditing}
       />
       {isEditMode && (
         <div className="flex flex-col gap-3">
           <PixieButton
             label="Update"
             disabled={false}
-            onClick={handleTextClose}
+            onClick={handleTextUpdate}
             className="w-full"
           />
           <CancelButton onClick={handleTextClose} />

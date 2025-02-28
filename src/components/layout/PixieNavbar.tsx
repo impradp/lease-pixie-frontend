@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+
 import SidebarMenu from "@/components/menus/SidebarMenu";
 
 const PixieNavbar = () => {
@@ -27,7 +28,7 @@ const PixieNavbar = () => {
                 alt="Primary Icon"
                 width={22}
                 height={22}
-                className="mr-2 object-contain"
+                className="mr-2 object-contain pb-2"
               />
               <Image
                 src="/icons/leasepixie-icon-char.svg"

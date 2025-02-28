@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { NewVendorFormData } from "@/types/vendor";
-import { NewUserFormData, DropdownOption } from "@/types/user";
-import { NewVendor } from "@/components/portfolio/NewVendor";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { CustomDropdown } from "@/components/ui/CustomDropdown";
-import { IconLinkButton } from "@/components/buttons/IconLinkButton";
-import { NewPortfolioUser } from "@/components/portfolio/NewPortfolioUser";
-import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
-import { getMessages } from "@/locales/loader";
+
 import { Locale } from "@/locales";
+import { getMessages } from "@/locales/loader";
+import { NewVendorFormData } from "@/types/vendor";
 import PixieButton from "@/components/buttons/PixieButton";
 import CancelButton from "@/components/buttons/CancelButton";
+import { NewVendor } from "@/components/portfolio/NewVendor";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { NewUserFormData, DropdownOption } from "@/types/user";
+import { CustomDropdown } from "@/components/ui/CustomDropdown";
+import { IconLinkButton } from "@/components/buttons/IconLinkButton";
+import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
+import { NewPortfolioUser } from "@/components/portfolio/NewPortfolioUser";
 
 interface PortfolioUserProps {
   label?: string;
@@ -55,7 +56,9 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     message: "",
   });
   const [isEditMode, setIsEditMode] = useState(false);
-  const isEditing = isEditMode; // Editing is only true when in edit mode
+  const [originalUser] = useState(selectedUser); // Store original selection
+  const [editedUser, setEditedUser] = useState(selectedUser); // Track edited selection
+  const isEditing = isEditMode;
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
@@ -116,7 +119,20 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 
   const handleTextClose = () => {
     setIsEditMode(false);
+    setEditedUser(originalUser); // Revert to original selection
     onSectionClose();
+  };
+
+  const handleUpdate = () => {
+    setIsEditMode(false);
+    if (onUserChange && editedUser) {
+      onUserChange(editedUser); // Update parent with new selection
+    }
+    onSectionClose();
+  };
+
+  const handleUserChange = (user: DropdownOption) => {
+    setEditedUser(user); // Update edited selection
   };
 
   const isEditDisabled =
@@ -133,18 +149,18 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
           title={label}
           onEdit={handleEdit}
           onTextCancel={handleTextClose}
-          showEditButton={!isEditMode} // Show Edit button when not in edit mode
-          showTextCloseButton={isEditMode} // Show Cancel button when in edit mode
+          showEditButton={!isEditMode}
+          showTextCloseButton={isEditMode}
           showInfo={showInfo}
           infoContent={infoContent}
           editDisabled={isEditDisabled}
         />
         <CustomDropdown
           options={users}
-          value={selectedUser?.value}
-          onChange={onUserChange}
-          readOnly={!isEditing} // Read-only unless in edit mode
-          isEditing={isEditing} // Enable editing UI only when in edit mode
+          value={editedUser?.value} // Use edited value
+          onChange={isEditing ? handleUserChange : undefined}
+          readOnly={!isEditing}
+          isEditing={isEditing}
           labelSuffix={userType}
           isLocked={isLocked}
           lockMessage={lockMessage}
@@ -163,7 +179,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
               <PixieButton
                 label="Update"
                 disabled={false}
-                onClick={handleTextClose}
+                onClick={handleUpdate} // Use new update handler
                 className="w-full"
               />
               <CancelButton onClick={handleTextClose} />

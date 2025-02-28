@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
-import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
+import Link from "next/link";
+
 import {
   samplePrimaryUsers,
   sampleSecondaryUsers,
   sampleVendorUsers,
 } from "@/data/users";
-import { DropdownOption } from "@/types/user";
-import PixieButton from "@/components/buttons/PixieButton";
-import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
-import { getMessages } from "@/locales/loader";
 import { Locale } from "@/locales";
-import Link from "next/link";
+import { DropdownOption } from "@/types/user";
+import { getMessages } from "@/locales/loader";
+import { ellipseCharacter } from "@/utils/textUtils";
+import PixieButton from "@/components/buttons/PixieButton";
+import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
+import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
+import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
 
 export default function PortfolioPage() {
   const [locale] = useState<Locale>("en");
@@ -92,13 +94,13 @@ export default function PortfolioPage() {
               className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
             >
               <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
-                Account Dashboard -&gt;
+                {ellipseCharacter("Account Dashboard", 30)} -&gt;
               </span>
             </Link>
           </div>
           <div className="text-right mt-1">
-            <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
-              Add Portfolio
+            <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1 pr-4">
+              {ellipseCharacter("Add Portfolio", 30)}
             </span>
           </div>
         </div>
@@ -108,11 +110,11 @@ export default function PortfolioPage() {
             className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
           >
             <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
-              Account Dashboard -&gt;
+              {ellipseCharacter("Account Dashboard", 30)} -&gt;
             </span>
           </Link>
           <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
-            Add Portfolio
+            {ellipseCharacter("Add Portfolio", 30)}
           </span>
         </div>
       </div>
