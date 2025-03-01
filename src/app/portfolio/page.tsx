@@ -86,35 +86,29 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <div className="flex items-start justify-end text-xs  mb-auto">
-        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-start pr-1 h-20">
-          <div className="text-right">
-            <Link
-              href="/account/dashboard"
-              className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
-            >
-              <span className="text-primary-fade font-normal font-['Inter'] leading-tight hover:text-primary-fill">
-                {ellipseCharacter("Account Dashboard", 50)} -&gt;
+      <div className="flex items-start justify-start text-xs  mb-auto">
+        <div className="hidden xs:flex xs:flex-col xs:items-start xs:justify-start h-20 space-y-1px">
+          <div className="text-right mb-[1px]">
+            <Link href="/account/dashboard">
+              <span className="text-primary-fade font-inter font-normal text-12 leading-16 hover:text-primary-regular">
+                -&gt; {ellipseCharacter("Account Dashboard", 50)}
               </span>
             </Link>
           </div>
-          <div className="text-right mt-1">
-            <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1 pr-4">
-              {ellipseCharacter("Add Portfolio", 50)}
+          <div className="text-right mb-[1px]">
+            <span className="text-primary-regular font-inter font-normal text-12 leading-16">
+              -&gt; {ellipseCharacter("Add Portfolio", 50)}
             </span>
           </div>
         </div>
-        <div className="flex xs:hidden items-center justify-end w-full">
-          <Link
-            href="/account/dashboard"
-            className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
-          >
-            <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
-              {ellipseCharacter("Account Dashboard", 50)} -&gt;
+        <div className="flex xs:hidden items-center justify-start w-full">
+          <Link href="/account/dashboard">
+            <span className="text-primary-fade font-inter font-normal text-12 leading-16 hover:text-primary-regular">
+              -&gt; {ellipseCharacter("Account Dashboard", 50)}
             </span>
           </Link>
-          <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
-            {ellipseCharacter("Add Portfolio", 50)}
+          <span className="text-primary-regular font-inter font-normal text-12 leading-16">
+            -&gt; {ellipseCharacter("Add Portfolio", 50)}
           </span>
         </div>
       </div>

@@ -118,7 +118,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               placeholder="800-555-1234"
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CustomInput
                 label="Vendor contact first name"
                 value={formData.vendorFirstName}
