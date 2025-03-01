@@ -58,6 +58,10 @@ const config: Config = {
           signout: "#292e33",
           text: "#000000",
         },
+        footer: {
+          fill: "#2a5598",
+          regular: "#FFFFFF",
+        },
       },
       fontFamily: {
         inter: ["var(--font-inter)"],

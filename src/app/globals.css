@@ -16,7 +16,7 @@ body {
 }
 
 .bg-custom-gradient {
-  background: linear-gradient(to top, #81bbbb, #2d566d);
+  background: linear-gradient(to bottom left, #2a5598 5%, #999999 100%);
 }
 
 /* Wrapper for the entire autocomplete input */
@@ -63,5 +63,61 @@ body {
     .sidebar-menu {
       padding: 10px 15px 20px !important;
     }
+  }
+}
+
+/* Add this to your globals.css */
+.opacity-fade {
+  animation: trippleFade 3s ease-in-out forwards;
+}
+
+@keyframes trippleFade {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  20% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* src/app/globals.css - Add these rules to your existing CSS */
+
+/* Fix for Safari/iOS SVG rendering */
+@supports (-webkit-touch-callout: none) {
+  svg {
+    shape-rendering: crispEdges !important;
+    text-rendering: geometricPrecision !important;
+  }
+
+  img[src$=".svg"] {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Higher specificity fix for Safari */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  _::-webkit-full-page-media,
+  _:future,
+  :root svg {
+    shape-rendering: crispEdges !important;
+    text-rendering: geometricPrecision !important;
   }
 }

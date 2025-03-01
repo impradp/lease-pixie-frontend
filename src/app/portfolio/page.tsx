@@ -86,21 +86,21 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <div className="flex items-end justify-end text-xs mb-8">
-        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-end pr-1">
+      <div className="flex items-start justify-end text-xs  mb-auto">
+        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-start pr-1 h-20">
           <div className="text-right">
             <Link
               href="/account/dashboard"
               className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
             >
-              <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
-                {ellipseCharacter("Account Dashboard", 30)} -&gt;
+              <span className="text-primary-fade font-normal font-['Inter'] leading-tight hover:text-primary-fill">
+                {ellipseCharacter("Account Dashboard", 50)} -&gt;
               </span>
             </Link>
           </div>
           <div className="text-right mt-1">
             <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1 pr-4">
-              {ellipseCharacter("Add Portfolio", 30)}
+              {ellipseCharacter("Add Portfolio", 50)}
             </span>
           </div>
         </div>
@@ -110,16 +110,16 @@ export default function PortfolioPage() {
             className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
           >
             <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
-              {ellipseCharacter("Account Dashboard", 30)} -&gt;
+              {ellipseCharacter("Account Dashboard", 50)} -&gt;
             </span>
           </Link>
           <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
-            {ellipseCharacter("Add Portfolio", 30)}
+            {ellipseCharacter("Add Portfolio", 50)}
           </span>
         </div>
       </div>
 
-      <div className="max-w-[800px] mx-auto space-y-8">
+      <div className="max-w-[800px] mt-10 mx-auto space-y-8">
         <div className="space-y-8">
           <PortfolioCard
             portfolioName=""
@@ -208,7 +208,7 @@ export default function PortfolioPage() {
             label={messages?.portfolio?.button?.label}
             disabled={false}
             onClick={handleSubmit}
-            className="w-1/2"
+            className="w-3/4"
           />
         </div>
       </div>
