@@ -42,11 +42,12 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
         className="sidebar-menu absolute top-full left-0 z-50 
-          bg-white/70 backdrop-blur-sm border border-card-input-stroke
+          bg-white/70 border border-card-input-stroke
           shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] rounded-[10px]
           w-[300px] p-5
           max-h-[calc(100vh-100%)] overflow-y-auto
           text-menu-text"
+        style={{ backdropFilter: "blur(4px)" }} // Raw CSS fallback
       >
         <dl className="m-0 p-0 flex flex-col gap-2">
           {menuItems.map((item, index) => (

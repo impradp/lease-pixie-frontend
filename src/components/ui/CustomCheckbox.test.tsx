@@ -13,7 +13,6 @@ const mockCheck = jest.fn((props: CheckProps) => (
 ));
 jest.mock("lucide-react", () => ({
   Check: (props: CheckProps) => {
-    console.log("Check called with props:", props); // Debug log
     return mockCheck(props);
   },
 }));

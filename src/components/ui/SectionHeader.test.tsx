@@ -5,10 +5,13 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 const mockX = jest.fn((props: { className?: string }) => (
   <svg data-testid="x-icon" {...props} />
 ));
+const mockInfo = jest.fn((props: { className?: string; size?: number }) => (
+  <svg data-testid="info-icon" {...props} />
+));
+
 jest.mock("lucide-react", () => ({
-  X: (props: { className?: string }) => {
-    return mockX(props);
-  },
+  X: (props: { className?: string }) => mockX(props),
+  Info: (props: { className?: string; size?: number }) => mockInfo(props),
 }));
 
 jest.mock("next/image", () => {
@@ -19,7 +22,7 @@ jest.mock("next/image", () => {
       alt={alt}
       width={width}
       height={height}
-      data-testid="info-icon"
+      data-testid="mock-next-image"
     />
   ));
 });
@@ -60,6 +63,24 @@ describe("SectionHeader", () => {
     expect(onEdit).toHaveBeenCalledTimes(1);
   });
 
+  it("shows edit button as disabled when editDisabled is true and does not trigger onEdit", () => {
+    const onEdit = jest.fn();
+    render(
+      <SectionHeader
+        {...defaultProps}
+        showEditButton={true}
+        onEdit={onEdit}
+        editDisabled={true}
+      />
+    );
+    const editButton = screen.getByText("Edit");
+    expect(editButton).toBeInTheDocument();
+    expect(editButton).toHaveClass("cursor-not-allowed");
+    expect(editButton).toHaveAttribute("disabled");
+    fireEvent.click(editButton);
+    expect(onEdit).not.toHaveBeenCalled();
+  });
+
   it("shows close button and triggers onClose when clicked", () => {
     const onClose = jest.fn();
     render(
@@ -91,6 +112,10 @@ describe("SectionHeader", () => {
     expect(screen.getByText("Description")).toBeInTheDocument();
     fireEvent.mouseLeave(infoButton.parentElement!);
     expect(screen.queryByText("Title:")).not.toBeInTheDocument();
+    expect(mockInfo).toHaveBeenCalledWith({
+      size: 20,
+      className: "text-icon-info",
+    });
   });
 
   it("positions tooltip on left when sufficient space on right", () => {

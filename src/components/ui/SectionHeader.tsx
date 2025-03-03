@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { X } from "lucide-react";
-import Image from "next/image";
+import { X, Info } from "lucide-react";
 
 interface SectionHeaderProps {
   title: string;
@@ -61,12 +60,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
             >
-              <Image
-                src="/icons/info-circle.svg"
-                alt=""
-                width={20}
-                height={20}
-              />
+              <Info size={20} className="text-icon-info" />
             </button>
             {showTooltip && (
               <div

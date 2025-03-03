@@ -71,16 +71,22 @@ body {
   0% {
     opacity: 0.6; /* Start at 60% opacity (40% transparency) */
   }
-  20% {
+  15% {
     opacity: 0.6; /* Stay at 60% opacity for 3s (20% of 15s) */
   }
-  40% {
-    opacity: 1; /* Reach 100% opacity after 3s more (6s total) */
+  30% {
+    opacity: 1; /* Stay at 60% opacity for 3s (20% of 15s) */
+  }
+  45% {
+    opacity: 0.6; /* Reach 100% opacity after 3s more (6s total) */
   }
   60% {
-    opacity: 0.6; /* Back to 60% opacity after 3s more (9s total) */
+    opacity: 1; /* Back to 60% opacity after 3s more (9s total) */
   }
-  80% {
+  75% {
+    opacity: 0.6; /* Reach 100% opacity after 3s more (12s total) */
+  }
+  90% {
     opacity: 1; /* Reach 100% opacity after 3s more (12s total) */
   }
   100% {
@@ -89,7 +95,7 @@ body {
 }
 
 .pulse-transparency {
-  animation: pulseFade 7.5s 1; /* 15s duration, runs once */
+  animation: pulseFade 5s 1; /* 1 *5 s duration, runs once */
   opacity: 0.6; /* Initial state - 60% opacity */
 }
 
@@ -106,9 +112,7 @@ body {
 }
 
 /* Higher specificity fix for Safari */
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  _::-webkit-full-page-media,
-  _:future,
+@supports (-webkit-touch-callout: none) and (-webkit-min-device-pixel-ratio: 0) {
   :root svg {
     shape-rendering: crispEdges !important;
     text-rendering: geometricPrecision !important;

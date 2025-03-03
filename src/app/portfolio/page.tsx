@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 import {
   samplePrimaryUsers,
@@ -11,7 +10,7 @@ import {
 import { Locale } from "@/locales";
 import { DropdownOption } from "@/types/user";
 import { getMessages } from "@/locales/loader";
-import { ellipseCharacter } from "@/utils/textUtils";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import PixieButton from "@/components/buttons/PixieButton";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
@@ -84,34 +83,19 @@ export default function PortfolioPage() {
     setEditingSection(null);
   };
 
+  const breadcrumbItems = [
+    { href: "/account/dashboard", label: "Account Dashboard" },
+    { href: "/portfolio/create", label: "Add Portfolio" },
+    {
+      href: "",
+      label: "Sync Settings For Portfolio #1 With Property #1",
+      isActive: true,
+    },
+  ];
+
   return (
     <>
-      <div className="flex items-start justify-start text-xs  mb-auto">
-        <div className="hidden xs:flex xs:flex-col xs:items-start xs:justify-start h-20 space-y-1px">
-          <div className="text-right mb-[1px]">
-            <Link href="/account/dashboard">
-              <span className="text-primary-fade font-inter font-normal text-12 leading-16 hover:text-primary-regular">
-                -&gt; {ellipseCharacter("Account Dashboard", 50)}
-              </span>
-            </Link>
-          </div>
-          <div className="text-right mb-[1px]">
-            <span className="text-primary-regular font-inter font-normal text-12 leading-16">
-              -&gt; {ellipseCharacter("Add Portfolio", 50)}
-            </span>
-          </div>
-        </div>
-        <div className="flex xs:hidden items-center justify-start w-full">
-          <Link href="/account/dashboard">
-            <span className="text-primary-fade font-inter font-normal text-12 leading-16 hover:text-primary-regular">
-              -&gt; {ellipseCharacter("Account Dashboard", 50)}
-            </span>
-          </Link>
-          <span className="text-primary-regular font-inter font-normal text-12 leading-16">
-            -&gt; {ellipseCharacter("Add Portfolio", 50)}
-          </span>
-        </div>
-      </div>
+      <Breadcrumbs items={breadcrumbItems} />
 
       <div className="max-w-[800px] mt-10 mx-auto space-y-8">
         <div className="space-y-8">
