@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 import {
   samplePrimaryUsers,
@@ -11,7 +10,7 @@ import {
 import { Locale } from "@/locales";
 import { DropdownOption } from "@/types/user";
 import { getMessages } from "@/locales/loader";
-import { ellipseCharacter } from "@/utils/textUtils";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import PixieButton from "@/components/buttons/PixieButton";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
@@ -84,40 +83,19 @@ export default function PortfolioPage() {
     setEditingSection(null);
   };
 
+  const breadcrumbItems = [
+    { href: "/account/dashboard", label: "Account Dashboard" },
+    { href: "/portfolio/create", label: "Add Portfolio" },
+    {
+      href: "",
+      label: "Sync Settings For Portfolio #1 With Property #1",
+      isActive: true,
+    },
+  ];
+
   return (
     <>
-      <div className="flex items-start justify-end text-xs  mb-auto">
-        <div className="hidden xs:flex xs:flex-col xs:items-end xs:justify-start pr-1 h-20">
-          <div className="text-right">
-            <Link
-              href="/account/dashboard"
-              className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
-            >
-              <span className="text-primary-fade font-normal font-['Inter'] leading-tight hover:text-primary-fill">
-                {ellipseCharacter("Account Dashboard", 50)} -&gt;
-              </span>
-            </Link>
-          </div>
-          <div className="text-right mt-1">
-            <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1 pr-4">
-              {ellipseCharacter("Add Portfolio", 50)}
-            </span>
-          </div>
-        </div>
-        <div className="flex xs:hidden items-center justify-end w-full">
-          <Link
-            href="/account/dashboard"
-            className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1"
-          >
-            <span className="text-primary-fade font-normal font-['Inter'] leading-tight">
-              {ellipseCharacter("Account Dashboard", 50)} -&gt;
-            </span>
-          </Link>
-          <span className="text-primary-regular font-normal font-['Inter'] leading-tight mx-1">
-            {ellipseCharacter("Add Portfolio", 50)}
-          </span>
-        </div>
-      </div>
+      <Breadcrumbs items={breadcrumbItems} />
 
       <div className="max-w-[800px] mt-10 mx-auto space-y-8">
         <div className="space-y-8">

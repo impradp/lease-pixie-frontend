@@ -8,13 +8,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backdropBlur: {
+        sm: "4px", // You can customize the blur value if needed
+      },
       screens: {
         xs: "431px",
       },
       colors: {
         primary: {
           fill: "#F9F9F9",
-          fade: "#D6D6D6",
+          fade: "#BAC4D9",
           regular: "#FDFDFD",
           button: "#0C111D",
         },
@@ -59,15 +62,32 @@ const config: Config = {
           text: "#000000",
         },
         footer: {
-          fill: "#2a5598",
+          fill: "rgba(42, 85, 152, 0.3)",
           regular: "#FFFFFF",
+        },
+        icon: {
+          info: "#999999",
         },
       },
       fontFamily: {
-        inter: ["var(--font-inter)"],
+        inter: ["var(--font-inter)", "sans-serif"],
         "myanmar-khyay": ["var(--font-myanmar-khyay)"],
+      },
+      fontSize: {
+        "12": "12px",
+      },
+      lineHeight: {
+        "16": "16px",
+      },
+      margin: {
+        "1px": "1px",
       },
     },
   },
+  plugins: [],
+  corePlugins: {
+    backdropFilter: true, // Ensure this is enabled
+  },
 };
+
 export default config;

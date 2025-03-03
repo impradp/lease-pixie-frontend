@@ -16,7 +16,7 @@ body {
 }
 
 .bg-custom-gradient {
-  background: linear-gradient(to bottom left, #2a5598 5%, #999999 100%);
+  background: linear-gradient(to bottom right, #2a5598 5%, #999999 100%);
 }
 
 /* Wrapper for the entire autocomplete input */
@@ -66,39 +66,38 @@ body {
   }
 }
 
-/* Add this to your globals.css */
-.opacity-fade {
-  animation: trippleFade 3s ease-in-out forwards;
-}
-
-@keyframes trippleFade {
+/* Updated pulse animation */
+@keyframes pulseFade {
   0% {
-    opacity: 1;
+    opacity: 0.6; /* Start at 60% opacity (40% transparency) */
   }
-  10% {
-    opacity: 0.3;
-  }
-  20% {
-    opacity: 1;
+  15% {
+    opacity: 0.6; /* Stay at 60% opacity for 3s (20% of 15s) */
   }
   30% {
-    opacity: 0.3;
+    opacity: 1; /* Stay at 60% opacity for 3s (20% of 15s) */
   }
-  40% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
+  45% {
+    opacity: 0.6; /* Reach 100% opacity after 3s more (6s total) */
   }
   60% {
-    opacity: 1;
+    opacity: 1; /* Back to 60% opacity after 3s more (9s total) */
+  }
+  75% {
+    opacity: 0.6; /* Reach 100% opacity after 3s more (12s total) */
+  }
+  90% {
+    opacity: 1; /* Reach 100% opacity after 3s more (12s total) */
   }
   100% {
-    opacity: 1;
+    opacity: 0.6; /* Back to 60% opacity after 3s more (15s total) */
   }
 }
 
-/* src/app/globals.css - Add these rules to your existing CSS */
+.pulse-transparency {
+  animation: pulseFade 5s 1; /* 1 *5 s duration, runs once */
+  opacity: 0.6; /* Initial state - 60% opacity */
+}
 
 /* Fix for Safari/iOS SVG rendering */
 @supports (-webkit-touch-callout: none) {
@@ -113,9 +112,7 @@ body {
 }
 
 /* Higher specificity fix for Safari */
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  _::-webkit-full-page-media,
-  _:future,
+@supports (-webkit-touch-callout: none) and (-webkit-min-device-pixel-ratio: 0) {
   :root svg {
     shape-rendering: crispEdges !important;
     text-rendering: geometricPrecision !important;
