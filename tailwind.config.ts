@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       backdropBlur: {
-        sm: "4px", // You can customize the blur value if needed
+        sm: "4px",
       },
       screens: {
         xs: "431px",
@@ -20,14 +20,22 @@ const config: Config = {
           fade: "#BAC4D9",
           regular: "#FDFDFD",
           button: "#0C111D",
+          space: "#C8C8C8",
         },
         secondary: {
+          fill: "#ececec",
           regular: "#000000",
           button: "#475467",
+          light: "#0b111d",
+          icon: "#667085",
+          space: "#101828",
         },
         tertiary: {
-          fill: "#DDDDDD",
+          fill: "#fcfcfc",
           regular: "#FCFCFD",
+          light: "#475466",
+          stroke: "#cfd4dc",
+          space: "#f5f6f5",
         },
         card: {
           open: {
@@ -38,7 +46,7 @@ const config: Config = {
             link: "#0C111D",
           },
           close: {
-            fill: "#F9F9F9",
+            fill: "#F8F8F8",
           },
           input: {
             fill: "#FFFFFF",
@@ -63,7 +71,7 @@ const config: Config = {
         },
         footer: {
           fill: "rgba(42, 85, 152, 0.3)",
-          regular: "#FFFFFF",
+          regular: "#FDFDFD",
         },
         icon: {
           info: "#999999",
@@ -86,7 +94,7 @@ const config: Config = {
   },
   plugins: [],
   corePlugins: {
-    backdropFilter: true, // Ensure this is enabled
+    backdropFilter: true,
   },
 };
 

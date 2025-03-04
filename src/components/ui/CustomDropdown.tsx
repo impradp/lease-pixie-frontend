@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useId } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import { DropdownOption } from "@/types/user";
 
 interface CustomDropdownProps {
@@ -9,9 +9,10 @@ interface CustomDropdownProps {
   onChange?: (value: DropdownOption) => void;
   readOnly?: boolean;
   isEditing: boolean;
-  labelSuffix?: string;
-  isLocked: boolean;
-  lockMessage: string;
+  isLocked?: boolean;
+  lockMessage?: string;
+  showInfo?: boolean;
+  infoContent?: string;
 }
 
 export const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -21,9 +22,10 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   onChange,
   readOnly = false,
   isEditing,
-  labelSuffix = "",
   lockMessage,
-  isLocked,
+  isLocked = false,
+  showInfo = false,
+  infoContent = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | "undefined">(
@@ -63,10 +65,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   };
 
   const handleOptionClick = (option: DropdownOption) => {
-    // Update local state immediately
     setSelectedValue(option.value);
-
-    // Call the onChange handler
     if (onChange) {
       onChange(option);
     }
@@ -97,14 +96,79 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<"left" | "right">(
+    "left"
+  );
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        const spaceOnRight = window.innerWidth - rect.right;
+        setTooltipPosition(spaceOnRight < 350 ? "right" : "left");
+      }
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
+  }, []);
+
   return (
     <div className="flex flex-col gap-1.5 w-full" ref={dropdownRef}>
-      <label
-        htmlFor={inputId}
-        className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
-      >
-        {label || `Selected ${labelSuffix}`}
-      </label>
+      {/* Combine label and tooltip in a flex container */}
+      <div className="flex items-center gap-2">
+        <label
+          htmlFor={inputId}
+          className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
+        >
+          {label}
+        </label>
+        {showInfo && (
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              className="text-gray-400 hover:text-gray-600 align-middle"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+              <Info size={20} className="text-icon-info" />
+            </button>
+            {showTooltip && (
+              <div
+                className={`absolute z-50 mt-2 ${
+                  tooltipPosition === "right" ? "right-0" : "left-0"
+                }`}
+              >
+                <div className="w-[300px] relative shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] bg-white rounded-lg">
+                  <svg
+                    className={`absolute -top-4 ${
+                      tooltipPosition === "right" ? "right-2" : "left-2"
+                    }`}
+                    width="20"
+                    height="16"
+                    viewBox="0 0 20 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M10 0L20 16H0L10 0Z" fill="white" />
+                  </svg>
+                  <div className="p-4">
+                    <div className="text-card-open-regular text-xs font-['Inter']">
+                      <span className="font-bold">
+                        {infoContent.split(":")[0]}:{" "}
+                      </span>
+                      <span>{infoContent.split(":").slice(1).join(":")} </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <div className="relative w-full">
         <div
           id={inputId}
@@ -116,7 +180,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
               ? "cursor-pointer"
               : "cursor-default"
           }`}
-          aria-label={label || `Selected ${labelSuffix}`}
+          aria-label={label}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={`${inputId}-options`}
@@ -127,16 +191,13 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             </div>
             {selectedOption?.label && (
               <div className="text-card-input-regular text-base font-normal font-['Inter'] leading-normal">
-                {selectedOption.value || "\u00A0"}{" "}
-                {/* Non-breaking space if empty */}
+                {selectedOption.value || "\u00A0"}
               </div>
             )}
           </div>
           {isEditing && !readOnly && !isLocked && (
-            <ChevronDown className="w-5 h-5 text-card-open-icon " />
+            <ChevronDown className="w-5 h-5 text-card-open-icon" />
           )}
-
-          {isLocked && <ChevronDown className="w-5 h-5 text-card-open-icon " />}
         </div>
 
         {isOpen && !isLocked && (
