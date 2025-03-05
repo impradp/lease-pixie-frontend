@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-
 import { Locale } from "@/locales";
 import { getMessages } from "@/locales/loader";
-import { NewVendorFormData } from "@/types/vendor";
 import PixieButton from "@/components/buttons/PixieButton";
 import CancelButton from "@/components/buttons/CancelButton";
-import { NewVendor } from "@/components/portfolio/NewVendor";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { NewUserFormData, DropdownOption } from "@/types/user";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
@@ -13,58 +10,82 @@ import { IconLinkButton } from "@/components/buttons/IconLinkButton";
 import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
 import { NewPortfolioUser } from "@/components/portfolio/NewPortfolioUser";
 
-interface PortfolioUserProps {
+interface PortfolioUsersProps {
   label?: string;
   selectedUser?: DropdownOption;
+  selectedSecondaryUser?: DropdownOption;
   onUserChange?: (user: DropdownOption) => void;
+  onSecondaryUserChange?: (user: DropdownOption) => void;
   users: DropdownOption[];
+  secondaryUsers: DropdownOption[];
   onAddUser?: (userData: NewUserFormData) => void;
-  onAddVendor?: (vendorData: NewVendorFormData) => void;
   showInfo?: boolean;
   infoContent?: string;
   userType?: string;
-  isLocked: boolean;
-  lockMessage?: string;
   sectionId: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
   onSectionClose: () => void;
+  subLabels: string[];
+  isSecondaryUserLocked?: boolean;
 }
 
-export const PortfolioUser: React.FC<PortfolioUserProps> = ({
+export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   label = "",
   selectedUser,
+  selectedSecondaryUser,
   onUserChange,
+  onSecondaryUserChange,
   users,
+  secondaryUsers,
   onAddUser,
-  onAddVendor,
   showInfo,
   infoContent,
   userType = "Portfolio User",
-  isLocked = false,
-  lockMessage = "Seat not active",
   sectionId,
   editingSection,
   onSectionEdit,
   onSectionClose,
+  subLabels = ["Selected User 1", "Selected User 2"],
+  isSecondaryUserLocked = false,
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
-  const [showNewVendorModal, setShowNewVendorModal] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationContent, setConfirmationContent] = useState({
     title: "",
     message: "",
   });
   const [isEditMode, setIsEditMode] = useState(false);
-  const [originalUser] = useState(selectedUser); // Store original selection
-  const [editedUser, setEditedUser] = useState(selectedUser); // Track edited selection
+  const [editedUser, setEditedUser] = useState(selectedUser);
+  const [editedSecondaryUser, setEditedSecondaryUser] = useState(
+    selectedSecondaryUser
+  );
+  const [originalUser, setOriginalUser] = useState(selectedUser);
+  const [originalSecondaryUser, setOriginalSecondaryUser] = useState(
+    selectedSecondaryUser
+  );
+  const [secondarySampleUsers, setSecondarySampleUsers] =
+    useState(secondaryUsers);
+
   const isEditing = isEditMode;
+
+  // Locally determine if secondary user dropdown should be unlocked
+  const isSecondaryUnlocked =
+    !isSecondaryUserLocked || (editedUser && editedUser.value !== "");
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
 
+  // Sync original and edited values with props whenever they change
   useEffect(() => {
-    if (showNewUserModal || showNewVendorModal || showConfirmation) {
+    setOriginalUser(selectedUser);
+    setOriginalSecondaryUser(selectedSecondaryUser);
+    setEditedUser(selectedUser);
+    setEditedSecondaryUser(selectedSecondaryUser);
+  }, [selectedUser, selectedSecondaryUser]);
+
+  useEffect(() => {
+    if (showNewUserModal || showConfirmation) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -72,7 +93,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showNewUserModal, showNewVendorModal, showConfirmation]);
+  }, [showNewUserModal, showConfirmation]);
 
   const handleAddUser = (userData: NewUserFormData) => {
     if (onAddUser) {
@@ -86,24 +107,8 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     setShowConfirmation(true);
   };
 
-  const handleAddVendor = (vendorData: NewVendorFormData) => {
-    if (onAddVendor) {
-      onAddVendor(vendorData);
-    }
-    setShowNewVendorModal(false);
-    setConfirmationContent({
-      title: messages?.portfolio?.vendor?.confirmModal?.title,
-      message: messages?.portfolio?.vendor?.confirmModal?.message,
-    });
-    setShowConfirmation(true);
-  };
-
   const handleCloseUserModal = () => {
     setShowNewUserModal(false);
-  };
-
-  const handleCloseVendorModal = () => {
-    setShowNewVendorModal(false);
   };
 
   const handleConfirmationClose = () => {
@@ -119,20 +124,32 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 
   const handleTextClose = () => {
     setIsEditMode(false);
-    setEditedUser(originalUser); // Revert to original selection
+    setEditedUser(originalUser);
+    setEditedSecondaryUser(originalSecondaryUser);
     onSectionClose();
   };
 
   const handleUpdate = () => {
     setIsEditMode(false);
     if (onUserChange && editedUser) {
-      onUserChange(editedUser); // Update parent with new selection
+      onUserChange(editedUser);
+    }
+    if (onSecondaryUserChange && editedSecondaryUser) {
+      onSecondaryUserChange(editedSecondaryUser);
     }
     onSectionClose();
   };
 
   const handleUserChange = (user: DropdownOption) => {
-    setEditedUser(user); // Update edited selection
+    setEditedUser(user);
+
+    setSecondarySampleUsers(
+      secondaryUsers.filter((opt) => opt.value !== user.value)
+    );
+  };
+
+  const handleSecondaryUserChange = (user: DropdownOption) => {
+    setEditedSecondaryUser(user);
   };
 
   const isEditDisabled =
@@ -155,30 +172,43 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
           infoContent={infoContent}
           editDisabled={isEditDisabled}
         />
+
         <CustomDropdown
           options={users}
-          value={editedUser?.value} // Use edited value
+          value={editedUser?.value}
           onChange={isEditing ? handleUserChange : undefined}
           readOnly={!isEditing}
           isEditing={isEditing}
-          isLocked={isLocked}
-          lockMessage={lockMessage}
+          label={subLabels[0]}
+        />
+        {isEditMode && (
+          <IconLinkButton
+            label={`Add ${userType}`}
+            onClick={() => setShowNewUserModal(true)}
+          />
+        )}
+
+        <CustomDropdown
+          options={secondarySampleUsers}
+          value={editedSecondaryUser?.value}
+          onChange={isEditing ? handleSecondaryUserChange : undefined}
+          readOnly={!isEditing}
+          isEditing={isEditing}
+          label={subLabels[1]}
+          isLocked={!isSecondaryUnlocked}
+          lockMessage="Secondary user not active"
         />
         {isEditMode && (
           <>
             <IconLinkButton
               label={`Add ${userType}`}
-              onClick={() =>
-                userType === messages?.portfolio?.user?.commonName
-                  ? setShowNewUserModal(true)
-                  : setShowNewVendorModal(true)
-              }
+              onClick={() => setShowNewUserModal(true)}
             />
             <div className="flex flex-col gap-3">
               <PixieButton
                 label="Update"
                 disabled={false}
-                onClick={handleUpdate} // Use new update handler
+                onClick={handleUpdate}
                 className="w-full"
               />
               <CancelButton onClick={handleTextClose} />
@@ -193,17 +223,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
             <NewPortfolioUser
               onClose={handleCloseUserModal}
               onSubmit={handleAddUser}
-            />
-          </div>
-        </div>
-      )}
-
-      {showNewVendorModal && (
-        <div className="fixed inset-0 z-50">
-          <div className="relative z-50">
-            <NewVendor
-              onClose={handleCloseVendorModal}
-              onSubmit={handleAddVendor}
             />
           </div>
         </div>

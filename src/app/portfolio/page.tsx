@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-
 import {
   samplePrimaryUsers,
   sampleSecondaryUsers,
-  sampleVendorUsers,
+  sampleVendors,
 } from "@/data/users";
 import { Locale } from "@/locales";
 import { DropdownOption } from "@/types/user";
@@ -13,39 +12,39 @@ import { getMessages } from "@/locales/loader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import PixieButton from "@/components/buttons/PixieButton";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
-import { PortfolioUser } from "@/components/portfolio/PortfolioUser";
+import { PortfolioUsers } from "@/components/portfolio/PortfolioUsers";
 import ConfirmationDialog from "@/components/popups/ConfirmationDialog";
+import { PortfolioVendors } from "@/components/portfolio/PortfolioVendors";
+import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
 
 export default function PortfolioPage() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
 
-  const [isEditing, setIsEditing] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isSecondaryUserLocked, setIsSecondaryUserLocked] = useState(true);
-  const [isSecondaryVendorLocked, setIsSecondaryVendorLocked] = useState(true);
-  const [isTertiaryVendorLocked, setIsTertiaryVendorLocked] = useState(true);
+  const emptyUserOption = samplePrimaryUsers.find((opt) => opt.value === "");
   const [primarySelectedUser, setPrimarySelectedUser] = useState<
     DropdownOption | undefined
-  >();
+  >(emptyUserOption);
   const [secondarySelectedUser, setSecondarySelectedUser] = useState<
     DropdownOption | undefined
-  >();
+  >(emptyUserOption);
+
+  const emptyVendorOption = sampleVendors.find((opt) => opt.value === "");
   const [primarySelectedVendor, setPrimarySelectedVendor] = useState<
     DropdownOption | undefined
-  >();
+  >(emptyVendorOption);
   const [secondarySelectedVendor, setSecondarySelectedVendor] = useState<
     DropdownOption | undefined
-  >();
+  >(emptyVendorOption);
   const [tertiarySelectedVendor, setTertiarySelectedVendor] = useState<
     DropdownOption | undefined
-  >();
+  >(emptyVendorOption);
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+  const handleEdit = () => {};
 
   const handleSubmit = () => {
     setIsPopupOpen(true);
@@ -53,26 +52,20 @@ export default function PortfolioPage() {
 
   const handlePrimaryUserChange = (user: DropdownOption) => {
     setPrimarySelectedUser(user);
+    const emptyOption = sampleSecondaryUsers.find((opt) => opt.value === "");
     if (user && user.value !== "") {
       setIsSecondaryUserLocked(false);
-      const emptyOption = sampleSecondaryUsers.find((opt) => opt.value === "");
       if (emptyOption) {
         setSecondarySelectedUser(emptyOption);
       }
+    } else {
+      setSecondarySelectedUser(emptyOption);
+      setIsSecondaryUserLocked(true);
     }
   };
 
-  const handlePrimaryVendorChange = (user: DropdownOption) => {
-    setPrimarySelectedVendor(user);
-    if (user && user.value !== "") {
-      setIsSecondaryVendorLocked(false);
-      setIsTertiaryVendorLocked(false);
-      const emptyOption = sampleVendorUsers.find((opt) => opt.value === "");
-      if (emptyOption) {
-        setSecondarySelectedVendor(emptyOption);
-        setTertiarySelectedVendor(emptyOption);
-      }
-    }
+  const handlePrimaryVendorChange = (vendor: DropdownOption) => {
+    setPrimarySelectedVendor(vendor);
   };
 
   const handleSectionEdit = (section: string) => {
@@ -108,73 +101,58 @@ export default function PortfolioPage() {
             onSectionClose={handleSectionClose}
           />
 
-          <PortfolioUser
-            label={messages?.portfolio?.user?.title}
+          <PortfolioUsers
+            label={messages?.portfolio?.users?.title}
             users={samplePrimaryUsers}
+            secondaryUsers={sampleSecondaryUsers}
             selectedUser={primarySelectedUser}
+            selectedSecondaryUser={secondarySelectedUser}
             onUserChange={handlePrimaryUserChange}
-            isLocked={false}
-            sectionId="primaryUser" // Unique identifier for this section
+            onSecondaryUserChange={setSecondarySelectedUser}
+            sectionId="portfolioUser"
             editingSection={editingSection}
             onSectionEdit={handleSectionEdit}
             onSectionClose={handleSectionClose}
+            subLabels={[
+              messages?.portfolio?.users?.primaryUserTitle,
+              messages?.portfolio?.users?.secondaryUserTitle,
+            ]}
+            isSecondaryUserLocked={isSecondaryUserLocked}
           />
 
-          <PortfolioUser
-            label={messages?.portfolio?.user?.titleSecondary}
-            users={sampleSecondaryUsers}
-            selectedUser={secondarySelectedUser}
-            onUserChange={isEditing ? setSecondarySelectedUser : undefined}
-            isLocked={isSecondaryUserLocked}
-            lockMessage={"Secondary user is not active"}
-            sectionId="secondaryUser"
+          <PortfolioVendors
+            label={messages?.portfolio?.vendors?.title}
+            vendors={sampleVendors}
+            secondaryVendors={sampleVendors}
+            tertiaryVendors={sampleVendors}
+            selectedVendor={primarySelectedVendor}
+            selectedSecondaryVendor={secondarySelectedVendor}
+            selectedTertiaryVendor={tertiarySelectedVendor}
+            onVendorChange={handlePrimaryVendorChange}
+            onSecondaryVendorChange={setSecondarySelectedVendor}
+            onTertiaryVendorChange={setTertiarySelectedVendor}
+            sectionId="portfolioVendor"
             editingSection={editingSection}
             onSectionEdit={handleSectionEdit}
             onSectionClose={handleSectionClose}
-          />
-
-          <PortfolioUser
-            label={messages?.portfolio?.vendor?.title}
-            users={sampleVendorUsers}
-            selectedUser={primarySelectedVendor}
-            onUserChange={handlePrimaryVendorChange}
+            subLabels={[
+              messages?.portfolio?.vendors?.primaryVendorTitle,
+              messages?.portfolio?.vendors?.secondaryVendorTitle,
+              messages?.portfolio?.vendors?.tertiaryVendorTitle,
+            ]}
             showInfo={true}
-            userType="Vendor"
-            infoContent={messages?.portfolio?.vendor?.primaryInfo}
-            isLocked={false}
-            sectionId="primaryVendor"
-            editingSection={editingSection}
-            onSectionEdit={handleSectionEdit}
-            onSectionClose={handleSectionClose}
+            infoContents={[
+              messages?.portfolio?.vendors.primaryInfo,
+              messages?.portfolio?.vendors.secondaryInfo,
+              messages?.portfolio?.vendors.tertiaryInfo,
+            ]}
           />
 
-          <PortfolioUser
-            label={messages?.portfolio?.vendor?.titleSecondary}
-            users={sampleVendorUsers}
-            selectedUser={secondarySelectedVendor}
-            onUserChange={setSecondarySelectedVendor}
-            showInfo={true}
-            userType="Vendor"
-            infoContent={messages?.portfolio?.vendor?.secondaryInfo}
-            isLocked={isSecondaryVendorLocked}
-            lockMessage={"Seat not active"}
-            sectionId="secondaryVendor"
-            editingSection={editingSection}
-            onSectionEdit={handleSectionEdit}
-            onSectionClose={handleSectionClose}
-          />
-
-          <PortfolioUser
-            label={messages?.portfolio?.vendor?.titleTertiary}
-            users={sampleVendorUsers}
-            selectedUser={tertiarySelectedVendor}
-            onUserChange={setTertiarySelectedVendor}
-            showInfo={true}
-            userType="Vendor"
-            infoContent={messages?.portfolio?.vendor?.tertiaryInfo}
-            isLocked={isTertiaryVendorLocked}
-            lockMessage={"Seat not active"}
-            sectionId="tertiaryVendor"
+          <PortfolioAutomationSync
+            label={messages?.portfolio?.automation?.title}
+            title={messages?.portfolio?.automation?.syncTitle}
+            info={messages?.portfolio?.automation?.info}
+            sectionId="portfolioAutomationSync"
             editingSection={editingSection}
             onSectionEdit={handleSectionEdit}
             onSectionClose={handleSectionClose}

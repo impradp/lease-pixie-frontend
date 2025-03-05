@@ -118,3 +118,15 @@ body {
     text-rendering: geometricPrecision !important;
   }
 }
+
+@keyframes spinClockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-5s {
+  animation: spinClockwise 5s linear infinite;
+}
