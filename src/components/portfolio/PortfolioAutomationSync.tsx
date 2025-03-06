@@ -8,7 +8,7 @@ import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import CancelButton from "@/components/buttons/CancelButton";
 import { PixieDropdown } from "@/components/ui/PixieDropdown";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { PixieDatePicker } from "@/components/ui/PixieDatePicker";
+import { PixieMonthPicker } from "@/components/ui/PixieMonthPicker";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
 
 interface PortfolioAutomationSyncProps {
@@ -582,7 +582,7 @@ export const PortfolioAutomationSync: React.FC<
                 </span>
               </div>
               <div className="w-full xs:w-auto">
-                <PixieDatePicker
+                <PixieMonthPicker
                   label="Date to request prior year summary"
                   value={tempOperatingExpenseProcessingValue ?? ""}
                   onChange={(value) =>
@@ -892,7 +892,7 @@ export const PortfolioAutomationSync: React.FC<
                 </span>
               </div>
               <div className="w-full xs:w-auto">
-                <PixieDatePicker
+                <PixieMonthPicker
                   label="Date to request annual payments summary"
                   value={tempVendor1099ProcessingValue ?? ""}
                   onChange={(value) =>
