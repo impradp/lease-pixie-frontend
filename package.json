@@ -20,7 +20,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^6.4.6",
+    "@mui/material": "^6.4.7",
     "@mui/x-date-pickers": "^7.27.1",
     "babel-plugin-react-compiler": "^19.0.0-beta-40c6c23-20250301",
     "date-fns": "^4.1.0",
