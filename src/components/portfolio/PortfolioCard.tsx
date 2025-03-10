@@ -2,10 +2,10 @@ import React, { useState } from "react";
 
 import { Locale } from "@/locales";
 import { getMessages } from "@/locales/loader";
-import { CustomInput } from "@/components/ui/CustomInput";
-import PixieButton from "@/components/buttons/PixieButton";
-import CancelButton from "@/components/buttons/CancelButton";
-import { SectionHeader } from "@/components/ui/SectionHeader";
+import { CustomInput } from "@/components/ui/input/CustomInput";
+import PixieButton from "@/components/ui/buttons/PixieButton";
+import CancelButton from "@/components/ui/buttons/CancelButton";
+import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 interface PortfolioCardProps {
   portfolioName: string;

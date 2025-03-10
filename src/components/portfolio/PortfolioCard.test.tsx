@@ -4,7 +4,7 @@ import { PortfolioCard } from "./PortfolioCard";
 import "@testing-library/jest-dom";
 
 // Mock the imported components and functions
-jest.mock("@/components/ui/CustomInput", () => ({
+jest.mock("@/components/ui/input/CustomInput", () => ({
   CustomInput: ({
     label,
     value,
@@ -31,7 +31,7 @@ jest.mock("@/components/ui/CustomInput", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/SectionHeader", () => ({
+jest.mock("@/components/ui/header/SectionHeader", () => ({
   SectionHeader: ({
     title,
     onEdit,
@@ -67,24 +67,31 @@ jest.mock("@/components/ui/SectionHeader", () => ({
   ),
 }));
 
-jest.mock("@/components/buttons/PixieButton", () => ({
+jest.mock("@/components/ui/buttons/PixieButton", () => ({
   __esModule: true,
   default: ({
     label,
     disabled,
     onClick,
+    className,
   }: {
     label: string;
     disabled?: boolean;
     onClick?: () => void;
+    className?: string;
   }) => (
-    <button data-testid="pixie-button" onClick={onClick} disabled={disabled}>
+    <button
+      data-testid="pixie-button"
+      onClick={onClick}
+      disabled={disabled}
+      className={className}
+    >
       {label}
     </button>
   ),
 }));
 
-jest.mock("@/components/buttons/CancelButton", () => ({
+jest.mock("@/components/ui/buttons/CancelButton", () => ({
   __esModule: true,
   default: ({ onClick }: { onClick?: () => void }) => (
     <button data-testid="cancel-action-button" onClick={onClick}>
@@ -244,5 +251,100 @@ describe("PortfolioCard", () => {
 
     // Should have open styling in edit mode
     expect(container.firstChild).toHaveClass("bg-card-open-fill");
+  });
+
+  test("stores original name when entering edit mode", () => {
+    render(<PortfolioCard {...defaultProps} />);
+
+    // Enter edit mode
+    fireEvent.click(screen.getByTestId("edit-button"));
+
+    // Change the input value
+    const input = screen.getByTestId("portfolio-input");
+    fireEvent.change(input, { target: { value: "Updated Portfolio" } });
+
+    // Click cancel button
+    fireEvent.click(screen.getByTestId("cancel-action-button"));
+
+    // Should revert to original name
+    expect(screen.getByTestId("portfolio-input")).toHaveValue("Test Portfolio");
+  });
+
+  test("persists edited name when updating", () => {
+    render(<PortfolioCard {...defaultProps} />);
+
+    // Enter edit mode
+    fireEvent.click(screen.getByTestId("edit-button"));
+
+    // Change the input value
+    const input = screen.getByTestId("portfolio-input");
+    fireEvent.change(input, { target: { value: "Updated Portfolio" } });
+
+    // Click update button
+    fireEvent.click(screen.getByTestId("pixie-button"));
+
+    // Should keep edited name
+    expect(screen.getByTestId("portfolio-input")).toHaveValue(
+      "Updated Portfolio"
+    );
+
+    // Enter edit mode again
+    fireEvent.click(screen.getByTestId("edit-button"));
+
+    // Click cancel button
+    fireEvent.click(screen.getByTestId("cancel-action-button"));
+
+    // Should keep the updated name as the new original
+    expect(screen.getByTestId("portfolio-input")).toHaveValue(
+      "Updated Portfolio"
+    );
+  });
+
+  test("update button has the correct className", () => {
+    render(<PortfolioCard {...defaultProps} />);
+
+    // Enter edit mode
+    fireEvent.click(screen.getByTestId("edit-button"));
+
+    // Check if PixieButton has the correct className
+    expect(screen.getByTestId("pixie-button")).toHaveClass("w-full");
+  });
+
+  test("handles optional onEdit prop correctly when undefined", () => {
+    const propsWithoutOnEdit = {
+      ...defaultProps,
+      onEdit: undefined,
+    };
+
+    render(<PortfolioCard {...propsWithoutOnEdit} />);
+
+    // Enter edit mode should not throw errors
+    fireEvent.click(screen.getByTestId("edit-button"));
+
+    // Component should still enter edit mode
+    expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
+    expect(screen.getByTestId("pixie-button")).toBeInTheDocument();
+  });
+
+  test("handles optional onNameChange prop correctly when undefined", () => {
+    const propsWithoutOnNameChange = {
+      ...defaultProps,
+      onNameChange: undefined,
+    };
+
+    render(<PortfolioCard {...propsWithoutOnNameChange} />);
+
+    // Enter edit mode
+    fireEvent.click(screen.getByTestId("edit-button"));
+
+    // Change input should not throw errors
+    const input = screen.getByTestId("portfolio-input");
+    fireEvent.change(input, { target: { value: "Updated Portfolio" } });
+
+    // Should still allow updates
+    fireEvent.click(screen.getByTestId("pixie-button"));
+    expect(screen.getByTestId("portfolio-input")).toHaveValue(
+      "Updated Portfolio"
+    );
   });
 });
