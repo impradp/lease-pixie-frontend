@@ -27,7 +27,7 @@ export default function LoginCard({ onSubmit, isSubmitting }: LoginCardProps) {
   };
 
   return (
-    <div className="w-full h-[1262px] bg-tertiary-ghostWhite/50 border border-tertiary-fill rounded-[10px] flex flex-col items-center p-5 relative">
+    <div className="w-full h-[1262px] max-xs:h-[932px] bg-tertiary-ghostWhite/50 border border-tertiary-fill rounded-[10px] flex flex-col items-center p-5 relative">
       <div className="w-full flex flex-col justify-center items-center">
         <Image
           src="/security-shield.svg"

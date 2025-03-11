@@ -145,14 +145,14 @@ const DashboardPage: React.FC = () => {
     <>
       <Breadcrumbs items={breadcrumbItems} />
       <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center">
-        <div className="w-[400px] max-w-full flex justify-center mb-4 custom:mb-0">
+        <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
           <WorkflowCard
             workflows={filteredWorkflows}
             isEditable={true}
             onSearchChange={handleSearchChange}
           />
         </div>
-        <div className="w-[400px] custom:w-full max-w-full custom:flex-1 flex justify-center">
+        <div className="w-[408px] custom:w-full max-w-full custom:flex-1 flex justify-center">
           <WelcomeCard
             email={user.email}
             onSignIn={handleSignIn}

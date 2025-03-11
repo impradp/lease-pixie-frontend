@@ -16,7 +16,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   onSearchChange,
 }) => {
   return (
-    <div className="w-[400px] h-[1262px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
+    <div className="w-[408px] h-[1262px] max-xs:h-[932px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
       <div className="w-full">
         <WorkflowHeader
           isEditable={isEditable}
