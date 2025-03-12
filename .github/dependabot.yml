@@ -5,7 +5,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
       time: "09:00"
       timezone: "UTC"
     groups:
@@ -43,7 +44,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily" # Check for updates daily
+      interval: "weekly"
+      day: "monday"
       time: "09:00"
       timezone: "UTC"
     labels:

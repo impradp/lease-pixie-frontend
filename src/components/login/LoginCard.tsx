@@ -4,17 +4,35 @@ import Image from "next/image";
 import { useState } from "react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { CustomInput } from "@/components/ui/input/CustomInput";
+import AuthenticateForm from "@/components/login/AuthenticateForm";
 
 interface LoginCardProps {
-  readonly onSubmit: (formData: { email: string; identifier: string }) => void;
+  readonly onSubmit: (formData: {
+    email: string;
+    identifier: string;
+    otp: string;
+  }) => void;
   readonly isSubmitting: boolean;
+  initialAuthCode?: string[];
+  error?: string;
+  attempts?: number;
 }
 
-export default function LoginCard({ onSubmit, isSubmitting }: LoginCardProps) {
+export default function LoginCard({
+  onSubmit,
+  isSubmitting, // Use the prop directly
+  initialAuthCode = ["", "", "", "", "", ""],
+  error,
+  attempts = 0,
+}: LoginCardProps) {
   const [formData, setFormData] = useState({
     email: "",
     identifier: "",
+    otp: "",
   });
+
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
 
   const handleInputChange =
     (field: keyof typeof formData) => (value: string) => {
@@ -23,7 +41,18 @@ export default function LoginCard({ onSubmit, isSubmitting }: LoginCardProps) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(formData);
+    setShowAuthForm(true);
+  };
+
+  const handleAuthCodeSubmit = (authCode: string) => {
+    setAuthCode(authCode.split(""));
+    onSubmit({ ...formData, otp: authCode });
+    handleCloseAuth();
+  };
+
+  const handleCloseAuth = () => {
+    setAuthCode(initialAuthCode);
+    setShowAuthForm(false);
   };
 
   return (
@@ -66,15 +95,37 @@ export default function LoginCard({ onSubmit, isSubmitting }: LoginCardProps) {
               className="h-24 w-[358px]"
             />
 
-            <PixieButton
-              label={isSubmitting ? "Signing In..." : "Sign-In"}
-              type="submit"
-              disabled={isSubmitting || !formData.email || !formData.identifier}
-              className="w-[358px]"
-            />
+            <div className="w-[358px] flex flex-col items-center gap-2">
+              <PixieButton
+                label={isSubmitting ? "Signing In..." : "Sign-In"}
+                type="submit"
+                disabled={
+                  isSubmitting ||
+                  !formData.email ||
+                  !formData.identifier ||
+                  (attempts >= 3 && !!error)
+                }
+                className="w-full"
+              />
+              {error && (
+                <div className="w-full text-tertiary-vermilion text-sm font-normal font-['Inter'] leading-tight text-center">
+                  <span dangerouslySetInnerHTML={{ __html: error }} />
+                </div>
+              )}
+            </div>
           </div>
         </form>
       </div>
+      {showAuthForm && (
+        <div className="absolute top-40 left-0 right-0 flex justify-center z-50">
+          <AuthenticateForm
+            onClose={handleCloseAuth}
+            onSubmitCode={handleAuthCodeSubmit}
+            initialCode={authCode}
+            className="w-full max-w-[358px] min-w-[280px]"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -24,3 +24,8 @@ export const sampleVendors: DropdownOption[] = [
   { label: "Ms Roxy", value: "X Technologies, Smith Fort" },
   { label: "Andrew Legend", value: "A Technologiec, Bay Area" },
 ];
+
+export const loggedInUser = {
+  name: "Jane",
+  email: "janedoe@gmail.com",
+};

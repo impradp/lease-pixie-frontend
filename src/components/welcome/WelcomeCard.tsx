@@ -3,43 +3,19 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import AuthenticateForm from "@/components/login/AuthenticateForm";
 
 interface WelcomeCardProps {
   email: string;
-  onSignIn?: (propertyId: string, authCode?: string) => void;
   onSignOut?: () => void;
-  initialAuthCode?: string[];
 }
 
-const WelcomeCard: React.FC<WelcomeCardProps> = ({
-  email,
-  onSignIn,
-  onSignOut,
-  initialAuthCode = ["", "", "", "", "", ""],
-}) => {
+const WelcomeCard: React.FC<WelcomeCardProps> = ({ email, onSignOut }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAuthForm, setShowAuthForm] = useState(true);
-  const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     onSignOut?.();
-  };
-
-  const handleAuthCodeSubmit = (authCode: string) => {
-    setAuthCode(authCode.split(""));
-    if (onSignIn) {
-      onSignIn(authCode);
-    }
-    setShowAuthForm(false);
-    setIsSubmitting(false);
-  };
-
-  const handleCloseAuth = () => {
-    setShowAuthForm(false);
-    setIsSubmitting(false);
   };
 
   return (
@@ -78,20 +54,7 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({
             </div>
           </form>
         </div>
-        {showAuthForm && (
-          <div className="absolute top-40 left-0 right-0 flex justify-center z-50">
-            <AuthenticateForm
-              onClose={handleCloseAuth}
-              onSubmitCode={handleAuthCodeSubmit}
-              initialCode={authCode}
-              className="w-full max-w-[358px] min-w-[280px]"
-            />
-          </div>
-        )}
       </div>
-      {showAuthForm && (
-        <div className="fixed inset-0 bg-black/50 z-40" aria-hidden="true" />
-      )}
     </div>
   );
 };

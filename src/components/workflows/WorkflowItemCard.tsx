@@ -54,7 +54,7 @@ const WorkflowItemCard: React.FC<WorkflowItemCardProps> = ({
             className="w-[8px] h-[8px] rounded-full mx-[5px]"
             style={{ backgroundColor: circleColor }}
           />
-          <p className="text-[#475467] font-['Inter'] text-[13px] font-normal leading-[18px] whitespace-nowrap overflow-hidden text-ellipsis">
+          <p className="text-tertiary-charcoalBlue font-['Inter'] text-[13px] font-normal leading-[18px] whitespace-nowrap overflow-hidden text-ellipsis">
             {city} (unit)
           </p>
         </div>

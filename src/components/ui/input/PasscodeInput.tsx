@@ -42,6 +42,28 @@ export default function PasscodeInput({
       }
     };
 
+  // Handle paste event
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text");
+    const parsedData = pastedData.replace(/\D/g, ""); // Remove non-numeric characters
+
+    // Check if pasted content has at least 6 digits
+    if (parsedData.length >= 6) {
+      const newCode = [...code];
+      // Fill in the code array with the first 6 digits
+      for (let i = 0; i < 6; i++) {
+        newCode[i] = parsedData[i] || "";
+      }
+      onChange(newCode);
+
+      // Focus the last input after pasting
+      if (newCode[5] !== "") {
+        inputRefs.current[5]?.current?.focus();
+      }
+    }
+  };
+
   useEffect(() => {
     inputRefs.current[0]?.current?.focus();
   }, []);
@@ -67,6 +89,7 @@ export default function PasscodeInput({
                   value={code[index]}
                   onChange={handleInputChange(index)}
                   onKeyDown={handleKeyDown(index)}
+                  onPaste={index === 0 ? handlePaste : undefined} // Only add paste handler to first input
                   className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-deepNavy focus:outline-none bg-transparent"
                 />
               </div>

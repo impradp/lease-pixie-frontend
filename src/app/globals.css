@@ -137,3 +137,12 @@ body {
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+@keyframes fillWidth {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}

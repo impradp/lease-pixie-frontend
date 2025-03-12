@@ -27,26 +27,22 @@ export default function AuthenticateForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const authCode = code.join("");
-
-    if (authCode === "111111") {
-      setIsSubmitting(true);
-      if (onSubmitCode) {
-        onSubmitCode(authCode);
-      }
-    } else {
-      setAttempts((prev) => {
-        const newAttempts = prev + 1;
-        setError(`Unsuccessful attempt ${newAttempts} of 3.`);
-        return newAttempts;
-      });
-      setCode(["", "", "", "", "", ""]);
+    if (onSubmitCode) {
+      onSubmitCode(authCode);
+      setCode(initialCode);
     }
   };
 
   const handleCodeChange = (newCode: string[]) => {
     setCode(newCode);
     if (error && newCode.every((digit) => digit !== "")) setError("");
+  };
+
+  const handleClose = () => {
+    setCode(initialCode);
+    if (onClose) onClose();
   };
 
   return (
@@ -56,7 +52,7 @@ export default function AuthenticateForm({
     >
       <div className="w-full relative mb-6">
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="w-6 h-6 inline-flex justify-center items-center focus:outline-none absolute top-0 right-0"
           aria-label="Close"
         >

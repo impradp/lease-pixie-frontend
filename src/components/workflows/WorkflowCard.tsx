@@ -41,7 +41,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           ))
         ) : (
           <div className="w-full py-8 flex items-center justify-center">
-            <p className="text-[#424242] text-[16px] font-medium font-['Inter']">
+            <p className="text-tertiary-charcoalGrey text-[16px] font-medium font-['Inter']">
               No workflows to display.
             </p>
           </div>

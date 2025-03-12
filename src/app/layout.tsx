@@ -14,9 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${myanmarKhyay.variable}`}>
-      <body className="min-h-screen bg-custom-gradient">
+      <body className="min-h-screen bg-custom-gradient flex flex-col">
         <PixieNavbar className="max-w-[1360px] mx-auto px-5.5 sm:px-6 md:px-[45px] lg:px-[45px] " />
-        <main className="w-full max-w-[1360px] mx-auto px-5.5 sm:px-6 md:px-[45px] lg:px-[45px] pb-6 ">
+        <main className="w-full max-w-[1360px] mx-auto px-5.5 sm:px-6 md:px-[45px] lg:px-[45px] pb-6 flex-grow">
           {children}
         </main>
         <Footer />
