@@ -45,7 +45,7 @@ function DashboardContent() {
   }, [searchParams, router]);
 
   const breadcrumbItems = [
-    { href: "/account/portfolio", label: "Add Portfolio" },
+    { href: "/portfolio", label: "Add Portfolio" },
     { href: "#", label: "Account Dashboard", isActive: true },
   ];
 

@@ -83,7 +83,7 @@ export default function LoginCard({
               onChange={handleInputChange("email")}
               placeholder="Enter your email"
               isEditing={true}
-              className="h-[91px] w-[358px]"
+              containerClassName="h-[91px] w-[358px]"
             />
 
             <CustomInput
@@ -92,7 +92,7 @@ export default function LoginCard({
               onChange={handleInputChange("identifier")}
               placeholder="Enter your ID"
               isEditing={true}
-              className="h-24 w-[358px]"
+              containerClassName="h-24 w-[358px]"
             />
 
             <div className="w-[358px] flex flex-col items-center gap-2">

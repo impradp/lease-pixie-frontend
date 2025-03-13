@@ -97,10 +97,10 @@ describe("CustomInput", () => {
       "text-secondary-light text-sm font-medium font-['Inter'] leading-tight"
     );
     expect(inputContainer).toHaveClass(
-      "px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke flex items-center"
+      "px-3.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke flex items-center"
     );
     expect(input).toHaveClass(
-      "w-full text-secondary-regular text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist"
+      "w-full py-2.5 text-base text-tertiary-light font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist"
     );
   });
 

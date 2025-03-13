@@ -90,7 +90,7 @@ export default function PasscodeInput({
                   onChange={handleInputChange(index)}
                   onKeyDown={handleKeyDown(index)}
                   onPaste={index === 0 ? handlePaste : undefined} // Only add paste handler to first input
-                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-deepNavy focus:outline-none bg-transparent"
+                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-light focus:outline-none bg-transparent"
                 />
               </div>
             ))}
@@ -118,7 +118,7 @@ export default function PasscodeInput({
                   value={code[index + 3]}
                   onChange={handleInputChange(index + 3)}
                   onKeyDown={handleKeyDown(index + 3)}
-                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-deepNavy focus:outline-none bg-transparent"
+                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-light focus:outline-none bg-transparent"
                 />
               </div>
             ))}

@@ -18,6 +18,7 @@ interface PixieDropdownProps {
   className?: string;
   labelClassName?: string;
   placeholder?: string;
+  containerClassName?: string;
 }
 
 export const PixieDropdown: React.FC<PixieDropdownProps> = ({
@@ -32,6 +33,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   className = "xs:w-[153px]",
   labelClassName = "text-secondary-light text-xs font-bold leading-[18px]",
   placeholder = "Select option",
+  containerClassName = "xs:w-[460px] h-[42px] gap-2",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string>(value);
@@ -106,7 +108,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
 
   return (
     <div
-      className="w-full xs:w-[460px] h-[42px] justify-end items-center gap-2 inline-flex relative"
+      className={`w-full justify-end items-center ${containerClassName} inline-flex relative`}
       ref={dropdownRef}
     >
       <div className={`"${labelClassName} font-['Inter']`}>{label}</div>

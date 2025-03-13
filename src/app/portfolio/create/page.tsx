@@ -77,7 +77,7 @@ export default function PortfolioPage() {
   };
 
   const breadcrumbItems = [
-    { href: "/account/portfolio", label: "Portfolio Dashboard" },
+    { href: "/portfolio", label: "Portfolio Dashboard" },
     { href: "#", label: "Add Portfolio", isActive: true },
   ];
 
