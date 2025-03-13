@@ -13,7 +13,7 @@ interface LoginResponse {
 
 interface LoginRequest {
   loginId: string;
-  totp: string;
+  totpSecret: string;
   email: string;
 }
 

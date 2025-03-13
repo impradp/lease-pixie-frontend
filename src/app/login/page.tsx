@@ -77,7 +77,7 @@ function LoginContent() {
     await loginService
       .login({
         loginId: formData.identifier,
-        totp: formData.otp,
+        totpSecret: formData.otp,
         email: formData.email,
       })
       .then((response) => {
