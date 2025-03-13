@@ -54,10 +54,7 @@ function DashboardContent() {
       <Breadcrumbs items={breadcrumbItems} />
       <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center relative">
         {showToastr && (
-          <div
-            className="fixed top-4 right-4 z-50"
-            style={{ transition: "none" }}
-          >
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 xs:right-4 xs:left-auto xs:translate-x-0 z-50 flex flex-col gap-2">
             <Toastr message="Login successful." toastrType="success" />
           </div>
         )}

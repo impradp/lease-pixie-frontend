@@ -1,9 +1,11 @@
+"use client";
+
 import React from "react";
 import LoadingSpinner from "./LoadingSpinner";
 
-const LoadingOverlay = ({ size = 80 }) => {
+const LoadingOverlay = ({ size = 80 }: { size?: number }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <LoadingSpinner size={size} />
     </div>
   );

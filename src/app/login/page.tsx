@@ -11,7 +11,6 @@ import { cookieHandler } from "@/lib/services/cookieHandler";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 
-// Create a separate client component for search params logic
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,9 +19,8 @@ function LoginContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [toastrs, setToastrs] = useState<ToastrMessage[]>([]);
-  const hasShownLogoutToastr = useRef(false); // Track if logout toastr has been shown
+  const hasShownLogoutToastr = useRef(false);
 
-  // Load cookie data and check for logout query parameter
   useEffect(() => {
     const loggedOut = searchParams.get("loggedOut");
     if (loggedOut === "true" && !hasShownLogoutToastr.current) {
@@ -63,9 +61,7 @@ function LoginContent() {
         .then(() => {
           router.push("/workflows");
         })
-        .catch(() => {
-          // Token invalid, continue with login page
-        });
+        .catch(() => {});
     };
 
     checkAuth();
@@ -86,21 +82,14 @@ function LoginContent() {
       })
       .then((response) => {
         if (response.status === 1) {
-          // Set redirecting state to show the loading overlay
           setIsRedirecting(true);
-
-          // Reset attempts and store last successful login
           const now = new Date().toISOString();
-          cookieHandler.setLoginAttempts(0, now, null, 86400); // 24 hours
-
-          // Navigate to the workflows page after a small delay
-          // to ensure the loading state is visible
+          cookieHandler.setLoginAttempts(0, now, null, 86400);
           setTimeout(() => {
             router.push("/workflows?success=true");
           }, 300);
         } else {
-          // Handle multiple retries
-          const toastrId = `toastr-${Date.now()}-${Math.random()}`; // Unique ID for each toastr
+          const toastrId = `toastr-${Date.now()}-${Math.random()}`;
           setToastrs((prev) => [
             ...prev,
             { id: toastrId, message: "Login failed.", toastrType: "warning" },
@@ -108,7 +97,7 @@ function LoginContent() {
           const now = new Date().toISOString();
           setAttempts((prev) => {
             const newAttempts = prev + 1;
-            cookieHandler.setLoginAttempts(newAttempts, null, now); // 30 minutes
+            cookieHandler.setLoginAttempts(newAttempts, null, now);
             if (newAttempts >= 3) {
               updateLockoutMessage(now);
             } else {
@@ -119,7 +108,7 @@ function LoginContent() {
         }
       })
       .catch(() => {
-        const toastrId = `toastr-${Date.now()}-${Math.random()}`; // Unique ID for each toastr
+        const toastrId = `toastr-${Date.now()}-${Math.random()}`;
         setToastrs((prev) => [
           ...prev,
           { id: toastrId, message: "Login failed.", toastrType: "warning" },
@@ -127,7 +116,6 @@ function LoginContent() {
         setError("An unexpected error occurred. Please try again.");
       })
       .finally(() => {
-        // Only set isSubmitting to false if not redirecting
         if (!isRedirecting) {
           setIsSubmitting(false);
         }
@@ -139,7 +127,7 @@ function LoginContent() {
   };
 
   const updateLockoutMessage = (lastFailedAttempt: string) => {
-    const lockoutDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
+    const lockoutDuration = 30 * 60 * 1000;
     const lastFailTime = new Date(lastFailedAttempt).getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
@@ -161,11 +149,9 @@ function LoginContent() {
 
   return (
     <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center">
-      {/* Show loading overlay when redirecting after successful login */}
       {isRedirecting && <LoadingOverlay size={40} />}
-
       {toastrs.length > 0 && (
-        <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 xs:right-4 xs:left-auto xs:translate-x-0 z-50 flex flex-col gap-2">
           {toastrs.map((toastr) => (
             <Toastr
               key={toastr.id}
@@ -176,7 +162,6 @@ function LoginContent() {
           ))}
         </div>
       )}
-
       <div className="w-[408px] max-w-full flex justify-center mb-4 max-xs:order-2 custom:mb-0">
         <WorkflowCard />
       </div>
@@ -199,7 +184,6 @@ export default function LoginPage() {
     setIsPageLoading(false);
   }, []);
 
-  // Show loading overlay during initial page load
   if (isPageLoading) {
     return <LoadingOverlay size={40} />;
   }

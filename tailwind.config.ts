@@ -110,6 +110,9 @@ const config: Config = {
       margin: {
         "1px": "1px",
       },
+      animation: {
+        "single-bounce": "singleBounce 0.4s ease forwards",
+      },
     },
   },
   plugins: [],
