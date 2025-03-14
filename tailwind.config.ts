@@ -56,6 +56,7 @@ const config: Config = {
           ghostWhite: "#eaecf0",
           slateMist: "#667084",
           lightGray: "#d3d8de",
+          darkGray: "#1e1e1e",
         },
         card: {
           open: {

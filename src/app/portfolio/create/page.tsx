@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   samplePrimaryUsers,
   sampleSecondaryUsers,
@@ -16,6 +16,7 @@ import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
 import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
+import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 
 export default function PortfolioPage() {
   const [locale] = useState<Locale>("en");
@@ -41,8 +42,8 @@ export default function PortfolioPage() {
   const [tertiarySelectedVendor, setTertiarySelectedVendor] = useState<
     DropdownOption | undefined
   >(emptyVendorOption);
-
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleEdit = () => {};
 
@@ -80,6 +81,14 @@ export default function PortfolioPage() {
     { href: "/portfolio", label: "Portfolio Dashboard" },
     { href: "#", label: "Add Portfolio", isActive: true },
   ];
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingOverlay size={40} />;
+  }
 
   return (
     <>
