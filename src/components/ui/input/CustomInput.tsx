@@ -1,7 +1,7 @@
 import React from "react";
 
 interface CustomInputProps {
-  label: string;
+  label?: string;
   value: string;
   onChange?: (value: string) => void;
   readOnly?: boolean;
@@ -9,10 +9,11 @@ interface CustomInputProps {
   placeholder?: string;
   containerClassName?: string;
   className?: string;
+  labelClassName?: string;
 }
 
 export const CustomInput: React.FC<CustomInputProps> = ({
-  label,
+  label = "",
   value,
   onChange,
   readOnly = false,
@@ -20,6 +21,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   placeholder = "",
   containerClassName = "",
   className = "py-2.5 text-base text-tertiary-light",
+  labelClassName = "text-secondary-light text-sm font-medium",
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isEditing || readOnly) return;
@@ -28,7 +30,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 
   return (
     <div className={`flex flex-col gap-1.5 ${containerClassName}`}>
-      <label className="text-secondary-light text-sm font-medium font-['Inter'] leading-tight">
+      <label className={`${labelClassName} font-['Inter'] leading-tight`}>
         {label}
       </label>
       <div

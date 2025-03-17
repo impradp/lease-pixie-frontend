@@ -199,7 +199,7 @@ export const AddressAutocompleteInput: React.FC<
             value={query}
             onChange={handleInputChange}
             readOnly={!isEditing}
-            className="w-full text-card-input-semibold text-base font-normal font-['Inter'] leading-normal outline-none bg-transparent"
+            className="w-full text-base text-tertiary-light font-normal font-['Inter'] leading-normal outline-none bg-transparent"
           />
         </div>
         {suggestions.length > 0 && (

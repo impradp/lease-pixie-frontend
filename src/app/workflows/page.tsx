@@ -76,7 +76,7 @@ function DashboardContent() {
 
 const DashboardPage: React.FC = () => {
   return (
-    <Suspense fallback={<LoadingOverlay size={40} />}>
+    <Suspense fallback={<LoadingOverlay />}>
       <DashboardContent />;
     </Suspense>
   );

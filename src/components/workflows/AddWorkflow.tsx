@@ -23,10 +23,10 @@ export const AddWorkflow: React.FC<AddWorkflowProps> = ({ onClose, onAdd }) => {
   const [vendor, setVendor] = React.useState("");
 
   const workflowOptions = [
-    "Workflow-1",
-    "Workflow-2",
-    "Workflow-3",
-    "Workflow-4",
+    { value: "Workflow-1", label: "Workflow-1" },
+    { value: "Workflow-2", label: "Workflow-2" },
+    { value: "Workflow-3", label: "Workflow-3" },
+    { value: "Workflow-4", label: "Workflow-4" },
   ];
 
   const suggestions = [
@@ -34,8 +34,14 @@ export const AddWorkflow: React.FC<AddWorkflowProps> = ({ onClose, onAdd }) => {
     "[Another suggestion]",
     "[Another suggestion]",
   ];
-  const unitOptions = ["Unit 1", "Unit 3", "Unit 2"];
-  const vendorOptions = ["Vendor 1", "Vendor 2", "Vendor 3"];
+  const unitOptions = [
+    { value: "Unit 1", label: "Unit 1" },
+    { value: "Unit 2", label: "Unit 2" },
+  ];
+  const vendorOptions = [
+    { value: "Vendor 1", label: "Vendor 1" },
+    { value: "Vendor 2", label: "Vendor 2" },
+  ];
 
   const handleAddClick = () => {
     onAdd({ workflow, title, unit, vendor });
@@ -72,7 +78,7 @@ export const AddWorkflow: React.FC<AddWorkflowProps> = ({ onClose, onAdd }) => {
               <PixieDropdown
                 options={workflowOptions}
                 value={workflow}
-                onChange={(option) => setWorkflow(option.value)}
+                onChange={(option) => setWorkflow(option)}
                 isEditing={true}
                 placeholder="Enter workflow"
                 className="w-[300px]"
@@ -130,7 +136,7 @@ export const AddWorkflow: React.FC<AddWorkflowProps> = ({ onClose, onAdd }) => {
             <PixieDropdown
               options={unitOptions}
               value={unit}
-              onChange={(option) => setUnit(option.value)}
+              onChange={(option) => setUnit(option)}
               isEditing={true}
               placeholder="Select unit"
               className="w-[300px]"
@@ -147,7 +153,7 @@ export const AddWorkflow: React.FC<AddWorkflowProps> = ({ onClose, onAdd }) => {
             <PixieDropdown
               options={vendorOptions}
               value={vendor}
-              onChange={(option) => setVendor(option.value)}
+              onChange={(option) => setVendor(option)}
               isEditing={true}
               placeholder="Select vendor"
               className="w-[300px]"

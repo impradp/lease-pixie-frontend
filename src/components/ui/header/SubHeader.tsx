@@ -5,12 +5,14 @@ interface SubHeaderProps {
   label: string;
   showInfo?: boolean;
   infoContent?: string;
+  className?: string; // Added prop for dynamic styling
 }
 
 export const SubHeader: React.FC<SubHeaderProps> = ({
   label,
   showInfo = false,
   infoContent = "",
+  className = "text-base font-semibold text-tertiary-deepNavy", // Default to empty string
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<"left" | "right">(
@@ -34,15 +36,12 @@ export const SubHeader: React.FC<SubHeaderProps> = ({
   }, []);
 
   return (
-    <div className="flex items-center gap-4">
-      <label
-        htmlFor={inputId}
-        className="text-base font-semibold leading-[30px] text-tertiary-deepNavy"
-      >
+    <div className={`flex items-center gap-4`}>
+      <label htmlFor={inputId} className={`${className} font-['Inter'] `}>
         {label}
       </label>
       {showInfo && (
-        <div className=" relative">
+        <div className="relative">
           <button
             ref={buttonRef}
             className="flex items-center text-gray-400 hover:text-gray-600 align-middle"

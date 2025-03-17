@@ -166,6 +166,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 checked={formData.getW9}
                 onChange={() => handleCheckboxChange("getW9")}
                 label="Get W-9"
+                isEditing={true}
               />
 
               <CustomCheckbox
@@ -173,6 +174,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 checked={formData.send1099}
                 onChange={() => handleCheckboxChange("send1099")}
                 label="Send 1099"
+                isEditing={true}
               />
 
               <CustomCheckbox
@@ -180,6 +182,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 checked={formData.getInsuranceCert}
                 onChange={() => handleCheckboxChange("getInsuranceCert")}
                 label="Get insurance certificate"
+                isEditing={true}
               />
             </div>
             <div className="flex flex-col gap-3 pb-6">

@@ -62,7 +62,9 @@ describe("CustomCheckbox", () => {
 
     rerender(<CustomCheckbox {...defaultProps} checked={true} />);
     container = screen.getByRole("checkbox").nextElementSibling;
-    expect(container).toHaveClass("bg-black border-black");
+    expect(container).toHaveClass(
+      "absolute top-0 left-0 w-5 h-5 border rounded pointer-events-none flex items-center justify-center transition-colors bg-white border-black"
+    );
   });
 
   it("triggers onChange when clicked", () => {
@@ -89,8 +91,12 @@ describe("CustomCheckbox", () => {
     const checkbox = screen.getByRole("checkbox");
     const label = screen.getByText("Test Checkbox");
 
-    expect(checkbox).toHaveClass("cursor-pointer");
-    expect(label).toHaveClass("cursor-pointer");
+    expect(checkbox).toHaveClass(
+      "absolute w-full h-full opacity-0 z-10 cursor-default"
+    );
+    expect(label).toHaveClass(
+      "text-tertiary-slateBlue text-sm font-medium font-['Inter'] leading-tight select-none cursor-default"
+    );
   });
 
   it("prevents text selection on label", () => {
@@ -109,7 +115,7 @@ describe("CustomCheckbox", () => {
     // Check the arguments passed to the mock
     expect(mockCheck).toHaveBeenCalledWith({
       size: 16,
-      className: "text-white",
+      className: "text-black",
     });
   });
 });
