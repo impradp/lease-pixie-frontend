@@ -149,7 +149,7 @@ function LoginContent() {
 
   return (
     <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center">
-      {isRedirecting && <LoadingOverlay size={40} />}
+      {isRedirecting && <LoadingOverlay />}
       {toastrs.length > 0 && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 xs:right-4 xs:left-auto xs:translate-x-0 z-50 flex flex-col gap-2">
           {toastrs.map((toastr) => (
@@ -185,11 +185,11 @@ export default function LoginPage() {
   }, []);
 
   if (isPageLoading) {
-    return <LoadingOverlay size={40} />;
+    return <LoadingOverlay />;
   }
 
   return (
-    <Suspense fallback={<LoadingOverlay size={40} />}>
+    <Suspense fallback={<LoadingOverlay />}>
       <LoginContent />
     </Suspense>
   );

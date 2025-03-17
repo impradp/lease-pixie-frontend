@@ -13,5 +13,6 @@ export interface NewUserFormData {
 
 export interface DropdownOption {
   label: string;
+  subLabel?: string;
   value: string;
 }

@@ -90,6 +90,13 @@ const en: Messages = {
       message: "Portfolio successfully added.",
     },
   },
+  property: {
+    automation: {
+      title: "Workflow Automation",
+      syncTitle: "Sync automation selections across properties",
+      info: "Property Sync:  used to apply automation and workflow settings consistently across all properties in the Portfolio.  These settings at a Property level will be not editable since they are initiated and controlled here at the Portfolio level. Certain features must be scheduled in sequence; in example, sending a paper mail invoice must occur after sending the invoice by email in an attempt to provide an avenue to help you reduce environmental impacts.",
+    },
+  },
 };
 
 export default en;

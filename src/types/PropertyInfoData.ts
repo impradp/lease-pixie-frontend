@@ -1,0 +1,21 @@
+export type PropertyInfoData = {
+  portfolioName: string;
+  propertyTitle: string;
+  propertyEntityName: string;
+  physicalPropertyAddress: string;
+  requestedBuildingSize: string;
+  requestedCategory: string;
+  estimatedMonthlyCollection: string;
+  largestMonthlyInvoice: string;
+  propertyManagementLegalEntity: string;
+  propertyManagementOfficePhoneNumber: string;
+  payableRemittanceAddress: string;
+  floorPlan: string;
+  elvatorPlan: string;
+  buildingStructure: string;
+  roofStructure: string;
+  constructionYear: string;
+  propertyExpirationDate: string;
+  firePanels: string;
+  sprinklerSystem: string;
+};

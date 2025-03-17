@@ -81,6 +81,13 @@ export type Messages = {
       message: string;
     };
   };
+  property: {
+    automation: {
+      title: string;
+      syncTitle: string;
+      info: string;
+    };
+  };
 };
 
 export const locales = {

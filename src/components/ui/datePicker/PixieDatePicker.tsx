@@ -13,6 +13,7 @@ interface PixieDatePickerProps {
   onChange?: (value: string) => void;
   readOnly?: boolean;
   isEditing: boolean;
+  dateFormat?: readonly ("year" | "month" | "day")[];
 }
 
 export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
@@ -21,12 +22,16 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
   onChange,
   readOnly = false,
   isEditing,
+  dateFormat = ["year", "month", "day"],
 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(
-    value ? value : null
+    value || null
   );
   const [open, setOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<"year" | "month" | "day">(
+    dateFormat[0] || "day"
+  );
 
   useEffect(() => {
     setIsMounted(true);
@@ -37,14 +42,17 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
       const isoDate = newValue ? newValue.toISOString() : "";
       setSelectedDate(isoDate);
       onChange?.(isoDate);
-      // Do not close the popup here; let onAccept handle it
+
+      // Close the popup if the current view is the last in dateFormat
+      if (currentView === dateFormat[dateFormat.length - 1]) {
+        setOpen(false);
+      }
     }
   };
 
-  const handleDateAccept = (newValue: dayjs.Dayjs | null) => {
-    // Called when a date is fully confirmed (month and day selected)
-    if (newValue && !readOnly && isEditing) {
-      setOpen(false); // Close the popup after a complete date is selected
+  const handleViewChange = (view: "year" | "month" | "day") => {
+    if (dateFormat.includes(view)) {
+      setCurrentView(view);
     }
   };
 
@@ -56,26 +64,36 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
     }
   };
 
+  // Reset view to the first in dateFormat when closing
+  useEffect(() => {
+    if (!open) {
+      setCurrentView(dateFormat[0] || "day");
+    }
+  }, [open, dateFormat]);
+
   if (!isMounted) return null;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className="w-full xs:w-[460px] h-[42px] justify-end items-center gap-2 inline-flex relative bg-white overflow-visible">
-        <div className="text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
+      <div className="w-full flex flex-col gap-1.5">
+        {/* Label Container */}
+        <div className="text-tertiary-slateBlue text-sm font-medium font-['Inter'] leading-[18px]">
           {label}
         </div>
-        <div className="w-full xs:w-[153px] self-stretch justify-start items-center gap-2 flex relative">
+        {/* Input Container */}
+        <div className="w-full relative">
           <MUIDatePicker
             open={open}
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
             value={selectedDate ? dayjs(selectedDate) : null}
             onChange={handleDateChange}
-            onAccept={handleDateAccept} // Handle closing after full date selection
             readOnly={readOnly || !isEditing}
-            openTo="day"
-            views={["month", "day"]}
-            className={`w-full grow shrink basis-0 h-9 px-3.5 py-2.5 bg-white rounded-lg border border-tertiary-stroke justify-between items-center gap-2 flex overflow-visible ${
+            openTo={dateFormat[0] || "day"}
+            views={dateFormat}
+            view={currentView}
+            onViewChange={handleViewChange}
+            className={`w-full h-[44px] px-3.5 py-2.5 bg-white rounded-lg border border-tertiary-stroke justify-between items-center gap-2 flex ${
               isEditing && !readOnly ? "cursor-pointer" : "cursor-default"
             }`}
             slotProps={{
@@ -84,7 +102,7 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
                 sx: {
                   "& .MuiInputBase-root": {
                     width: "100%",
-                    height: "36px",
+                    height: "44px",
                     padding: "0 14px",
                     backgroundColor: "white",
                     borderRadius: "8px",
@@ -99,26 +117,33 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
                   "& .MuiInputBase-input": {
                     paddingRight: "32px",
                     color: "#475467",
-                    fontSize: 14,
+                    fontSize: 16,
                     fontFamily: "Inter",
+                    height: "44px",
+                    boxSizing: "border-box",
+                    "&:disabled": {
+                      color: "#9CA3AF",
+                      WebkitTextFillColor: "#9CA3AF",
+                    },
+                    "&.Mui-disabled": {
+                      WebkitTextFillColor: "#475466",
+                    },
                   },
-                  // Set MuiInput-underline to transparent
                   "& .MuiInput-underline": {
                     "&:before": {
-                      borderBottomColor: "transparent", // Default underline
+                      borderBottomColor: "transparent",
                     },
                     "&:hover:not(.Mui-disabled):before": {
-                      borderBottomColor: "transparent", // Underline on hover
+                      borderBottomColor: "transparent",
                     },
                     "&:after": {
-                      borderBottomColor: "rgba(71, 84, 102, 1)", // Underline when focused
+                      borderBottomColor: "rgba(71, 84, 102, 1)",
                     },
                   },
-                  // Set MuiInputBase-colorPrimary states to transparent where applicable
                   "& .MuiInputBase-colorPrimary": {
                     "&.Mui-focused": {
                       "& .MuiInput-underline:after": {
-                        borderBottomColor: "transparent", // Ensure focused underline is transparent
+                        borderBottomColor: "transparent",
                       },
                     },
                   },
@@ -126,7 +151,11 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
                 InputProps: {
                   endAdornment: (
                     <Calendar
-                      className="w-5 h-5 stroke-secondary-icon cursor-pointer absolute right-2 top-1/2 transform -translate-y-1/2"
+                      className={`w-5 h-5 stroke-secondary-icon absolute right-2 top-1/2 transform -translate-y-1/2 ${
+                        isEditing && !readOnly
+                          ? "cursor-pointer"
+                          : "cursor-default"
+                      }`}
                       onClick={handleCalendarClick}
                     />
                   ),

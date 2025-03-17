@@ -87,7 +87,7 @@ export default function PortfolioPage() {
   }, []);
 
   if (isLoading) {
-    return <LoadingOverlay size={40} />;
+    return <LoadingOverlay />;
   }
 
   return (

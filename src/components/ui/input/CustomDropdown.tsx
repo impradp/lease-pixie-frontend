@@ -42,7 +42,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
   // Find the selected option based on the selectedValue state
   const selectedOption = isLocked
-    ? { label: lockMessage, value: "" }
+    ? { label: lockMessage, value: "", subLabel: "" }
     : selectedValue
     ? options.find((option) => option.value === selectedValue)
     : options.find((option) => option.value === "");
@@ -191,7 +191,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             </div>
             {selectedOption?.label && (
               <div className="text-card-input-regular text-base font-normal font-['Inter'] leading-normal">
-                {selectedOption.value || "\u00A0"}
+                {selectedOption.subLabel || "\u00A0"}
               </div>
             )}
           </div>
@@ -234,7 +234,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                     </div>
                     {option.value !== option.label && (
                       <div className="text-dropdown-regular text-base font-normal font-['Inter'] leading-normal">
-                        {option.value || "\u00A0"}
+                        {option.subLabel || "\u00A0"}
                       </div>
                     )}
                   </div>

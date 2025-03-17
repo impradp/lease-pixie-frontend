@@ -10,7 +10,7 @@ import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { PixieMonthPicker } from "@/components/ui/datePicker/PixieMonthPicker";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
 
-interface PortfolioAutomationSyncProps {
+interface WorkflowAutomationSyncProps {
   sectionId: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
@@ -56,9 +56,7 @@ interface FormData {
   vendor1099ProcessingValue: string;
 }
 
-export const PortfolioAutomationSync: React.FC<
-  PortfolioAutomationSyncProps
-> = ({
+export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
   sectionId,
   editingSection,
   onSectionEdit,
