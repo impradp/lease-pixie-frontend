@@ -1,135 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
+import { Locale } from "@/locales";
+import { getMessages } from "@/locales/loader";
+import { sampleBankAccounts } from "@/data/accounts";
 import { ToastrMessage } from "@/types/ToastrMessage";
 import Toastr from "@/components/ui/toastrPopup/Toastr";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
+import PropertyInfoCard from "@/components/property/PropertyInfoCard";
+import BankSettingsCard from "@/components/property/BankSettingsCard";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
 import SpaceSettingsCard from "@/components/property/SpaceSettingsCard";
-import PropertyInfoCard from "@/components/property/PropertyInfoCard";
-import { Locale } from "@/locales";
-import { getMessages } from "@/locales/loader";
 import InvoiceSettingsCard from "@/components/property/InvoiceSettingsCard";
-import BankSettingsCard from "@/components/property/BankSettingsCard";
-import { sampleBankAccounts } from "@/data/accounts";
 import { WorkflowAutomationSync } from "@/components/property/WorkflowAutomationSync";
+import {
+  buildingStructureOptions,
+  categoryOptions,
+  elevatorPlanOptions,
+  existingInvoiceSettingsData,
+  existingPropertyInfoData,
+  firePanelsOptions,
+  floorPlanOptions,
+  largestMonthlyInvoiceOptions,
+  portfolioOptions,
+  roofStructureOptions,
+  sprinklerSystemOptions,
+} from "@/data/Properties";
 
 export default function PropertyPage() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [toastrs, setToastrs] = useState<ToastrMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const portfolioOptions = [
-    {
-      label: "Portfolio 1",
-      value: "Portfolio 1",
-    },
-    {
-      label: "Portfolio 2",
-      value: "Portfolio 2",
-    },
-    {
-      label: "Portfolio 3",
-      value: "Portfolio 3",
-    },
-  ];
-
-  const categoryOptions = [
-    {
-      label: "Category 1",
-      value: "Category 1",
-    },
-    {
-      label: "Category 2",
-      value: "Category 2",
-    },
-    {
-      label: "Category 3",
-      value: "Category 3",
-    },
-  ];
-
-  const largestMonthlyInvoiceOptions = [
-    { label: "$1000", value: "$1000" },
-    { label: "$2000", value: "$2000" },
-    { label: "$3000", value: "$3000" },
-  ];
-
-  const floorPlanOptions = [
-    { label: "Floor Plan 1", value: "Floor Plan 1" },
-    { label: "Floor Plan 2", value: "Floor Plan 2" },
-    { label: "Floor Plan 3", value: "Floor Plan 3" },
-  ];
-
-  const elevatorPlanOptions = [
-    { label: "Elevator Plan 1", value: "Elevator Plan 1" },
-    { label: "Elevator Plan 2", value: "Elevator Plan 2" },
-    { label: "Elevator Plan 3", value: "Elevator Plan 3" },
-  ];
-
-  const buildingStructureOptions = [
-    { label: "Block", value: "Block" },
-    { label: "Brick", value: "Brick" },
-    { label: "Concrete", value: "Concrete" },
-    { label: "Steel", value: "Steel" },
-    { label: "Wood", value: "Wood" },
-  ];
-
-  const roofStructureOptions = [
-    { label: "Asphalt", value: "Asphalt" },
-    { label: "Concrete", value: "Concrete" },
-    { label: "Metal", value: "Metal" },
-    { label: "Rubber", value: "Rubber" },
-    { label: "Shingle", value: "Shingle" },
-  ];
-
-  const sprinklerSystemOptions = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
-  ];
-
-  const firePanelsOptions = [
-    { label: "1", value: "1" },
-    { label: "2", value: "2" },
-    { label: "3", value: "3" },
-  ];
-
-  const existingPropertyInfoData = {
-    portfolioName: "Portfolio 1",
-    propertyTitle: "Property 1",
-    propertyEntityName: "Property 1",
-    physicalPropertyAddress: "",
-    requestedBuildingSize: "",
-    requestedCategory: "",
-    estimatedMonthlyCollection: "",
-    largestMonthlyInvoice: "",
-    propertyManagementLegalEntity: "",
-    propertyManagementOfficePhoneNumber: "",
-    payableRemittanceAddress: "",
-    floorPlan: "",
-    elvatorPlan: "",
-    buildingStructure: "",
-    roofStructure: "",
-    constructionYear: "",
-    propertyExpirationDate: "",
-    firePanels: "",
-    sprinklerSystem: "",
-  };
-
-  const existingInvoiceSettingsData = {
-    entityForInvoiceHeader: "Invoice Header 1",
-    addressForInvoiceHeader: "",
-    phoneForInvoiceHeader: "",
-    taxRateBaseRentFlag: false,
-    taxRateBaseRent: "",
-    defaultNoticeBody:
-      "This letter confirms a monetary default under your lease.  The details of the outstanding invoices are below, please address these payments immediately.  Further communications will be conducted by our attorney, after which point, incurred attorney costs related to this default shall be added to any amounts due.",
-    w9CompletedFile: "",
-  };
 
   const handleEdit = () => {};
 
@@ -138,7 +43,7 @@ export default function PropertyPage() {
   };
 
   const handleSectionClose = () => {
-    setSelectedFile(null);
+    //TODO: Set selected file
     setEditingSection(null);
   };
 
@@ -163,7 +68,7 @@ export default function PropertyPage() {
 
     // Validate file size
     if (file.size <= 10 * 1024 * 1024) {
-      setSelectedFile(file);
+      //TODO: Set selected file
     } else {
       const toastrId = `toastr-${Date.now()}-${Math.random()}`;
       setToastrs((prev) => [
@@ -177,22 +82,20 @@ export default function PropertyPage() {
     }
   };
 
-  // TODO: Handle file upload
   const handleSpaceSettingUpdate = () => {
-    console.log("File uploaded", selectedFile);
+    // TODO: Handle file upload
   };
 
-  //TODO: Handle
   const handlePropertyInfoUpdate = () => {
-    console.log("Property Info Updated");
+    // TODO: Handle property update
   };
 
   const handleBankSettingsUpdate = () => {
-    console.log("Bank Settings Updated");
+    // TODO: Handle bank settings update
   };
 
   const handleInvoiceSettingsUpdate = () => {
-    console.log("Invoice Settings Updated");
+    // TODO: Handle invoice settings update
   };
 
   const handleToastrClose = (id: string) => {

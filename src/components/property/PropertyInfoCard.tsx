@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { DropdownOption } from "@/types/user";
-import { PropertyInfoData } from "@/types/PropertyInfoData";
+import { PropertyInfoData } from "@/types/PropertyInfo";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { CustomInput } from "@/components/ui/input/CustomInput";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
+import { PixieDatePicker } from "../ui/datePicker/PixieDatePicker";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
 import { AddressAutocompleteInput } from "@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput";
-import { PixieDatePicker } from "../ui/datePicker/PixieDatePicker";
 
 interface PropertyInfoCardProps {
   onEdit?: () => void;
@@ -189,7 +189,7 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             }
             readOnly={!isEditing}
             isEditing={isEditing}
-            labelClassName="text-[#344053] text-sm font-medium"
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
             containerClassName="w-full"
           />
 
@@ -201,7 +201,7 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             }
             readOnly={!isEditing}
             isEditing={isEditing}
-            labelClassName="text-[#344053] text-sm font-medium"
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
             containerClassName="w-full"
           />
 
@@ -231,7 +231,7 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               }
               readOnly={!isEditing}
               isEditing={isEditing}
-              labelClassName="text-[#344053] text-sm font-medium"
+              labelClassName="text-tertiary-slateBlue text-sm font-medium"
               containerClassName="w-full"
             />
 
@@ -260,7 +260,7 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               }
               readOnly={!isEditing}
               isEditing={isEditing}
-              labelClassName="text-[#344053] text-sm font-medium"
+              labelClassName="text-tertiary-slateBlue text-sm font-medium"
               containerClassName="w-full"
             />
 
@@ -291,7 +291,7 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             }
             readOnly={!isEditing}
             isEditing={isEditing}
-            labelClassName="text-[#344053] text-sm font-medium"
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
             containerClassName="w-full"
           />
 
@@ -306,8 +306,8 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             }
             readOnly={!isEditing}
             isEditing={isEditing}
-            className="py-2.5 text-base text-[#0f1728]"
-            labelClassName="text-[#344053] text-sm font-medium"
+            className="py-2.5 text-base text-tertiary-deepNavy"
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
             placeholder="800-555-1234"
             containerClassName="w-full"
           />

@@ -14,18 +14,14 @@ export class ApiService {
         method: "POST",
         credentials: "include",
       });
-      console.log("Refresh token response:", {
-        status: response.status,
-        statusText: response.statusText,
-      });
       const data: { token?: string } = await response.json();
       if (data.token) {
         this.token = data.token;
         return this.token;
       }
       return null;
-    } catch (error) {
-      console.error("Refresh token error:", error);
+    } catch {
+      //TODO: Handle error properly
       return null;
     }
   }
@@ -116,7 +112,7 @@ export class ApiService {
 
       return data;
     } catch (error) {
-      console.error(`Error in request to ${endpoint}:`, error);
+      //TODO: Handle error properly
       throw error; // Let caller handle errors
     }
   }

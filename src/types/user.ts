@@ -9,6 +9,7 @@ export interface NewUserFormData {
   lastName: string;
   email: string;
   mobilePhone: string;
+  smsActive?: boolean;
 }
 
 export interface DropdownOption {

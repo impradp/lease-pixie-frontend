@@ -57,6 +57,12 @@ const config: Config = {
           slateMist: "#667084",
           lightGray: "#d3d8de",
           darkGray: "#1e1e1e",
+          darkNavy: "#0003",
+          whisperGray: "#eef0f3",
+          platinumGray: "#d9dde3",
+          coolSilver: "#d8dde3",
+          neutralGray: "#dddddd",
+          offBlack: "#232323",
         },
         card: {
           open: {

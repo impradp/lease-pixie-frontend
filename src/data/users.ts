@@ -1,3 +1,4 @@
+import { PortfolioUser } from "@/types/Portfolio";
 import { DropdownOption } from "@/types/user";
 
 //TODO: Remove this sample data later after integrating with the API
@@ -33,3 +34,16 @@ export const loggedInUser = {
   name: "Jane",
   email: "janedoe@gmail.com",
 };
+
+export const samplePortfolioUser: PortfolioUser[] = [
+  {
+    id: "user1",
+    name: "Sarah Johnson",
+    email: "SarahJohnson@gmail.com",
+    phone: "905.345.789",
+    portfolios: [
+      { id: "port1", name: "Portfolio Name A", propertyCount: 1 },
+      { id: "port2", name: "Portfolio Name B", propertyCount: 2 },
+    ],
+  },
+];

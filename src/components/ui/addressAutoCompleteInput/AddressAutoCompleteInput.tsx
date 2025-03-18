@@ -44,7 +44,7 @@ export const AddressAutocompleteInput: React.FC<
       try {
         const API_KEY = process.env.NEXT_PUBLIC_RADAR_API_KEY;
         if (!API_KEY) {
-          console.error("Radar API key is missing.");
+          //TODO: Handle error: Radar API key is missing.
           return;
         }
 
@@ -53,8 +53,8 @@ export const AddressAutocompleteInput: React.FC<
 
         Radar.initialize(API_KEY);
         setRadarInitialized(true);
-      } catch (error) {
-        console.error("Failed to initialize Radar SDK:", error);
+      } catch {
+        //TODO: Log error properly
         setError("Failed to initialize address autocomplete");
       }
     };
@@ -130,8 +130,8 @@ export const AddressAutocompleteInput: React.FC<
         setSuggestions([]);
         setError("No results found");
       }
-    } catch (error) {
-      console.error("Radar autocomplete error:", error);
+    } catch {
+      //TODO: Handle error properly:Radar autocomplete error
       setError("Failed to fetch address suggestions");
       setSuggestions([]);
     } finally {

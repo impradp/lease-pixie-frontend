@@ -1,39 +1,43 @@
+//This dashboard is intended for admin user. Please dont use it for other user types.
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { loggedInUser } from "@/data/users";
-import { loginService } from "@/lib/services/login";
+import { samplePortfolios } from "@/data/portfolio";
+import { sampleProperties } from "@/data/Properties";
 import Toastr from "@/components/ui/toastrPopup/Toastr";
-import WelcomeCard from "@/components/welcome/WelcomeCard";
-import { workflows as WorkflowList } from "@/data/workflows";
-import WorkflowCard from "@/components/workflows/WorkflowCard";
+import BlankCard from "@/components/dashboard/BlankCard";
+import { propertyApprovalData } from "@/data/propertyApproval";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
+import ROAdminUsersCard from "@/components/dashboard/ROAdminUsersCard";
+import PropertyUsersCard from "@/components/dashboard/PropertyUsersCard";
+import PortfolioUsersCard from "@/components/dashboard/PortfolioUsersCard";
+import PropertyApprovalCard from "@/components/dashboard/PropertyApprovalCard";
+import PropertyAndPortfolioCard from "@/components/dashboard/PropertyAndPortfolioCard";
 
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState("");
   const [showToastr, setShowToastr] = useState(false);
-
-  const workflows = WorkflowList;
-
-  const filteredWorkflows = workflows.filter((workflow) =>
-    workflow.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
   };
 
-  const user = loggedInUser;
-
-  const handleSignOut = () => {
-    loginService.logout();
-    router.push("/login?loggedOut=true"); // Add query parameter for logout
+  const hanldeAddUser = () => {
+    //TODO: Handle Add User
   };
+
+  const filteredProperties = sampleProperties.filter((property) =>
+    property.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredPortfolios = samplePortfolios.filter((portfolio) =>
+    portfolio.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     const success = searchParams.get("success");
@@ -59,14 +63,25 @@ function DashboardContent() {
         )}
 
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
-          <WorkflowCard
-            workflows={filteredWorkflows}
+          <BlankCard />
+        </div>
+        <div className="w-[408px] flex flex-col max-w-full flex justify-center mb-4 custom:mb-0 gap-4">
+          <PropertyApprovalCard
+            isEditable={true}
+            existingApprovalData={propertyApprovalData}
+          />
+          <PropertyAndPortfolioCard
             isEditable={true}
             onSearchChange={handleSearchChange}
+            portfolios={filteredPortfolios}
+            properties={filteredProperties}
           />
+          <PortfolioUsersCard />
+          <PropertyUsersCard />
+          <ROAdminUsersCard onAddUser={hanldeAddUser} />
         </div>
-        <div className="w-[408px] custom:w-full max-w-full custom:flex-1 flex justify-center">
-          <WelcomeCard email={user.email} onSignOut={handleSignOut} />
+        <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
+          <BlankCard />
         </div>
       </div>
     </>

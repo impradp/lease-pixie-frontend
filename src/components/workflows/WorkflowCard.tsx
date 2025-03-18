@@ -37,8 +37,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     setIsPlusClicked(false);
   };
 
-  const handleSuggest = (description: string) => {
-    console.log("Suggested workflow description:", description);
+  const handleSuggest = () => {
     setIsSuggestOpen(false); // Close the SuggestWorkflow popup
     setIsAddWorkflowOpen(true); // Open the AddWorkflow component
     setIsPlusClicked(false); // Reset plus button state
@@ -48,22 +47,16 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     setIsAddWorkflowOpen(false);
   };
 
-  const handleAddWorkflowSubmit = (workflowData: {
-    workflow: string;
-    title: string;
-    unit: string;
-    vendor: string;
-  }) => {
-    console.log("Workflow added:", workflowData);
+  const handleAddWorkflowSubmit = () => {
     setIsAddWorkflowOpen(false); // Close AddWorkflow after submission
   };
 
   const handleSortIconClick = () => {
-    console.log("Sort icon clicked");
+    //TODO: Handle Sort icon click
   };
 
   const handleRefreshClick = () => {
-    console.log("Refresh clicked");
+    //TODO: Handle refresh click
   };
 
   return (

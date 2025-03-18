@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { Upload } from "lucide-react";
 import SubHeader from "@/components/ui/header/SubHeader";
+import { InvoiceSettingsData } from "@/types/InvoiceSettings";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { CustomInput } from "@/components/ui/input/CustomInput";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
-import { InvoiceSettingsData } from "@/types/InvoiceSettingsData";
 import CustomTextArea from "@/components/ui/input/CustomTextArea";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
 import { AddressAutocompleteInput } from "@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput";
