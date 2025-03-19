@@ -63,11 +63,11 @@ const en: Messages = {
       secondaryVendorTitle: "Attorney Seat",
       tertiaryVendorTitle: "Tax Reporting Seat",
       primaryInfo:
-        "Accounting Seat: included in workflows to provide tax related reports to file taxes",
+        "Property Insurance Seat: included in workflows related to property insurance coverage.",
       secondaryInfo:
-        "Property Insurance Seat: included in workflows related to property insurance coverage",
-      tertiaryInfo:
         "Attorney Seat: included in workflows related to legal lease document production and tenant defaults. This seat will be requested to produce legal documents and must be licensed to practice law in the state in which the property is located.",
+      tertiaryInfo:
+        "Accounting Seat: included in workflows to provide tax related reports to file taxes.",
       defaultSelectionLabel: "Select vendor",
       button: { label: "Add Vendor", type: "submit" },
       modal: {
