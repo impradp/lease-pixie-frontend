@@ -16,6 +16,7 @@ import PropertyUsersCard from "@/components/dashboard/PropertyUsersCard";
 import PortfolioUsersCard from "@/components/dashboard/PortfolioUsersCard";
 import PropertyApprovalCard from "@/components/dashboard/PropertyApprovalCard";
 import PropertyAndPortfolioCard from "@/components/dashboard/PropertyAndPortfolioCard";
+import AccountsCard from "@/components/dashboard/AccountsCard";
 
 function DashboardContent() {
   const router = useRouter();
@@ -80,8 +81,8 @@ function DashboardContent() {
           <PropertyUsersCard />
           <ROAdminUsersCard onAddUser={hanldeAddUser} />
         </div>
-        <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
-          <BlankCard />
+        <div className="w-full max-w-full flex justify-center mb-4 custom:mb-0">
+          <AccountsCard isEditable={true} onSearchChange={handleSearchChange} />
         </div>
       </div>
     </>
