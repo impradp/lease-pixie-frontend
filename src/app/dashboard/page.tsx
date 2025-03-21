@@ -12,11 +12,11 @@ import { propertyApprovalData } from "@/data/propertyApproval";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
 import ROAdminUsersCard from "@/components/dashboard/ROAdminUsersCard";
+import AccountsCard from "@/components/dashboard/accounts/AccountsCard";
 import PropertyUsersCard from "@/components/dashboard/PropertyUsersCard";
 import PortfolioUsersCard from "@/components/dashboard/PortfolioUsersCard";
 import PropertyApprovalCard from "@/components/dashboard/PropertyApprovalCard";
 import PropertyAndPortfolioCard from "@/components/dashboard/PropertyAndPortfolioCard";
-import AccountsCard from "@/components/dashboard/AccountsCard";
 
 function DashboardContent() {
   const router = useRouter();

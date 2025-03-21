@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { userService } from "@/lib/services/user";
 import { loginService } from "@/lib/services/login";
 import LoginCard from "@/components/login/LoginCard";
+import { getDefaultPage } from "@/config/roleAccess";
 import { ToastrMessage } from "@/types/ToastrMessage";
 import Toastr from "@/components/ui/toastrPopup/Toastr";
 import { cookieHandler } from "@/lib/services/cookieHandler";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
-import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setLoading } = useContext(LoadingContext);
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
   const [toastrs, setToastrs] = useState<ToastrMessage[]>([]);
   const hasShownLogoutToastr = useRef(false);
 
@@ -47,32 +47,13 @@ function LoginContent() {
     }
   }, []);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("auth_token="))
-        ?.split("=")[1];
-
-      if (!token) return;
-
-      await userService
-        .self()
-        .then(() => {
-          router.push("/workflows");
-        })
-        .catch(() => {});
-    };
-
-    checkAuth();
-  }, [router]);
-
   const handleLogin = async (formData: {
     email: string;
     identifier: string;
     otp: string;
   }) => {
     setIsSubmitting(true);
+    setLoading(true);
 
     await loginService
       .login({
@@ -82,12 +63,9 @@ function LoginContent() {
       })
       .then((response) => {
         if (response.status === 1) {
-          setIsRedirecting(true);
           const now = new Date().toISOString();
           cookieHandler.setLoginAttempts(0, now, null, 86400);
-          setTimeout(() => {
-            router.push("/workflows?success=true");
-          }, 300);
+          router.push(getDefaultPage());
         } else {
           const toastrId = `toastr-${Date.now()}-${Math.random()}`;
           setToastrs((prev) => [
@@ -116,9 +94,8 @@ function LoginContent() {
         setError("An unexpected error occurred. Please try again.");
       })
       .finally(() => {
-        if (!isRedirecting) {
-          setIsSubmitting(false);
-        }
+        setIsSubmitting(false);
+        setLoading(false);
       });
   };
 
@@ -149,7 +126,6 @@ function LoginContent() {
 
   return (
     <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center">
-      {isRedirecting && <LoadingOverlay />}
       {toastrs.length > 0 && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 xs:right-4 xs:left-auto xs:translate-x-0 z-50 flex flex-col gap-2">
           {toastrs.map((toastr) => (
@@ -178,19 +154,5 @@ function LoginContent() {
 }
 
 export default function LoginPage() {
-  const [isPageLoading, setIsPageLoading] = useState(true);
-
-  useEffect(() => {
-    setIsPageLoading(false);
-  }, []);
-
-  if (isPageLoading) {
-    return <LoadingOverlay />;
-  }
-
-  return (
-    <Suspense fallback={<LoadingOverlay />}>
-      <LoginContent />
-    </Suspense>
-  );
+  return <LoginContent />;
 }

@@ -14,14 +14,21 @@ export class ApiService {
         method: "POST",
         credentials: "include",
       });
+
+      if (!response.ok) {
+        return null;
+      }
+
       const data: { token?: string } = await response.json();
       if (data.token) {
         this.token = data.token;
+        document.cookie = `auth_token=${this.token}; path=/; max-age=${
+          60 * 60 * 24 * 7
+        }; ${process.env.NODE_ENV === "production" ? "secure" : ""}`;
         return this.token;
       }
       return null;
     } catch {
-      //TODO: Handle error properly
       return null;
     }
   }
@@ -71,12 +78,17 @@ export class ApiService {
     headers: Record<string, string>,
     body?: object | FormData
   ): RequestInit {
-    return {
+    const config: RequestInit = {
       method,
       headers,
       credentials: "include",
-      body: this.getRequestBody(body),
     };
+
+    if (method !== "GET" && method !== "HEAD") {
+      config.body = this.getRequestBody(body);
+    }
+
+    return config;
   }
 
   private async request<T>(
@@ -85,14 +97,18 @@ export class ApiService {
     body: object | FormData,
     isRetry: boolean = false
   ): Promise<T> {
+    if (!endpoint) {
+      throw new Error("Endpoint is undefined or empty");
+    }
+
     const headers = this.createHeaders(body, endpoint);
     const config = this.createRequestConfig(method, headers, body);
+    const url = `${this.baseUrl}${endpoint}`;
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, config);
+      const response = await fetch(url, config);
       const rawText = await response.text();
 
-      // Ensure the response can be parsed as JSON and matches type T
       let data: T;
       try {
         data = rawText ? JSON.parse(rawText) : ({} as T);
@@ -100,20 +116,26 @@ export class ApiService {
         throw new Error(`Failed to parse response as JSON: ${parseError}`);
       }
 
-      if (!response.ok && process.env.NEXT_REFRESH_TOKEN_ENABLE) {
-        if (response.status === 401 && !isRetry) {
+      if (!response.ok) {
+        if (
+          process.env.NEXT_REFRESH_TOKEN_ENABLE &&
+          response.status === 401 &&
+          !isRetry
+        ) {
           const newToken = await this.refreshToken();
           if (newToken) {
             return this.request<T>(method, endpoint, body, true);
           }
         }
-        throw new Error(`Request failed with status ${response.status}`);
+        // Include the status code in the error message
+        throw new Error(
+          `Request failed with status ${response.status}: ${rawText}`
+        );
       }
 
       return data;
     } catch (error) {
-      //TODO: Handle error properly
-      throw error; // Let caller handle errors
+      throw error;
     }
   }
 

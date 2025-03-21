@@ -1,4 +1,5 @@
 export class CookieHandler {
+  // Generic method to get a cookie by name
   getCookie(name: string): string | undefined {
     return document.cookie
       .split("; ")
@@ -6,6 +7,18 @@ export class CookieHandler {
       ?.split("=")[1];
   }
 
+  // Get the auth_token cookie
+  getAuthToken(): string | undefined {
+    return this.getCookie("auth_token");
+  }
+
+  // Clear the auth_token cookie
+  clearAuthToken(): void {
+    document.cookie =
+      "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  }
+
+  // Get login attempts data
   getLoginAttempts(): {
     attempts: number;
     lastSuccessfulLogin: string | null;
@@ -17,6 +30,7 @@ export class CookieHandler {
       : { attempts: 0, lastSuccessfulLogin: null, lastFailedAttempt: null };
   }
 
+  // Set login attempts data
   setLoginAttempts(
     attempts: number,
     lastSuccessfulLogin: string | null,
@@ -35,6 +49,7 @@ export class CookieHandler {
     }`;
   }
 
+  // Clear login attempts data
   clearLoginAttempts(): void {
     this.setLoginAttempts(0, null, null, 0);
   }

@@ -43,7 +43,7 @@ const PropertyUsersCard: React.FC = () => {
           showSearchIcon={true}
         />
       </div>
-      <div className="mt-4 gap-2">
+      <div className="gap-2">
         {filteredPropertyUsers.map((user) => (
           <PropertyUsersCardContent
             key={user.id}

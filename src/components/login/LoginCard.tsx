@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { CustomInput } from "@/components/ui/input/CustomInput";
 import AuthenticateForm from "@/components/login/AuthenticateForm";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
 interface LoginCardProps {
   readonly onSubmit: (formData: {
@@ -20,17 +21,17 @@ interface LoginCardProps {
 
 export default function LoginCard({
   onSubmit,
-  isSubmitting, // Use the prop directly
+  isSubmitting,
   initialAuthCode = ["", "", "", "", "", ""],
   error,
   attempts = 0,
 }: LoginCardProps) {
+  const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
     email: "",
     identifier: "",
     otp: "",
   });
-
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
 
@@ -45,6 +46,7 @@ export default function LoginCard({
   };
 
   const handleAuthCodeSubmit = (authCode: string) => {
+    setLoading(true);
     setAuthCode(authCode.split(""));
     onSubmit({ ...formData, otp: authCode });
     handleCloseAuth();

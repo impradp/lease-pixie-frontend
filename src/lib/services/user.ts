@@ -6,11 +6,13 @@ import { ENDPOINTS } from "@/lib/constants/endpoints";
 interface UserResponse {
   id: number;
   loginId: string;
+  role: string;
 }
 
 class UserService {
   async self(): Promise<UserResponse> {
-    const response = await apiService.get<UserResponse>(ENDPOINTS.USER.SELF);
+    const endpoint = ENDPOINTS.USER.SELF ?? "/api/user/self";
+    const response = await apiService.get<UserResponse>(endpoint);
     return response;
   }
 }

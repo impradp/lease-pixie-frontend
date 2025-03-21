@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { sampleCompanyInfoData } from "@/data/company";
 import CompanyInfo from "@/components/dashboard/CompanyInfo";
-import { NewAccount } from "@/components/dashboard/NewAccount";
+import { NewAccount } from "@/components/dashboard/accounts/NewAccount";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
 
