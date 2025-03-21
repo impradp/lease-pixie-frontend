@@ -1,4 +1,4 @@
-import React from "react";
+// app/loading.tsx
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 
 export default function Loading() {

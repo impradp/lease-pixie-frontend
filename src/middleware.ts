@@ -4,7 +4,6 @@ import { publicRoutes, hasAccess, getDefaultPage } from "@/config/roleAccess";
 
 export function middleware(request: NextRequest): NextResponse {
   const pathname = request.nextUrl.pathname;
-
   const authToken = request.cookies.get("auth_token")?.value;
 
   if (!authToken && !pathname.startsWith("/login")) {
@@ -12,18 +11,13 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   if (pathname.startsWith("/login")) {
+    if (authToken) {
+      return NextResponse.redirect(new URL(getDefaultPage(), request.url));
+    }
     return NextResponse.next();
   }
 
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
-    // If the user is on the login page and has a valid token, redirect to their default page
-    if (pathname === "/login" && authToken) {
-      try {
-        return NextResponse.redirect(new URL(getDefaultPage(), request.url));
-      } catch {
-        return NextResponse.next();
-      }
-    }
     return NextResponse.next();
   }
 
@@ -51,7 +45,6 @@ export function middleware(request: NextRequest): NextResponse {
 
     return NextResponse.next();
   } catch {
-    //TODO: Log error
     cookieHandler.clearAuthToken();
     return NextResponse.redirect(new URL("/login", request.url));
   }

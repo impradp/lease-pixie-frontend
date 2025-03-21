@@ -14,10 +14,9 @@ import { LoadingContext } from "@/components/ClientLoadingWrapper";
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setLoading } = useContext(LoadingContext);
+  const { setLoading, isLoading } = useContext(LoadingContext);
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastrs, setToastrs] = useState<ToastrMessage[]>([]);
   const hasShownLogoutToastr = useRef(false);
 
@@ -52,51 +51,48 @@ function LoginContent() {
     identifier: string;
     otp: string;
   }) => {
-    setIsSubmitting(true);
-    setLoading(true);
+    try {
+      setLoading(true); // Set loading immediately
+      await new Promise((resolve) => requestAnimationFrame(resolve)); // Ensure UI updates
 
-    await loginService
-      .login({
+      const response = await loginService.login({
         loginId: formData.identifier,
         totpSecret: formData.otp,
         email: formData.email,
-      })
-      .then((response) => {
-        if (response.status === 1) {
-          const now = new Date().toISOString();
-          cookieHandler.setLoginAttempts(0, now, null, 86400);
-          router.push(getDefaultPage());
-        } else {
-          const toastrId = `toastr-${Date.now()}-${Math.random()}`;
-          setToastrs((prev) => [
-            ...prev,
-            { id: toastrId, message: "Login failed.", toastrType: "warning" },
-          ]);
-          const now = new Date().toISOString();
-          setAttempts((prev) => {
-            const newAttempts = prev + 1;
-            cookieHandler.setLoginAttempts(newAttempts, null, now);
-            if (newAttempts >= 3) {
-              updateLockoutMessage(now);
-            } else {
-              setError(`Unsuccessful attempt ${newAttempts} of 3.`);
-            }
-            return newAttempts;
-          });
-        }
-      })
-      .catch(() => {
+      });
+
+      if (response.status === 1) {
+        const now = new Date().toISOString();
+        cookieHandler.setLoginAttempts(0, now, null, 86400);
+        router.push(getDefaultPage()); // Trigger redirection (ClientLoadingWrapper will handle loading state)
+      } else {
         const toastrId = `toastr-${Date.now()}-${Math.random()}`;
         setToastrs((prev) => [
           ...prev,
           { id: toastrId, message: "Login failed.", toastrType: "warning" },
         ]);
-        setError("An unexpected error occurred. Please try again.");
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-        setLoading(false);
-      });
+        const now = new Date().toISOString();
+        setAttempts((prev) => {
+          const newAttempts = prev + 1;
+          cookieHandler.setLoginAttempts(newAttempts, null, now);
+          if (newAttempts >= 3) {
+            updateLockoutMessage(now);
+          } else {
+            setError(`Unsuccessful attempt ${newAttempts} of 3.`);
+          }
+          return newAttempts;
+        });
+        setLoading(false); // Clear loading on failure
+      }
+    } catch {
+      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
+      setToastrs((prev) => [
+        ...prev,
+        { id: toastrId, message: "Login failed.", toastrType: "warning" },
+      ]);
+      setError("An unexpected error occurred. Please try again.");
+      setLoading(false); // Clear loading on error
+    }
   };
 
   const handleToastrClose = (id: string) => {
@@ -144,7 +140,7 @@ function LoginContent() {
       <div className="w-[408px] custom:w-full max-w-full custom:flex-1 flex max-xs:order-1 mb-4 justify-center">
         <LoginCard
           onSubmit={handleLogin}
-          isSubmitting={isSubmitting}
+          isSubmitting={isLoading}
           error={error}
           attempts={attempts}
         />

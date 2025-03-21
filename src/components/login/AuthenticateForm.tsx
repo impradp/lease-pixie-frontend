@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { X } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import PasscodeInput from "@/components/ui/input/PasscodeInput";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
 interface AuthenticateFormProps {
   readonly onClose?: () => void;
@@ -20,19 +21,22 @@ export default function AuthenticateForm({
   className = "",
   style,
 }: AuthenticateFormProps) {
+  const { setLoading, isLoading } = useContext(LoadingContext);
   const [code, setCode] = useState(initialCode);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    const authCode = code.join("");
-    if (onSubmitCode) {
-      onSubmitCode(authCode);
-      setCode(initialCode);
-    }
+    setLoading(true); // Set loading immediately
+    // Force a synchronous UI update by delaying the async call slightly
+    requestAnimationFrame(() => {
+      const authCode = code.join("");
+      if (onSubmitCode) {
+        onSubmitCode(authCode);
+        setCode(initialCode);
+      }
+    });
   };
 
   const handleCodeChange = (newCode: string[]) => {
@@ -55,6 +59,7 @@ export default function AuthenticateForm({
           onClick={handleClose}
           className="w-6 h-6 inline-flex justify-center items-center focus:outline-none absolute top-0 right-0"
           aria-label="Close"
+          disabled={isLoading}
         >
           <X className="w-6 h-6 text-secondary-button" />
         </button>
@@ -80,13 +85,14 @@ export default function AuthenticateForm({
             setAttempts(0);
             setError("");
           }}
+          disabled={isLoading}
         />
 
         <div className="w-full flex flex-col">
           <PixieButton
-            label={isSubmitting ? "Submitting..." : "Submit"}
+            label={isLoading ? "Submitting..." : "Submit"}
             type="submit"
-            disabled={code.some((digit) => digit === "") || isSubmitting}
+            disabled={isLoading || code.some((digit) => digit === "")}
             className="bg-black text-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-inner border-2 border-white/10"
           />
         </div>

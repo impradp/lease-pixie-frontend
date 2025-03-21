@@ -9,6 +9,7 @@ interface PasscodeInputProps {
   attempts?: number;
   onReset?: () => void;
   className?: string;
+  disabled?: boolean; // Add disabled prop to respect loading state
 }
 
 export default function PasscodeInput({
@@ -16,6 +17,8 @@ export default function PasscodeInput({
   onChange,
   error,
   onReset,
+  className = "",
+  disabled = false, // Default to false
 }: PasscodeInputProps) {
   const inputRefs = useRef<Array<React.RefObject<HTMLInputElement | null>>>(
     [...Array(6)].map(() => React.createRef<HTMLInputElement>())
@@ -23,6 +26,7 @@ export default function PasscodeInput({
 
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (disabled) return; // Prevent changes when disabled
       const value = e.target.value;
       if (/^[0-9]$/.test(value) || value === "") {
         const newCode = [...code];
@@ -37,6 +41,7 @@ export default function PasscodeInput({
 
   const handleKeyDown =
     (index: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (disabled) return; // Prevent key actions when disabled
       if (e.key === "Backspace" && code[index] === "" && index > 0) {
         inputRefs.current[index - 1]?.current?.focus();
       }
@@ -44,20 +49,18 @@ export default function PasscodeInput({
 
   // Handle paste event
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    if (disabled) return; // Prevent paste when disabled
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text");
     const parsedData = pastedData.replace(/\D/g, ""); // Remove non-numeric characters
 
-    // Check if pasted content has at least 6 digits
     if (parsedData.length >= 6) {
       const newCode = [...code];
-      // Fill in the code array with the first 6 digits
       for (let i = 0; i < 6; i++) {
         newCode[i] = parsedData[i] || "";
       }
       onChange(newCode);
 
-      // Focus the last input after pasting
       if (newCode[5] !== "") {
         inputRefs.current[5]?.current?.focus();
       }
@@ -65,11 +68,15 @@ export default function PasscodeInput({
   };
 
   useEffect(() => {
-    inputRefs.current[0]?.current?.focus();
-  }, []);
+    if (!disabled) {
+      inputRefs.current[0]?.current?.focus();
+    }
+  }, [disabled]);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center gap-2">
+    <div
+      className={`w-full flex flex-col justify-center items-center gap-2 ${className}`}
+    >
       <div className="h-10 sm:h-11 inline-flex flex-col justify-start items-start gap-1 sm:gap-1.5">
         <div className="self-stretch inline-flex justify-start items-center gap-2 sm:gap-3">
           {/* First group of 3 digits */}
@@ -89,8 +96,9 @@ export default function PasscodeInput({
                   value={code[index]}
                   onChange={handleInputChange(index)}
                   onKeyDown={handleKeyDown(index)}
-                  onPaste={index === 0 ? handlePaste : undefined} // Only add paste handler to first input
-                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-light focus:outline-none bg-transparent"
+                  onPaste={index === 0 ? handlePaste : undefined}
+                  disabled={disabled} // Disable input when loading
+                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-light focus:outline-none bg-transparent disabled:opacity-50"
                 />
               </div>
             ))}
@@ -118,7 +126,8 @@ export default function PasscodeInput({
                   value={code[index + 3]}
                   onChange={handleInputChange(index + 3)}
                   onKeyDown={handleKeyDown(index + 3)}
-                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-light focus:outline-none bg-transparent"
+                  disabled={disabled} // Disable input when loading
+                  className="w-full h-5 sm:h-6 text-center text-base sm:text-lg font-medium text-tertiary-light focus:outline-none bg-transparent disabled:opacity-50"
                 />
               </div>
             ))}

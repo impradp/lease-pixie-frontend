@@ -46,7 +46,7 @@ export default function LoginCard({
   };
 
   const handleAuthCodeSubmit = (authCode: string) => {
-    setLoading(true);
+    setLoading(true); // Trigger loading overlay
     setAuthCode(authCode.split(""));
     onSubmit({ ...formData, otp: authCode });
     handleCloseAuth();
