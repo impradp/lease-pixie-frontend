@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+
 import { DropdownOption } from "@/types/user";
 import { PropertyInfoData } from "@/types/PropertyInfo";
 import PixieButton from "@/components/ui/buttons/PixieButton";
@@ -8,7 +10,15 @@ import SectionHeader from "@/components/ui/header/SectionHeader";
 import { PixieDatePicker } from "../ui/datePicker/PixieDatePicker";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
-import { AddressAutocompleteInput } from "@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput";
+
+const AddressAutocompleteInput = dynamic(
+  () =>
+    import("@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput"),
+  {
+    ssr: false, // Disable SSR since it uses client-side Radar SDK
+    loading: () => <p>Loading address input...</p>, // Optional fallback
+  }
+);
 
 interface PropertyInfoCardProps {
   onEdit?: () => void;

@@ -7,7 +7,7 @@ import ROAdminUsersCardContent from "./ROAdminUsersCardContent";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { sampleReadOnlyAdminUsers } from "@/data/readOnlyAdminUsers";
 import { NewReadOnlyAdminUser } from "@/components/dashboard/NewReadOnlyAdminUser";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 
 interface ROAdminUsersCardProps {
   onAddUser?: (userData: NewUserFormData) => void;

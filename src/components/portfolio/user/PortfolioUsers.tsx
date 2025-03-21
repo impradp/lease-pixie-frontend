@@ -7,7 +7,7 @@ import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { NewUserFormData, DropdownOption } from "@/types/user";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 import { NewPortfolioUser } from "@/components/portfolio/user/NewPortfolioUser";
 
 interface PortfolioUsersProps {

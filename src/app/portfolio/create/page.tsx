@@ -14,7 +14,7 @@ import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
 import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 

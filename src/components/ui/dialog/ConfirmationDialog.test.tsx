@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 
 jest.mock("lucide-react", () => ({
   X: () => <svg data-testid="mock-x-icon" />,

@@ -8,7 +8,7 @@ import CancelButton from "@/components/ui/buttons/CancelButton";
 import { CustomInput } from "@/components/ui/input/CustomInput";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 
 interface NewReadOnlyAdminUserProps {
   onClose: () => void;

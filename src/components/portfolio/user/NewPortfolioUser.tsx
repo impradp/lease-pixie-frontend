@@ -4,7 +4,7 @@ import { NewUserFormData } from "@/types/user";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 import { getMessages } from "@/locales/loader";
 import { Locale } from "@/locales";
 

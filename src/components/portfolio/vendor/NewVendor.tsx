@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 
 import { Locale } from "@/locales";
 import { getMessages } from "@/locales/loader";
@@ -8,7 +9,15 @@ import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
-import { AddressAutocompleteInput } from "@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput";
+
+const AddressAutocompleteInput = dynamic(
+  () =>
+    import("@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput"),
+  {
+    ssr: false, // Disable SSR since it uses client-side Radar SDK
+    loading: () => <p>Loading address input...</p>, // Optional fallback
+  }
+);
 
 interface NewVendorProps {
   onClose: () => void;

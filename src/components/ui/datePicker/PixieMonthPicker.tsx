@@ -70,7 +70,7 @@ const CustomCalendarHeader = (props: PickersCalendarHeaderProps<Dayjs>) => {
   );
 };
 
-export const PixieMonthPicker: React.FC<PixieMonthPickerProps> = ({
+const PixieMonthPicker: React.FC<PixieMonthPickerProps> = ({
   label = "",
   value = "",
   onChange,
@@ -235,3 +235,5 @@ export const PixieMonthPicker: React.FC<PixieMonthPickerProps> = ({
     </LocalizationProvider>
   );
 };
+
+export default PixieMonthPicker;

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 
 import { Upload } from "lucide-react";
 import SubHeader from "@/components/ui/header/SubHeader";
@@ -9,7 +10,15 @@ import CancelButton from "@/components/ui/buttons/CancelButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import CustomTextArea from "@/components/ui/input/CustomTextArea";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
-import { AddressAutocompleteInput } from "@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput";
+
+const AddressAutocompleteInput = dynamic(
+  () =>
+    import("@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput"),
+  {
+    ssr: false, // Disable SSR since it uses client-side Radar SDK
+    loading: () => <p>Loading address input...</p>, // Optional fallback
+  }
+);
 
 interface InvoiceSettingsCardProps {
   onEdit?: () => void;

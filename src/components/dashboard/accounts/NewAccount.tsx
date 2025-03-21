@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 
 import { Account } from "@/types/Account";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { CustomInput } from "@/components/ui/input/CustomInput";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
-import { AddressAutocompleteInput } from "@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput";
+
+const AddressAutocompleteInput = dynamic(
+  () =>
+    import("@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput"),
+  {
+    ssr: false, // Disable SSR since it uses client-side Radar SDK
+    loading: () => <p>Loading address input...</p>, // Optional fallback
+  }
+);
 
 interface NewAccountProps {
   onClose: () => void;

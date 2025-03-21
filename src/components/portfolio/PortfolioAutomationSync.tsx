@@ -1,14 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+
 import { RefreshCcw } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
-import { PixieMonthPicker } from "@/components/ui/datePicker/PixieMonthPicker";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
+
+const PixieMonthPicker = dynamic(
+  () => import("@/components/ui/datePicker/PixieMonthPicker"),
+  {
+    ssr: false,
+    loading: () => <p>Loading month picker...</p>,
+  }
+);
 
 interface PortfolioAutomationSyncProps {
   sectionId: string;

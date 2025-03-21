@@ -45,7 +45,7 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
       </div>
 
       {/* Tabbed Section */}
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <PixieTab
           tabs={tabs}
           activeTab={activeTab}

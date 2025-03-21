@@ -5,7 +5,8 @@ import { sampleCompanyInfoData } from "@/data/company";
 import CompanyInfo from "@/components/dashboard/CompanyInfo";
 import { NewAccount } from "@/components/dashboard/accounts/NewAccount";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
+import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 
 interface AccountsCardProps {
   isEditable?: boolean;
@@ -27,6 +28,8 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   const [filteredCompanies, setFilteredCompanies] = useState([
     sampleCompanyInfoData,
   ]);
+  const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
+    useState(false);
 
   // Handle search input change
   const handleSearchChange = (value: string) => {
@@ -46,7 +49,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
 
   // Handle adding a new account
   const handleAccountAdd = () => {
-    setShowNewAccountModal(true);
+    setShowPreConfirmationDialog(true);
   };
 
   useEffect(() => {
@@ -76,6 +79,15 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
 
   const handleConfirmationClose = () => {
     setShowConfirmation(false);
+  };
+
+  const handlePreConfirm = () => {
+    setShowPreConfirmationDialog(false);
+    setShowNewAccountModal(true);
+  };
+
+  const handlePreConfirmationClose = () => {
+    setShowPreConfirmationDialog(false);
   };
 
   return (
@@ -124,6 +136,17 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           </div>
         </div>
       )}
+
+      <PreConfirmationDialog
+        isOpen={showPreConfirmationDialog}
+        onClose={handlePreConfirmationClose}
+        onConfirm={handlePreConfirm}
+        title={"Create Account"}
+        message={
+          "Create a billing account.  This action will add an Account user to the platform."
+        }
+        confirmButtonLabel="Create Billing Account"
+      />
 
       <ConfirmationDialog
         isOpen={showConfirmation}

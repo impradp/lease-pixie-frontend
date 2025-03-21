@@ -17,9 +17,7 @@ interface AddressAutocompleteInputProps {
   inputId?: string;
 }
 
-export const AddressAutocompleteInput: React.FC<
-  AddressAutocompleteInputProps
-> = ({
+const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   label,
   value,
   onChange,
@@ -263,3 +261,5 @@ export const AddressAutocompleteInput: React.FC<
     </div>
   );
 };
+
+export default AddressAutocompleteInput;

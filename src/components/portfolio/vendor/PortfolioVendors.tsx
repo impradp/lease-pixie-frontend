@@ -9,7 +9,7 @@ import { NewVendorFormData } from "@/types/vendor";
 import { DropdownOption } from "@/types/user";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
-import ConfirmationDialog from "@/components/ui/confirmationDialog/ConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 import { NewVendor } from "@/components/portfolio/vendor/NewVendor";
 
 interface PortfolioVendorsProps {
