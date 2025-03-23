@@ -107,15 +107,8 @@ export class ApiService {
 
     try {
       const response = await fetch(url, config);
-      const rawText = await response.text();
 
-      let data: T;
-      try {
-        data = rawText ? JSON.parse(rawText) : ({} as T);
-      } catch (parseError) {
-        throw new Error(`Failed to parse response as JSON: ${parseError}`);
-      }
-
+      // Check if response is OK first
       if (!response.ok) {
         if (
           process.env.NEXT_REFRESH_TOKEN_ENABLE &&
@@ -127,13 +120,33 @@ export class ApiService {
             return this.request<T>(method, endpoint, body, true);
           }
         }
-        // Include the status code in the error message
+        const errorText = await response.text();
         throw new Error(
-          `Request failed with status ${response.status}: ${rawText}`
+          `Request failed with status ${response.status}: ${errorText}`
         );
       }
 
-      return data;
+      // Get content type to determine parsing method
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        // Parse as JSON for JSON content type
+        const rawText = await response.text();
+        try {
+          return rawText ? JSON.parse(rawText) : ({} as T);
+        } catch (parseError) {
+          throw new Error(`Failed to parse response as JSON: ${parseError}`);
+        }
+      } else {
+        // For text/plain responses, handle based on the generic type T
+        const rawText = await response.text();
+        if ((typeof {} as T) === "string") {
+          return rawText as unknown as T;
+        } else {
+          // Try to convert text to an object that matches T
+          return { message: rawText, status: response.status } as unknown as T;
+        }
+      }
     } catch (error) {
       throw error;
     }

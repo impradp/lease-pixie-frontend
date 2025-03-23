@@ -2,9 +2,9 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import { PixieDropdown } from "../ui/input/PixieDropdown";
-import PixieButton from "../ui/buttons/PixieButton";
-import { CustomInput } from "../ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
+import PixieButton from "@/components/ui/buttons/PixieButton";
+import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 
 interface AddWorkflowProps {
   onClose: () => void;

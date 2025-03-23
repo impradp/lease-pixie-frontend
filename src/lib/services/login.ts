@@ -5,10 +5,17 @@ import { ENDPOINTS } from "@/lib/constants/endpoints";
 
 // Define the raw response structure
 interface LoginResponse {
-  access_token: string;
-  userRole: string;
-  token_type: string;
-  status: number;
+  data: {
+    accessToken: string;
+    tokenType: string;
+    role: string;
+    refreshToken: string;
+  };
+  status: string;
+  errorDetails: {
+    message: string;
+    code: number;
+  };
 }
 
 interface LoginRequest {
@@ -23,8 +30,8 @@ class LoginService {
       ENDPOINTS.AUTH.LOGIN,
       credentials
     );
-    if (response.access_token) {
-      apiService.setToken(response.access_token);
+    if (response.status === "SUCCESS") {
+      apiService.setToken(response.data?.accessToken);
     }
     return response;
   }

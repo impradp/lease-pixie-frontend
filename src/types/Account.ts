@@ -1,9 +1,9 @@
 export interface Account {
-  company: string;
-  companyAddress: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+  accountCompany: string;
+  accountAddress: string;
+  accountContactFirstName: string;
+  accountContactLastName: string;
+  accountEmail: string;
+  phoneNumber: string;
   officePhone: string;
-  mobilePhone: string;
 }

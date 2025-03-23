@@ -44,6 +44,12 @@ body {
   margin-top: 4px;
   display: block;
 }
+.input-error {
+  color: #721c24;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: block;
+}
 
 /* Custom styles for SidebarMenu - Light mode only */
 @media (prefers-color-scheme: light) {

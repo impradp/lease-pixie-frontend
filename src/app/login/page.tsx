@@ -61,7 +61,7 @@ function LoginContent() {
         email: formData.email,
       });
 
-      if (response.status === 1) {
+      if (response.status === "SUCCESS") {
         const now = new Date().toISOString();
         cookieHandler.setLoginAttempts(0, now, null, 86400);
         router.push(getDefaultPage()); // Trigger redirection (ClientLoadingWrapper will handle loading state)

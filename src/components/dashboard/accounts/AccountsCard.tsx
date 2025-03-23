@@ -7,15 +7,20 @@ import { NewAccount } from "@/components/dashboard/accounts/NewAccount";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
+import { Account } from "@/types/Account";
+import { accountService } from "@/lib/services/account";
+import { ToastrMessage } from "@/types/ToastrMessage";
 
 interface AccountsCardProps {
   isEditable?: boolean;
   onSearchChange?: (value: string) => void;
+  onToastr?: (message: string, toastrType: ToastrMessage["toastrType"]) => void;
 }
 
 const AccountsCard: React.FC<AccountsCardProps> = ({
   isEditable = false,
   onSearchChange,
+  onToastr,
 }) => {
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -31,14 +36,11 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
 
-  // Handle search input change
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     if (onSearchChange) {
       onSearchChange(value);
     }
-
-    // Filter companies based on search term
     const filtered = [sampleCompanyInfoData].filter((company) =>
       [company.companyName, company.contactName, company.email].some((field) =>
         field.toLowerCase().includes(searchTerm.toLowerCase())
@@ -47,7 +49,6 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     setFilteredCompanies(filtered);
   };
 
-  // Handle adding a new account
   const handleAccountAdd = () => {
     setShowPreConfirmationDialog(true);
   };
@@ -63,14 +64,34 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     };
   }, [showNewAccountModal, showConfirmation]);
 
-  const handleAddAccount = () => {
-    //Call API and handle
-    setConfirmationContent({
-      title: "Account Added",
-      message: "Account user successfully added.",
-    });
-    setShowNewAccountModal(false);
-    setShowConfirmation(true);
+  const handleAddAccount = async (
+    userData: Account,
+    setLoading: (loading: boolean) => void
+  ) => {
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    await accountService
+      .create(userData)
+      .then(() => {
+        setConfirmationContent({
+          title: "Account Added",
+          message: "Account user successfully added.",
+        });
+        setShowNewAccountModal(false);
+        setShowConfirmation(true);
+
+        if (onToastr) {
+          onToastr("Account successfully created", "success");
+        }
+      })
+      .catch(() => {
+        if (onToastr) {
+          onToastr("Failed to create account", "warning");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleCloseAccountModal = () => {
@@ -143,7 +164,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
         onConfirm={handlePreConfirm}
         title={"Create Account"}
         message={
-          "Create a billing account.  This action will add an Account user to the platform."
+          "Create a billing account. This action will add an Account user to the platform."
         }
         confirmButtonLabel="Create Billing Account"
       />

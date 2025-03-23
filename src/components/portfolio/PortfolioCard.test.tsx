@@ -5,7 +5,8 @@ import "@testing-library/jest-dom";
 
 // Mock the imported components and functions
 jest.mock("@/components/ui/input/CustomInput", () => ({
-  CustomInput: ({
+  __esModule: true,
+  default: ({
     label,
     value,
     onChange,
@@ -236,7 +237,7 @@ describe("PortfolioCard", () => {
       <PortfolioCard {...defaultProps} editingSection="portfolio-section" />
     );
 
-    // Edit button should not be disabled
+    // Input should be editable
     expect(screen.getByTestId("edit-button")).not.toHaveAttribute("disabled");
   });
 
@@ -253,7 +254,7 @@ describe("PortfolioCard", () => {
     expect(container.firstChild).toHaveClass("bg-card-open-fill");
   });
 
-  test("stores original name when entering edit mode", () => {
+  test("stores original name when entering edit mode and reverts when canceled", () => {
     render(<PortfolioCard {...defaultProps} />);
 
     // Enter edit mode

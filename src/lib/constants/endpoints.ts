@@ -6,4 +6,7 @@ export const ENDPOINTS = {
   USER: {
     SELF: "/api/index",
   },
+  ACCOUNT: {
+    CREATE: "/account",
+  },
 } as const;
