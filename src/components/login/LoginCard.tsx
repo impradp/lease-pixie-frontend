@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, useContext } from "react";
-import PixieButton from "@/components/ui/buttons/PixieButton";
+
 import CustomInput from "@/components/ui/input/CustomInput";
+import PixieButton from "@/components/ui/buttons/PixieButton";
 import AuthenticateForm from "@/components/login/AuthenticateForm";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
@@ -26,6 +28,7 @@ export default function LoginCard({
   error,
   attempts = 0,
 }: LoginCardProps) {
+  const router = useRouter();
   const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
     email: "",
@@ -55,6 +58,12 @@ export default function LoginCard({
   const handleCloseAuth = () => {
     setAuthCode(initialAuthCode);
     setShowAuthForm(false);
+  };
+
+  const switchToReset = (e: React.MouseEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    setLoading(true); // Trigger loading overlay
+    router.push("/reset");
   };
 
   return (
@@ -94,12 +103,21 @@ export default function LoginCard({
               onChange={handleInputChange("identifier")}
               placeholder="Enter your ID"
               isEditing={true}
-              containerClassName="h-24 w-[358px]"
+              containerClassName="w-[358px]"
             />
+
+            <div className="w-[358px] flex flex-col justify-center items-end ">
+              <span
+                className="text-secondary-light text-sm font-normal font-['Inter'] underline cursor-pointer"
+                onClick={switchToReset}
+              >
+                Generate User ID
+              </span>
+            </div>
 
             <div className="w-[358px] flex flex-col items-center gap-2">
               <PixieButton
-                label={isSubmitting ? "Signing In..." : "Sign-In"}
+                label={"Sign-In"}
                 type="submit"
                 disabled={
                   isSubmitting ||
@@ -107,6 +125,7 @@ export default function LoginCard({
                   !formData.identifier ||
                   (attempts >= 3 && !!error)
                 }
+                isLoading={isSubmitting}
                 className="w-full"
               />
               {error && (

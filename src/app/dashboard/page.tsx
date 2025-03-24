@@ -108,7 +108,7 @@ function DashboardContent() {
           <PropertyUsersCard />
           <ROAdminUsersCard onAddUser={hanldeAddUser} />
         </div>
-        <div className="w-full max-w-full flex justify-center mb-4 custom:mb-0">
+        <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
           <AccountsCard
             isEditable={true}
             onSearchChange={handleSearchChange}

@@ -83,7 +83,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
       // Ensure UI updates before async operation, matching login page behavior
       await new Promise((resolve) => requestAnimationFrame(resolve));
       await onSubmit(
-        { ...formData, phoneNumber: formData?.phoneNumber.replace("-", "") },
+        { ...formData, phoneNumber: formData?.phoneNumber.replaceAll("-", "") },
         setIsLoading
       );
     } catch {

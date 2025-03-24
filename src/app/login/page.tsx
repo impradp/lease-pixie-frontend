@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useContext } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { loginService } from "@/lib/services/login";
 import LoginCard from "@/components/login/LoginCard";
 import { getDefaultPage } from "@/config/roleAccess";
@@ -14,16 +15,19 @@ import { LoadingContext } from "@/components/ClientLoadingWrapper";
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setLoading, isLoading } = useContext(LoadingContext);
+
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
   const [toastrs, setToastrs] = useState<ToastrMessage[]>([]);
+  const { setLoading, isLoading } = useContext(LoadingContext);
+
   const hasShownLogoutToastr = useRef(false);
+  const hasShownResetToastr = useRef(false);
+  const toastrId = `toastr-${Date.now()}-${Math.random()}`;
 
   useEffect(() => {
     const loggedOut = searchParams.get("loggedOut");
     if (loggedOut === "true" && !hasShownLogoutToastr.current) {
-      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
       setToastrs((prev) => [
         ...prev,
         {
@@ -33,6 +37,20 @@ function LoginContent() {
         },
       ]);
       hasShownLogoutToastr.current = true;
+      router.replace("/login");
+    }
+
+    const resetSuccess = searchParams.get("reset");
+    if (resetSuccess === "true" && !hasShownResetToastr.current) {
+      setToastrs((prev) => [
+        ...prev,
+        {
+          id: toastrId,
+          message: "SMS sent sucessfully.",
+          toastrType: "success",
+        },
+      ]);
+      hasShownResetToastr.current = true;
       router.replace("/login");
     }
   }, [searchParams, router]);
@@ -66,7 +84,6 @@ function LoginContent() {
         cookieHandler.setLoginAttempts(0, now, null, 86400);
         router.push(getDefaultPage()); // Trigger redirection (ClientLoadingWrapper will handle loading state)
       } else {
-        const toastrId = `toastr-${Date.now()}-${Math.random()}`;
         setToastrs((prev) => [
           ...prev,
           { id: toastrId, message: "Login failed.", toastrType: "warning" },
@@ -85,7 +102,6 @@ function LoginContent() {
         setLoading(false); // Clear loading on failure
       }
     } catch {
-      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
       setToastrs((prev) => [
         ...prev,
         { id: toastrId, message: "Login failed.", toastrType: "warning" },

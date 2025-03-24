@@ -15,14 +15,14 @@ export const roleAccessMap: Record<string, string[]> = {
 
 export const defaultPages: Record<string, string> = {
   ADMINUSER: "/dashboard",
-  ACCOUNT: "/account",
+  ACCOUNTUSER: "/account",
   PORTFOLIO: "/portfolio",
   WORKFLOW: "/workflow",
   INQUIRY: "/inquiry",
 };
 
 export const publicRoutes = [
-  "/register",
+  "/reset",
   "/forgot-password",
   "/reset-password",
   "/api/login",

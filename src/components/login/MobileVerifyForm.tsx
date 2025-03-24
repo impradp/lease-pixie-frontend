@@ -3,53 +3,58 @@
 import { useState, useContext } from "react";
 import { X } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import PasscodeInput from "@/components/ui/input/PasscodeInput";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
+import MobileVerifyInput from "../ui/input/MobileVerifyInput";
 
-interface AuthenticateFormProps {
+interface MobileVerifyFormProps {
   readonly onClose?: () => void;
   readonly onSubmitCode?: (authCode: string) => void;
   readonly initialCode?: string[];
   className?: string;
   style?: React.CSSProperties;
-  label?: string;
-  subLabel?: string;
 }
 
-export default function AuthenticateForm({
+function MobileVerifyForm({
   onClose,
   onSubmitCode,
-  initialCode = ["", "", "", "", "", ""],
+  initialCode = ["", "", "", ""],
   className = "",
   style,
-  label = "Authentication code",
-  subLabel,
-}: AuthenticateFormProps) {
+}: MobileVerifyFormProps) {
   const { setLoading, isLoading } = useContext(LoadingContext);
-  const [code, setCode] = useState(initialCode);
+  const [code, setCode] = useState<string[]>(initialCode.slice(0, 4));
   const [error, setError] = useState("");
-  const [attempts, setAttempts] = useState(0);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true); // Set loading immediately
-    // Force a synchronous UI update by delaying the async call slightly
-    requestAnimationFrame(() => {
-      const authCode = code.join("");
+    if (isLoading || code.length !== 4 || code.some((digit) => !digit)) return;
+
+    setLoading(true);
+    setError("");
+
+    const authCode = code.join("");
+    try {
       if (onSubmitCode) {
-        onSubmitCode(authCode);
-        setCode(initialCode);
+        await onSubmitCode(authCode);
+        setCode(["", "", "", ""]);
       }
-    });
+    } catch {
+      setError("Invalid code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCodeChange = (newCode: string[]) => {
-    setCode(newCode);
-    if (error && newCode.every((digit) => digit !== "")) setError("");
+    if (newCode.length === 4) {
+      setCode(newCode);
+      if (error && newCode.every((digit) => digit)) setError("");
+    }
   };
 
   const handleClose = () => {
-    setCode(initialCode);
+    setCode(["", "", "", ""]);
+    setError("");
     if (onClose) onClose();
   };
 
@@ -65,36 +70,31 @@ export default function AuthenticateForm({
           aria-label="Close"
           disabled={isLoading}
         >
-          <X className="w-6 h-6 text-secondary-button" />
+          <X className="w-6 h-6 text-gray-500" />
         </button>
       </div>
       <div className="w-full relative mb-6">
-        <div className="text-tertiary-deepNavy text-xl font-semibold font-['Inter'] text-center w-full">
-          {label}
+        <div className="text-gray-800 text-xl font-semibold font-['Inter'] text-center w-full">
+          New Log-In Credentials
         </div>
       </div>
-
-      {subLabel && (
-        <div className="w-full relative mb-6">
-          <div className="self-stretch text-center justify-start text-[#0f1728] text-sm font-normal font-['Inter'] leading-[30px]">
-            {subLabel}
-          </div>
+      <div className="w-full relative mb-6">
+        <div className="self-stretch text-center justify-start text-gray-700 text-sm font-semibold font-['Inter'] leading-[30px]">
+          Enter the last 4 digits of your mobile
         </div>
-      )}
+      </div>
 
       <form
         onSubmit={handleSubmit}
         className="w-full flex flex-col justify-center items-center gap-4"
         aria-describedby={error ? "error-message" : undefined}
       >
-        <PasscodeInput
+        <MobileVerifyInput
           code={code}
           onChange={handleCodeChange}
           error={error}
-          attempts={attempts}
           onReset={() => {
-            setCode(["", "", "", "", "", ""]);
-            setAttempts(0);
+            setCode(["", "", "", ""]);
             setError("");
           }}
           disabled={isLoading}
@@ -102,9 +102,11 @@ export default function AuthenticateForm({
 
         <div className="w-full flex flex-col">
           <PixieButton
-            label={"Submit"}
+            label="Continue"
             type="submit"
-            disabled={isLoading || code.some((digit) => digit === "")}
+            disabled={
+              isLoading || code.length !== 4 || code.some((digit) => !digit)
+            }
             isLoading={isLoading}
             className="bg-black text-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-inner border-2 border-white/10"
           />
@@ -114,3 +116,5 @@ export default function AuthenticateForm({
     </div>
   );
 }
+
+export default MobileVerifyForm;

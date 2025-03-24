@@ -6,18 +6,20 @@ export function middleware(request: NextRequest): NextResponse {
   const pathname = request.nextUrl.pathname;
   const authToken = request.cookies.get("auth_token")?.value;
 
+  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+    console.log(pathname);
+    return NextResponse.next();
+  }
+
   if (!authToken && !pathname.startsWith("/login")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   if (pathname.startsWith("/login")) {
+    console.log(pathname);
     if (authToken) {
       return NextResponse.redirect(new URL(getDefaultPage(), request.url));
     }
-    return NextResponse.next();
-  }
-
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
