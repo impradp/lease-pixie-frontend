@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Download, Upload } from "lucide-react";
 import { PropertyApproval } from "@/types/PropertyApproval";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 

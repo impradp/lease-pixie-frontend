@@ -5,7 +5,7 @@ import { getMessages } from "@/locales/loader";
 import { NewUserFormData } from "@/types/user";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
 import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";

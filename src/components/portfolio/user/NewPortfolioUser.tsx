@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import { NewUserFormData } from "@/types/user";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import PixieButton from "@/components/ui/buttons/PixieButton";

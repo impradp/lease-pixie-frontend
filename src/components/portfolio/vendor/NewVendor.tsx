@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { Locale } from "@/locales";
 import { getMessages } from "@/locales/loader";
 import { NewVendorFormData } from "@/types/vendor";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";

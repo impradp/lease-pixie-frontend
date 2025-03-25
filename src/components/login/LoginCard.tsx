@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useContext } from "react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import AuthenticateForm from "@/components/login/AuthenticateForm";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
 

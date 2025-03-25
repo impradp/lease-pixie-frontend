@@ -15,6 +15,8 @@ interface AddressAutocompleteInputProps {
   isEditing?: boolean;
   placeholder?: string;
   inputId?: string;
+  disabled?: boolean;
+  error?: string; // External error from parent, renamed from formError to match CustomInput
 }
 
 const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
@@ -24,17 +26,27 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   isEditing = true,
   placeholder = "",
   inputId = "autocomplete-input",
+  disabled = false,
+  error = "", // External error, defaults to empty string
 }) => {
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<RadarAddress[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [internalError, setInternalError] = useState<string | null>(null); // Internal errors (e.g., API failures)
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [radarInitialized, setRadarInitialized] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null); // Ref for the wrapper div
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
 
-  // Initialize Radar only on the client side
+  // Sync query with value prop and reset internal error when value changes
+  useEffect(() => {
+    setQuery(value);
+    if (value.trim() && internalError) {
+      setInternalError(null); // Clear internal error if user provides a value
+    }
+  }, [value]);
+
+  // Initialize Radar
   useEffect(() => {
     const initializeRadar = async () => {
       if (typeof window === "undefined") return;
@@ -42,7 +54,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
       try {
         const API_KEY = process.env.NEXT_PUBLIC_RADAR_API_KEY;
         if (!API_KEY) {
-          //TODO: Handle error: Radar API key is missing.
+          if (!error) setInternalError("Radar API key is missing");
           return;
         }
 
@@ -52,13 +64,13 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
         Radar.initialize(API_KEY);
         setRadarInitialized(true);
       } catch {
-        //TODO: Log error properly
-        setError("Failed to initialize address autocomplete");
+        if (!error)
+          setInternalError("Failed to initialize address autocomplete");
       }
     };
 
     initializeRadar();
-  }, []);
+  }, [error]); // Include error to respect its precedence
 
   // Handle click outside to close suggestions
   useEffect(() => {
@@ -67,7 +79,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
         wrapperRef.current &&
         !wrapperRef.current.contains(event.target as Node)
       ) {
-        setSuggestions([]); // Close the suggestions list
+        setSuggestions([]);
       }
     };
 
@@ -78,8 +90,12 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   }, []);
 
   const debouncedSearch = debounce(async (input: string) => {
-    if (!radarInitialized) {
-      setError("Address service is initializing...");
+    if (!radarInitialized || disabled) {
+      if (!error) {
+        setInternalError(
+          disabled ? null : "Address service is initializing..."
+        );
+      }
       setSuggestions([]);
       setIsLoading(false);
       return;
@@ -87,7 +103,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
 
     if (input.trim().length < 3) {
       setSuggestions([]);
-      setError(null);
+      if (!error) setInternalError(null);
       setIsLoading(false);
       return;
     }
@@ -123,14 +139,13 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
           });
 
         setSuggestions(addressSuggestions);
-        setError(null);
+        if (!error) setInternalError(null);
       } else {
         setSuggestions([]);
-        setError("No results found");
+        if (!error) setInternalError("No results found");
       }
     } catch {
-      //TODO: Handle error properly:Radar autocomplete error
-      setError("Failed to fetch address suggestions");
+      if (!error) setInternalError("Failed to fetch address suggestions");
       setSuggestions([]);
     } finally {
       setIsLoading(false);
@@ -145,27 +160,37 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled || !isEditing) return;
+
     const newValue = e.target.value;
     setQuery(newValue);
     onChange(newValue);
     handleSearchChange(newValue);
     setSelectedValue(null);
+    if (error && newValue.trim()) {
+      setInternalError(null); // Clear internal error when user starts typing and there was an external error
+    }
   };
 
   const handleOptionClick = (suggestion: RadarAddress) => {
+    if (disabled) return;
+
     const fullAddress = suggestion.formattedAddress;
     setQuery(fullAddress);
     onChange(fullAddress);
-    setSuggestions([]); // Close the suggestions after selection
+    setSuggestions([]);
     setSelectedValue(
       suggestion.placeId?.toString() || suggestion.formattedAddress
     );
+    if (error) setInternalError(null); // Clear internal error on selection
   };
 
   const handleOptionKeyDown = (
     e: React.KeyboardEvent<HTMLLIElement>,
     suggestion: RadarAddress
   ) => {
+    if (disabled) return;
+
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleOptionClick(suggestion);
@@ -177,19 +202,28 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     label: suggestion.formattedAddress,
   }));
 
+  // Display error: external (error) takes precedence over internal
+  const displayError = error || internalError;
+
   return (
     <div
-      ref={wrapperRef} // Attach the ref to the wrapper div
-      className="flex flex-col gap-1.5 w-full autocomplete-input-wrapper relative" // Added relative for positioning
+      ref={wrapperRef}
+      className="flex flex-col gap-1.5 w-full autocomplete-input-wrapper relative"
     >
       <label
         htmlFor={inputId}
-        className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
+        className={`text-card-input-label text-sm font-medium font-['Inter'] leading-tight ${
+          disabled ? "opacity-50" : ""
+        }`}
       >
         {label}
       </label>
       <div className="autocomplete-input-container">
-        <div className="px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center">
+        <div
+          className={`px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center ${
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
           <input
             id={inputId}
             placeholder={placeholder}
@@ -197,10 +231,13 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
             value={query}
             onChange={handleInputChange}
             readOnly={!isEditing}
-            className="w-full text-base text-tertiary-light font-normal font-['Inter'] leading-normal outline-none bg-transparent"
+            disabled={disabled}
+            className={`w-full text-base text-tertiary-light font-normal font-['Inter'] leading-normal outline-none bg-transparent ${
+              disabled ? "cursor-not-allowed" : ""
+            }`}
           />
         </div>
-        {suggestions.length > 0 && (
+        {suggestions.length > 0 && !disabled && (
           <ul
             id={`${inputId}-options`}
             role="listbox"
@@ -256,8 +293,14 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
           </ul>
         )}
       </div>
-      {isLoading && <span className="autocomplete-loading">Loading...</span>}
-      {error && <span className="autocomplete-error">{error}</span>}
+      {isLoading && !disabled && (
+        <span className="autocomplete-loading">Loading...</span>
+      )}
+      {displayError && !disabled && (
+        <span className="autocomplete-error text-red-500 text-sm mt-1">
+          {displayError}
+        </span>
+      )}
     </div>
   );
 };

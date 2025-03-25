@@ -5,7 +5,7 @@ import { Upload } from "lucide-react";
 import SubHeader from "@/components/ui/header/SubHeader";
 import { InvoiceSettingsData } from "@/types/InvoiceSettings";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import CustomTextArea from "@/components/ui/input/CustomTextArea";

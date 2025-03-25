@@ -1,7 +1,7 @@
 import { cookieHandler } from "@/lib/services/cookieHandler";
 
 export const roleAccessMap: Record<string, string[]> = {
-  ADMIN: ["/admin", "/dashboard", "/workflows", "/portfolio"],
+  ADMINUSER: ["/admin", "/dashboard", "/workflows", "/portfolio"],
   ACCOUNT: ["/account", "/account/profile", "/account/settings"],
   PORTFOLIO: ["/portfolio", "/portfolio/view", "/portfolio/reports"],
   WORKFLOW: [
@@ -14,7 +14,7 @@ export const roleAccessMap: Record<string, string[]> = {
 };
 
 export const defaultPages: Record<string, string> = {
-  ADMIN: "/dashboard",
+  ADMINUSER: "/dashboard",
   ACCOUNT: "/account",
   PORTFOLIO: "/portfolio",
   WORKFLOW: "/workflow",

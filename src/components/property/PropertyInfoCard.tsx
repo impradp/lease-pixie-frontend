@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { DropdownOption } from "@/types/user";
 import { PropertyInfoData } from "@/types/PropertyInfo";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import { CustomInput } from "@/components/ui/input/CustomInput";
+import CustomInput from "@/components/ui/input/CustomInput";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { PixieDatePicker } from "../ui/datePicker/PixieDatePicker";
