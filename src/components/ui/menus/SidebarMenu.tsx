@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { MenuItem } from "@/types/menuItem";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import PixieButton from "../buttons/PixieButton";
+import { loginService } from "@/lib/services/login";
+import { useRouter } from "next/navigation";
+import Toastr from "@/components/ui/toastrPopup/Toastr";
 
 type SidebarMenuProps = {
   isOpen: boolean;
@@ -9,6 +12,7 @@ type SidebarMenuProps = {
 };
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
+  const router = useRouter();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     {
       title: "List",
@@ -26,6 +30,12 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       subItems: ["User", "Portfolio"],
     },
   ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [toastr, setToastr] = useState<{
+    id: string;
+    message: string;
+    toastrType: "warning";
+  } | null>(null);
 
   const toggleMenuItem = (index: number) => {
     const updatedMenuItems = menuItems.map((item, idx) => ({
@@ -33,6 +43,29 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       isExpanded: idx === index ? !item.isExpanded : false,
     }));
     setMenuItems(updatedMenuItems);
+  };
+
+  const handleSignOut = async () => {
+    setIsLoading(true);
+    try {
+      loginService.logout();
+      router.push("/login?loggedOut=true");
+      onClose();
+    } catch {
+      //TODO: Use logger
+      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
+      setToastr({
+        id: toastrId,
+        message: "Failed to sign out. Please try again.",
+        toastrType: "warning",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToastrClose = () => {
+    setToastr(null);
   };
 
   if (!isOpen) return null;
@@ -47,7 +80,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
           w-[300px] p-5
           max-h-[calc(100vh-100%)] overflow-y-auto
           text-menu-text"
-        style={{ backdropFilter: "blur(4px)" }} // Raw CSS fallback
+        style={{ backdropFilter: "blur(4px)" }}
       >
         <dl className="m-0 p-0 flex flex-col gap-2">
           {menuItems.map((item, index) => (
@@ -90,9 +123,23 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
             </div>
           ))}
           <div className="mt-4 flex flex-col">
-            <PixieButton label={"Sign out"} disabled={false} />
+            <PixieButton
+              label="Sign out"
+              onClick={handleSignOut}
+              isLoading={isLoading}
+              disabled={isLoading}
+            />
           </div>
         </dl>
+        {toastr && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+            <Toastr
+              message={toastr.message}
+              toastrType={toastr.toastrType}
+              onClose={handleToastrClose}
+            />
+          </div>
+        )}
       </div>
     </>
   );

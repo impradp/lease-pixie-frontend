@@ -12,7 +12,7 @@ const PixieNavbar: React.FC<PixieNavbarProps> = ({ className = "" }) => {
   const pathname = usePathname();
 
   const hasHamburgerEnabled =
-    !pathname?.includes("/login") || !pathname?.includes("/reset");
+    !pathname?.includes("/login") && !pathname?.includes("/reset");
   const isLoginPage = pathname?.includes("/login");
   const isResetPage = pathname?.includes("/reset");
 
