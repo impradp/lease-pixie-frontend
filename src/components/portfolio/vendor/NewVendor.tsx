@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 import { Locale } from "@/locales";
-import { getMessages } from "@/locales/loader";
+import { getMessages } from "@/locales/locale";
 import { NewVendorFormData } from "@/types/vendor";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";

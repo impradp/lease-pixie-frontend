@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState, useContext } from "react";
 
 import CustomInput from "@/components/ui/input/CustomInput";
@@ -19,6 +18,7 @@ interface LoginCardProps {
   initialAuthCode?: string[];
   error?: string;
   attempts?: number;
+  setShowLogin: (isVisible: boolean) => void;
 }
 
 export default function LoginCard({
@@ -27,8 +27,8 @@ export default function LoginCard({
   initialAuthCode = ["", "", "", "", "", ""],
   error,
   attempts = 0,
+  setShowLogin,
 }: LoginCardProps) {
-  const router = useRouter();
   const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
     email: "",
@@ -62,8 +62,8 @@ export default function LoginCard({
 
   const switchToReset = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
-    setLoading(true); // Trigger loading overlay
-    router.push("/reset");
+    // router.push("/reset");
+    setShowLogin(false);
   };
 
   return (
@@ -128,11 +128,6 @@ export default function LoginCard({
                 isLoading={isSubmitting}
                 className="w-full"
               />
-              {error && (
-                <div className="w-full text-tertiary-vermilion text-sm font-normal font-['Inter'] leading-tight text-center">
-                  <span dangerouslySetInnerHTML={{ __html: error }} />
-                </div>
-              )}
             </div>
           </div>
         </form>

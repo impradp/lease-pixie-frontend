@@ -3,6 +3,7 @@ import { inter, myanmarKhyay } from "./fonts";
 import Footer from "@/components/ui/footer/Footer";
 import PixieNavbar from "@/components/ui/navbar/PixieNavbar";
 import ClientLoadingWrapper from "@/components/ClientLoadingWrapper";
+import ToastrContainer from "@/components/ui/toastrPopup/ToastContainer";
 
 export const metadata = {
   title: "Lease Pixie",
@@ -22,6 +23,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <ToastrContainer />
         </ClientLoadingWrapper>
       </body>
     </html>

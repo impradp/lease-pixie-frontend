@@ -8,7 +8,7 @@ import {
 } from "@/data/users";
 import { Locale } from "@/locales";
 import { DropdownOption } from "@/types/user";
-import { getMessages } from "@/locales/loader";
+import { getMessages } from "@/locales/locale";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";

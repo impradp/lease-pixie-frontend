@@ -1,33 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { sampleCompanyInfoData } from "@/data/company";
-import CompanyInfo from "@/components/dashboard/CompanyInfo";
-import { NewAccount } from "@/components/dashboard/accounts/NewAccount";
-import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
-import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
-import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
+
+import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
+import { sampleCompanyInfoData } from "@/data/company";
 import { accountService } from "@/lib/services/account";
-import { ToastrMessage } from "@/types/ToastrMessage";
+import CompanyInfo from "@/components/dashboard/CompanyInfo";
+import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
+import { NewAccount } from "@/components/dashboard/accounts/NewAccount";
+import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 
 interface AccountsCardProps {
   isEditable?: boolean;
   onSearchChange?: (value: string) => void;
-  onToastr?: (message: string, toastrType: ToastrMessage["toastrType"]) => void;
 }
 
 const AccountsCard: React.FC<AccountsCardProps> = ({
   isEditable = false,
   onSearchChange,
-  onToastr,
 }) => {
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [confirmationContent, setConfirmationContent] = useState({
-    title: "",
-    message: "",
-  });
   const [isAccessLocked, setIsAccessLocked] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCompanies, setFilteredCompanies] = useState([
@@ -54,7 +47,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   };
 
   useEffect(() => {
-    if (showNewAccountModal || showConfirmation) {
+    if (showNewAccountModal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -62,7 +55,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showNewAccountModal, showConfirmation]);
+  }, [showNewAccountModal]);
 
   const handleAddAccount = async (
     userData: Account,
@@ -73,21 +66,17 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     await accountService
       .create(userData)
       .then(() => {
-        setConfirmationContent({
-          title: "Account Added",
-          message: "Account user successfully added.",
-        });
         setShowNewAccountModal(false);
-        setShowConfirmation(true);
-
-        if (onToastr) {
-          onToastr("Account successfully created", "success");
-        }
+        toastr({
+          message: "Account created successfully.",
+          toastrType: "success",
+        });
       })
       .catch(() => {
-        if (onToastr) {
-          onToastr("Failed to create account", "warning");
-        }
+        toastr({
+          message: "Failed to create account.",
+          toastrType: "error",
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -96,10 +85,6 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
 
   const handleCloseAccountModal = () => {
     setShowNewAccountModal(false);
-  };
-
-  const handleConfirmationClose = () => {
-    setShowConfirmation(false);
   };
 
   const handlePreConfirm = () => {
@@ -167,13 +152,6 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           "Create a billing account. This action will add an Account user to the platform."
         }
         confirmButtonLabel="Create Billing Account"
-      />
-
-      <ConfirmationDialog
-        isOpen={showConfirmation}
-        onClose={handleConfirmationClose}
-        title={confirmationContent.title}
-        message={confirmationContent.message}
       />
     </>
   );

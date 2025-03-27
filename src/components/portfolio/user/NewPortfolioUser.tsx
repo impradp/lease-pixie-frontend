@@ -5,7 +5,7 @@ import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
-import { getMessages } from "@/locales/loader";
+import { getMessages } from "@/locales/locale";
 import { Locale } from "@/locales";
 
 interface NewPortfolioUserProps {

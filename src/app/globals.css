@@ -170,3 +170,118 @@ body {
 .animate-single-bounce {
   animation: singleBounce 0.4s ease forwards;
 }
+
+.colorCycle1 {
+  animation: colorCycle1 1s infinite steps(1);
+}
+
+.colorCycle2 {
+  animation: colorCycle2 1s infinite steps(1);
+}
+
+.colorCycle3 {
+  animation: colorCycle3 1s infinite steps(1);
+}
+
+@keyframes colorCycle1 {
+  0% {
+    fill: #1c71d8;
+  }
+  33% {
+    fill: #c061cb;
+  }
+  66% {
+    fill: #ff7800;
+  }
+  100% {
+    fill: #1c71d8;
+  }
+}
+
+@keyframes colorCycle2 {
+  0% {
+    fill: #c061cb;
+  }
+  33% {
+    fill: #ff7800;
+  }
+  66% {
+    fill: #1c71d8;
+  }
+  100% {
+    fill: #c061cb;
+  }
+}
+
+@keyframes colorCycle3 {
+  0% {
+    fill: #ff7800;
+  }
+  33% {
+    fill: #1c71d8;
+  }
+  66% {
+    fill: #c061cb;
+  }
+  100% {
+    fill: #ff7800;
+  }
+}
+.custom-toastr {
+  width: 384px !important; /* As specified */
+  height: 52px !important; /* Strictly enforce the height */
+  min-height: 52px !important; /* Prevent shrinking */
+  max-height: 52px !important; /* Prevent growing */
+  background: rgba(165, 179, 201, 0.9) !important; /* As specified */
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important; /* Use flex to control layout */
+  align-items: center !important; /* Center content vertically */
+  padding: 0 16px !important; /* Adjust padding to fit content within 52px */
+}
+
+/* Override react-toastify's default toast body to prevent extra spacing */
+.Toastify__toast-body {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* Ensure the close button doesn't add extra height */
+.Toastify__close-button {
+  height: 16px !important;
+  width: 16px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: initial !important;
+}
+
+/* Ensure the icon doesn't add extra height */
+.Toastiffy__toast-icon {
+  height: 20px !important;
+  width: 20px !important;
+  margin-right: 8px !important;
+  align-self: center !important;
+}
+
+.Toastify__progress-bar {
+  background: #6887b4;
+}
+
+.Toastify__progress-bar-theme--light {
+  background: linear-gradient(90deg, #bc62ca 0%, #e4984f 99%) !important;
+}
+
+.Toastify__progress-bar--success {
+  background: linear-gradient(90deg, #bc62ca 0%, #e4984f 99%) !important;
+}
+
+.Toastify__progress-bar--error {
+  background: linear-gradient(90deg, #bc62ca 0%, #e4984f 99%) !important;
+}
+
+.Toastify__progress-bar--info {
+  background: linear-gradient(90deg, #bc62ca 0%, #e4984f 99%) !important;
+}

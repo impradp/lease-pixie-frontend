@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { Locale } from "@/locales";
-import { getMessages } from "@/locales/loader";
+import { getMessages } from "@/locales/locale";
 import { NewVendorFormData } from "@/types/vendor";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";

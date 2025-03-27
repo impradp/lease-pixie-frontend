@@ -1,14 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState, useContext, useEffect } from "react";
 
+import ConsentForm from "@/components/ui/ConsentForm";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import AuthenticateForm from "@/components/login/AuthenticateForm";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
-import ConsentForm from "@/components/ui/ConsentForm";
 
 interface ResetCardProps {
   readonly onSubmit: (formData: {
@@ -28,6 +27,7 @@ interface ResetCardProps {
   attempts?: number;
   emailSent?: boolean;
   isEmailCodeVerified?: boolean;
+  setShowLogin: (isVisible: boolean) => void;
 }
 
 function ResetCard({
@@ -41,22 +41,22 @@ function ResetCard({
   emailSent = false,
   onResetCodeVerify,
   isEmailCodeVerified,
+  setShowLogin,
 }: ResetCardProps) {
-  const router = useRouter();
   const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
     email: "",
     mobileNumber: "",
     otp: "",
   });
+  const [smsConsent, setSMSConsent] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
+  const [cookieConsent, setCookieConsent] = useState(false);
+  const [serviceConsent, setServiceConsent] = useState(false);
   const [showSMSConsentForm, setShowSMSConsentForm] = useState(false);
+  const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
   const [showServiceConsentForm, setShowServiceConsentForm] = useState(false);
   const [showCookieConsentForm, setShowCookieConsentForm] = useState(false);
-  const [smsConsent, setSMSConsent] = useState(false);
-  const [serviceConsent, setServiceConsent] = useState(false);
-  const [cookieConsent, setCookieConsent] = useState(false);
 
   useEffect(() => {
     if (isEmailCodeVerified) {
@@ -83,8 +83,7 @@ function ResetCard({
 
   const switchToLogin = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
-    setLoading(true);
-    router.push("/login");
+    setShowLogin(true);
   };
 
   const handleAuthCodeSubmit = (authCode: string) => {
@@ -199,11 +198,6 @@ function ResetCard({
                 isLoading={isSubmitting}
                 className="w-full"
               />
-              {error && (
-                <div className="w-full text-tertiary-vermilion text-sm font-normal font-['Inter'] leading-tight text-center">
-                  <span dangerouslySetInnerHTML={{ __html: error }} />
-                </div>
-              )}
             </div>
           </div>
         </form>

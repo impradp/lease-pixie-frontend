@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { MenuItem } from "@/types/menuItem";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import PixieButton from "../buttons/PixieButton";
-import { loginService } from "@/lib/services/login";
 import { useRouter } from "next/navigation";
-import Toastr from "@/components/ui/toastrPopup/Toastr";
+
+import toastr from "@/lib/func/toastr";
+import { MenuItem } from "@/types/menuItem";
+import { loginService } from "@/lib/services/login";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import PixieButton from "@/components/ui/buttons/PixieButton";
 
 type SidebarMenuProps = {
   isOpen: boolean;
@@ -31,11 +32,6 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [toastr, setToastr] = useState<{
-    id: string;
-    message: string;
-    toastrType: "warning";
-  } | null>(null);
 
   const toggleMenuItem = (index: number) => {
     const updatedMenuItems = menuItems.map((item, idx) => ({
@@ -53,19 +49,13 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       onClose();
     } catch {
       //TODO: Use logger
-      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
-      setToastr({
-        id: toastrId,
+      toastr({
         message: "Failed to sign out. Please try again.",
         toastrType: "warning",
       });
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleToastrClose = () => {
-    setToastr(null);
   };
 
   if (!isOpen) return null;
@@ -131,15 +121,6 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
             />
           </div>
         </dl>
-        {toastr && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
-            <Toastr
-              message={toastr.message}
-              toastrType={toastr.toastrType}
-              onClose={handleToastrClose}
-            />
-          </div>
-        )}
       </div>
     </>
   );

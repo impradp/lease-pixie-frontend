@@ -12,12 +12,16 @@ interface PropertyApprovalCardProps {
   existingApprovalData: PropertyApproval;
   onApprove?: () => void;
   isEditable?: boolean;
+  showAdminFunc?: boolean;
+  btnLabel?: string;
 }
 
 const PropertyApprovalCard: React.FC<PropertyApprovalCardProps> = ({
   existingApprovalData,
   onApprove,
   isEditable = false,
+  showAdminFunc = false,
+  btnLabel = "Approve",
 }) => {
   const [isEditMode, setIsEditMode] = useState(isEditable);
 
@@ -153,71 +157,75 @@ const PropertyApprovalCard: React.FC<PropertyApprovalCardProps> = ({
                       </div>
                     )}
                   </div>
-                  <div className="self-stretch flex flex-col justify-center items-start gap-2">
-                    <div className="justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                      Balance Requirement for Processing
-                    </div>
-                    <CustomInput
-                      value={formData.balanceRequirement}
-                      onChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          balanceRequirement: value,
-                        }))
-                      }
-                      readOnly={!isEditMode}
-                      isEditing={isEditMode}
-                      className="h-9 px-3.5 py-2.5 text-sm text-tertiary-light"
-                      containerClassName="w-full"
-                      labelClassName="hidden"
-                      placeholder="i.e. $8,000"
-                    />
-                  </div>
-                  <div className="self-stretch flex flex-col justify-center items-start gap-2">
-                    <div className="justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                      Confirmed Sq-ft
-                    </div>
-                    <CustomInput
-                      value={formData.confirmedSqFt}
-                      onChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          confirmedSqFt: value,
-                        }))
-                      }
-                      readOnly={!isEditMode}
-                      isEditing={isEditMode}
-                      className="h-9 px-3.5 py-2.5 text-sm text-tertiary-light"
-                      containerClassName="w-full"
-                      labelClassName="hidden"
-                      placeholder="i.e. 10000"
-                    />
-                  </div>
-                  <div className="self-stretch flex flex-col justify-center items-start gap-2">
-                    <div className="justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                      Category
-                    </div>
-                    <div className="self-stretch inline-flex justify-between items-start">
-                      <div className="w-[216px] flex justify-start items-center gap-3">
-                        <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                          Industrial
+                  {showAdminFunc && (
+                    <>
+                      <div className="self-stretch flex flex-col justify-center items-start gap-2">
+                        <div className="justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
+                          Balance Requirement for Processing
                         </div>
-                        <ToggleSwitch
-                          isOn={formData.isIndustrialCategory}
-                          onToggle={toggleCategory}
-                          isDisabled={!isEditMode}
+                        <CustomInput
+                          value={formData.balanceRequirement}
+                          onChange={(value) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              balanceRequirement: value,
+                            }))
+                          }
+                          readOnly={!isEditMode}
+                          isEditing={isEditMode}
+                          className="h-9 px-3.5 py-2.5 text-sm text-tertiary-light"
+                          containerClassName="w-full"
+                          labelClassName="hidden"
+                          placeholder="i.e. $8,000"
                         />
-                        <div className="w-[103px] justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                          Retail, Office, Flex
+                      </div>
+                      <div className="self-stretch flex flex-col justify-center items-start gap-2">
+                        <div className="justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
+                          Confirmed Sq-ft
+                        </div>
+                        <CustomInput
+                          value={formData.confirmedSqFt}
+                          onChange={(value) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              confirmedSqFt: value,
+                            }))
+                          }
+                          readOnly={!isEditMode}
+                          isEditing={isEditMode}
+                          className="h-9 px-3.5 py-2.5 text-sm text-tertiary-light"
+                          containerClassName="w-full"
+                          labelClassName="hidden"
+                          placeholder="i.e. 10000"
+                        />
+                      </div>
+                      <div className="self-stretch flex flex-col justify-center items-start gap-2">
+                        <div className="justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
+                          Category
+                        </div>
+                        <div className="self-stretch inline-flex justify-between items-start">
+                          <div className="w-[216px] flex justify-start items-center gap-3">
+                            <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
+                              Industrial
+                            </div>
+                            <ToggleSwitch
+                              isOn={formData.isIndustrialCategory}
+                              onToggle={toggleCategory}
+                              isDisabled={!isEditMode}
+                            />
+                            <div className="w-[103px] justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
+                              Retail, Office, Flex
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
                 {isEditMode && (
                   <div className="self-stretch bg-secondary-light rounded inline-flex justify-center items-center gap-2 mt-4">
                     <PixieButton
-                      label="Approve"
+                      label={btnLabel}
                       disabled={false}
                       onClick={handleApprove}
                       className="flex-1 h-8 px-[85px] py-0.5 bg-tertiary-deepNavy text-white"

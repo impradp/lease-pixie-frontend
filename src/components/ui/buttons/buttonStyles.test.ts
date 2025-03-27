@@ -6,7 +6,7 @@ import {
 describe("buttonStyles", () => {
   it("has the correct base style", () => {
     expect(buttonStyles.base).toBe(
-      "h-10 px-3.5 py-2.5 bg-secondary-light rounded-lg outline-2 outline-offset-[-2px] outline-white/10 inline-flex justify-center items-center gap-1 overflow-hidden"
+      "h-10 px-3.5 py-2.5 bg-secondary-light rounded outline-2 outline-offset-[-2px] outline-white/10 inline-flex justify-center items-center gap-1 overflow-hidden"
     );
   });
 

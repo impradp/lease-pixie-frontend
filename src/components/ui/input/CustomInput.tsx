@@ -65,7 +65,6 @@ const CustomInput: React.FC<CustomInputProps> = ({
     }
 
     onChange?.(newValue);
-    validateInput(newValue);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -127,7 +126,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
         {label}
       </label>
       <div
-        className={`px-3.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke flex items-center ${
+        className={`px-3.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)_inset] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke flex items-center ${
           disabled ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >

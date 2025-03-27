@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react";
 
 import { Locale } from "@/locales";
-import { getMessages } from "@/locales/loader";
+import toastr from "@/lib/func/toastr";
+import { getMessages } from "@/locales/locale";
 import { sampleBankAccounts } from "@/data/accounts";
-import { ToastrMessage } from "@/types/ToastrMessage";
-import Toastr from "@/components/ui/toastrPopup/Toastr";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import PropertyInfoCard from "@/components/property/PropertyInfoCard";
 import BankSettingsCard from "@/components/property/BankSettingsCard";
@@ -33,7 +32,6 @@ export default function PropertyPage() {
   const messages = getMessages(locale);
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [toastrs, setToastrs] = useState<ToastrMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleEdit = () => {};
@@ -54,15 +52,10 @@ export default function PropertyPage() {
       .slice(file.name.lastIndexOf("."))
       .toLowerCase();
     if (!validExtensions.includes(fileExtension)) {
-      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
-      setToastrs((prev) => [
-        ...prev,
-        {
-          id: toastrId,
-          message: "Invalid file type. Please select an XLS or XLSX file.",
-          toastrType: "warning",
-        },
-      ]);
+      toastr({
+        message: "Invalid file type. Please select an XLS or XLSX file.",
+        toastrType: "error",
+      });
       return;
     }
 
@@ -70,15 +63,10 @@ export default function PropertyPage() {
     if (file.size <= 10 * 1024 * 1024) {
       //TODO: Set selected file
     } else {
-      const toastrId = `toastr-${Date.now()}-${Math.random()}`;
-      setToastrs((prev) => [
-        ...prev,
-        {
-          id: toastrId,
-          message: "File size exceeds 10MB limit",
-          toastrType: "warning",
-        },
-      ]);
+      toastr({
+        message: "File size exceeds 10MB limit",
+        toastrType: "warning",
+      });
     }
   };
 
@@ -96,10 +84,6 @@ export default function PropertyPage() {
 
   const handleInvoiceSettingsUpdate = () => {
     // TODO: Handle invoice settings update
-  };
-
-  const handleToastrClose = (id: string) => {
-    setToastrs((prev) => prev.filter((toastr) => toastr.id !== id));
   };
 
   useEffect(() => {
@@ -120,18 +104,6 @@ export default function PropertyPage() {
       <Breadcrumbs items={breadcrumbItems} />
 
       <div className="max-w-[800px] mx-auto space-y-8 py-4">
-        {toastrs.length > 0 && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 xs:right-4 xs:left-auto xs:translate-x-0 z-50 flex flex-col gap-2">
-            {toastrs.map((toastr) => (
-              <Toastr
-                key={toastr.id}
-                message={toastr.message}
-                toastrType={toastr.toastrType}
-                onClose={() => handleToastrClose(toastr.id)}
-              />
-            ))}
-          </div>
-        )}
         <div className="space-y-8">
           <SpaceSettingsCard
             onEdit={handleEdit}
