@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { sampleCompanyInfoData } from "@/data/company";
 import { Invoice, Portfolio } from "@/types/Company";
-import { getServicePill } from "@/utils/pillsColors";
+import { getServicePill } from "@/lib/utils/pillsColors";
 import { ServicePill } from "@/types/ServicePills";
 import { Pills } from "../ui/pills";
 import { ToggleSwitch } from "../ui/input/ToggleSwitch";

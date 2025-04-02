@@ -63,6 +63,7 @@ const config: Config = {
           coolSilver: "#d8dde3",
           neutralGray: "#dddddd",
           offBlack: "#232323",
+          muteBlueGray: "#878aa4",
         },
         card: {
           open: {

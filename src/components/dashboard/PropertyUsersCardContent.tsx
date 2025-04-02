@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { PropertyUser } from "@/types/PropertyUser";
-import { privilegeColors } from "@/utils/privilegeColors";
+import { privilegeColors } from "@/lib/utils/privilegeColors";
 
 interface PropertyUsersCardContentProps {
   user: PropertyUser;

@@ -6,7 +6,7 @@ import { Account } from "@/types/Account";
 
 // Define the raw response structure
 interface AccountResponse {
-  status?: number;
+  status?: string;
   message?: string;
   data?: string;
 }

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+
+import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
@@ -36,7 +38,6 @@ export const NewAccount: React.FC<NewAccountProps> = ({
     phoneNumber: "",
     officePhone: "",
   });
-  const [formErrors, setFormErrors] = useState<Partial<Account>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -54,33 +55,31 @@ export const NewAccount: React.FC<NewAccountProps> = ({
   }, []);
 
   const validateForm = (): boolean => {
-    const errors: Partial<Account> = {};
+    // Only check if required fields are empty, don't store specific errors
+    const isValid =
+      formData.accountCompany.trim() &&
+      formData.accountAddress.trim() &&
+      formData.accountContactFirstName.trim() &&
+      formData.accountContactLastName.trim() &&
+      formData.accountEmail.trim() &&
+      formData.phoneNumber.trim();
 
-    if (!formData.accountCompany.trim())
-      errors.accountCompany = "Company is required";
-    if (!formData.accountAddress.trim())
-      errors.accountAddress = "Address is required";
-    if (!formData.accountContactFirstName.trim())
-      errors.accountContactFirstName = "First name is required";
-    if (!formData.accountContactLastName.trim())
-      errors.accountContactLastName = "Last name is required";
-    if (!formData.accountEmail.trim())
-      errors.accountEmail = "Email is required";
-    if (!formData.phoneNumber.trim())
-      errors.phoneNumber = "Mobile phone is required";
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return !!isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toastr({
+        message: "Required fields (*) are empty.",
+        toastrType: "error",
+      });
+      return;
+    }
 
     try {
       setIsLoading(true);
-      // Ensure UI updates before async operation, matching login page behavior
       await new Promise((resolve) => requestAnimationFrame(resolve));
       await onSubmit(
         { ...formData, phoneNumber: formData?.phoneNumber.replaceAll("-", "") },
@@ -88,19 +87,11 @@ export const NewAccount: React.FC<NewAccountProps> = ({
       );
     } catch {
       setIsLoading(false);
-      // Error handling is managed by parent component via toastr
     }
   };
 
   const handleInputChange = (field: keyof Account, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (formErrors[field]) {
-      setFormErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
   };
 
   return (
@@ -122,8 +113,8 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                 value={formData.accountCompany}
                 onChange={(value) => handleInputChange("accountCompany", value)}
                 isEditing={true}
-                error={formErrors.accountCompany}
                 disabled={isLoading}
+                isRequired={true}
               />
               <AddressAutocompleteInput
                 label="Address"
@@ -133,7 +124,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                 placeholder="Start typing address..."
                 inputId="company-address-input"
                 disabled={isLoading}
-                error={formErrors.accountAddress}
+                isRequired={true}
               />
               <div className="grid grid-cols-2 gap-4">
                 <CustomInput
@@ -143,8 +134,8 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                     handleInputChange("accountContactFirstName", value)
                   }
                   isEditing={true}
-                  error={formErrors.accountContactFirstName}
                   disabled={isLoading}
+                  isRequired={true}
                 />
                 <CustomInput
                   label="Last name"
@@ -153,8 +144,8 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                     handleInputChange("accountContactLastName", value)
                   }
                   isEditing={true}
-                  error={formErrors.accountContactLastName}
                   disabled={isLoading}
+                  isRequired={true}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -173,8 +164,8 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                   isEditing={true}
                   placeholder="800-555-1234"
                   type="mobile"
-                  error={formErrors.phoneNumber}
                   disabled={isLoading}
+                  isRequired={true}
                 />
               </div>
 
@@ -184,8 +175,8 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                 onChange={(value) => handleInputChange("accountEmail", value)}
                 isEditing={true}
                 type="email"
-                error={formErrors.accountEmail}
                 disabled={isLoading}
+                isRequired={true}
               />
 
               <div className="flex flex-col gap-3">
@@ -193,7 +184,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                   label={"Add Account"}
                   disabled={isLoading}
                   type={"submit"}
-                  isLoading={isLoading} // Assuming PixieButton supports this prop
+                  isLoading={isLoading}
                 />
                 <CancelButton onClick={onClose} disabled={isLoading} />
               </div>

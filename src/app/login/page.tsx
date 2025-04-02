@@ -22,6 +22,7 @@ function LoginContent() {
   const [attempts, setAttempts] = useState(0);
   const { setLoading, isLoading } = useContext(LoadingContext);
   const [showLogin, setShowLogin] = useState(true);
+  const [showAuthForm, setShowAuthForm] = useState(false);
 
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [isEmailCodeVerified, setIsEmailCodeVerified] =
@@ -42,7 +43,7 @@ function LoginContent() {
     if (loggedOut === "true" && !hasShownLogoutToastr.current) {
       toastr({
         message: "Logged out successfully.",
-        toastrType: "error",
+        toastrType: "success",
       });
       hasShownLogoutToastr.current = true;
       router.replace("/login");
@@ -84,6 +85,7 @@ function LoginContent() {
       });
 
       if (response.status === "SUCCESS") {
+        setShowAuthForm(false);
         const now = new Date().toISOString();
         cookieHandler.setLoginAttempts(0, now, null, 86400);
         router.push(getDefaultPage()); // Trigger redirection (ClientLoadingWrapper will handle loading state)
@@ -274,6 +276,10 @@ function LoginContent() {
     setShowLogin(isVisible);
   };
 
+  const handleSetShowAuthForm = (isVisible: boolean) => {
+    setShowAuthForm(isVisible);
+  };
+
   return (
     <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center">
       <div className="w-[408px] max-w-full flex justify-center mb-4 max-xs:order-2 custom:mb-0">
@@ -287,6 +293,8 @@ function LoginContent() {
             error={error}
             attempts={attempts}
             setShowLogin={handleLoginResetSwitch}
+            isAuthFormVisible={showAuthForm}
+            setShowAuthForm={handleSetShowAuthForm}
           />
         )}
 

@@ -19,6 +19,8 @@ interface LoginCardProps {
   error?: string;
   attempts?: number;
   setShowLogin: (isVisible: boolean) => void;
+  isAuthFormVisible?: boolean;
+  setShowAuthForm: (isVisible: boolean) => void;
 }
 
 export default function LoginCard({
@@ -28,6 +30,8 @@ export default function LoginCard({
   error,
   attempts = 0,
   setShowLogin,
+  isAuthFormVisible = false,
+  setShowAuthForm,
 }: LoginCardProps) {
   const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
@@ -35,7 +39,6 @@ export default function LoginCard({
     identifier: "",
     otp: "",
   });
-  const [showAuthForm, setShowAuthForm] = useState(false);
   const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
 
   const handleInputChange =
@@ -45,6 +48,7 @@ export default function LoginCard({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // setShowAuthForm(true);
     setShowAuthForm(true);
   };
 
@@ -52,17 +56,12 @@ export default function LoginCard({
     setLoading(true); // Trigger loading overlay
     setAuthCode(authCode.split(""));
     onSubmit({ ...formData, otp: authCode });
-    handleCloseAuth();
-  };
-
-  const handleCloseAuth = () => {
+    // handleCloseAuth();
     setAuthCode(initialAuthCode);
-    setShowAuthForm(false);
   };
 
   const switchToReset = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
-    // router.push("/reset");
     setShowLogin(false);
   };
 
@@ -132,10 +131,10 @@ export default function LoginCard({
           </div>
         </form>
       </div>
-      {showAuthForm && (
+      {isAuthFormVisible && (
         <div className="absolute top-40 left-0 right-0 flex justify-center z-50">
           <AuthenticateForm
-            onClose={handleCloseAuth}
+            onClose={() => setShowAuthForm(false)}
             onSubmitCode={handleAuthCodeSubmit}
             initialCode={authCode}
             className="w-full max-w-[358px] min-w-[280px]"

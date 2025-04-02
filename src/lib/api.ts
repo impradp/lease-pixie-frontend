@@ -148,6 +148,7 @@ export class ApiService {
         }
       }
     } catch (error) {
+      // TODO: Handle logs
       throw error;
     }
   }

@@ -10,6 +10,6 @@ export const ENDPOINTS = {
     SELF: "/api/index",
   },
   ACCOUNT: {
-    CREATE: "/account",
+    CREATE: "/api/v1/account",
   },
 } as const;

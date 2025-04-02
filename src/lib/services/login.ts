@@ -30,7 +30,7 @@ class LoginService {
       ENDPOINTS.AUTH.LOGIN,
       credentials
     );
-    if (response.status === "SUCCESS") {
+    if (response?.status === "SUCCESS") {
       apiService.setToken(response.data?.accessToken);
     }
     return response;

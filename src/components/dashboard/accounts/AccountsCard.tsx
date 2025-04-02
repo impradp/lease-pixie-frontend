@@ -61,26 +61,33 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     userData: Account,
     setLoading: (loading: boolean) => void
   ) => {
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    try {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
 
-    await accountService
-      .create(userData)
-      .then(() => {
+      const response = await accountService.create(userData);
+
+      if (response?.status === "SUCCESS") {
         setShowNewAccountModal(false);
         toastr({
           message: "Account created successfully.",
           toastrType: "success",
         });
-      })
-      .catch(() => {
+      } else {
+        //TODO: Log error
         toastr({
-          message: "Failed to create account.",
+          message: "Account creation failed.",
           toastrType: "error",
         });
-      })
-      .finally(() => {
-        setLoading(false);
+      }
+    } catch  {
+      //TODO: Log error
+      toastr({
+        message: "Failed to create account. Please view logs for more info.",
+        toastrType: "error",
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseAccountModal = () => {

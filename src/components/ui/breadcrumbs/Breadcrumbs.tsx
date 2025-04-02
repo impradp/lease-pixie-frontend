@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ellipseCharacter } from "@/utils/textUtils";
+import { ellipseCharacter } from "@/lib/utils/textUtils";
 import { BreadcrumbItem } from "@/types/BreadcrumbItem";
 
 interface BreadcrumbsProps {

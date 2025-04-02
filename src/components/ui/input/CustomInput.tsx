@@ -13,6 +13,7 @@ interface CustomInputProps {
   type?: "text" | "email" | "mobile";
   error?: string;
   disabled?: boolean; // Added disabled prop
+  isRequired?: boolean;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -28,6 +29,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   type = "text",
   error: externalError,
   disabled = false, // Default to false
+  isRequired = false,
 }) => {
   const [internalError, setInternalError] = useState<string | null>(null);
 
@@ -114,7 +116,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     }
   };
 
-  const displayError = externalError || internalError;
+  const displayError = externalError ?? internalError;
 
   return (
     <div className={`flex flex-col gap-1.5 ${containerClassName}`}>
@@ -124,7 +126,9 @@ const CustomInput: React.FC<CustomInputProps> = ({
         }`}
       >
         {label}
+        {isRequired && <span className="text-[#878aa4] text-sm "> *</span>}
       </label>
+
       <div
         className={`px-3.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)_inset] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke flex items-center ${
           disabled ? "opacity-50 cursor-not-allowed" : ""

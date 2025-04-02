@@ -17,6 +17,7 @@ interface AddressAutocompleteInputProps {
   inputId?: string;
   disabled?: boolean;
   error?: string; // External error from parent, renamed from formError to match CustomInput
+  isRequired?: boolean;
 }
 
 const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
@@ -28,6 +29,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   inputId = "autocomplete-input",
   disabled = false,
   error = "", // External error, defaults to empty string
+  isRequired = false,
 }) => {
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<RadarAddress[]>([]);
@@ -217,6 +219,9 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
         }`}
       >
         {label}
+        {isRequired && (
+          <span className="text-tertiary-muteBlueGray text-sm "> *</span>
+        )}
       </label>
       <div className="autocomplete-input-container">
         <div
