@@ -1,11 +1,12 @@
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import React, { useState, useContext } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import toastr from "@/lib/func/toastr";
 import { MenuItem } from "@/types/menuItem";
 import { loginService } from "@/lib/services/login";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
 type SidebarMenuProps = {
   isOpen: boolean;
@@ -14,6 +15,7 @@ type SidebarMenuProps = {
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
+  const { isLoading, setLoading } = useContext(LoadingContext);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     {
       title: "List",
@@ -31,7 +33,6 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       subItems: ["User", "Portfolio"],
     },
   ]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const toggleMenuItem = (index: number) => {
     const updatedMenuItems = menuItems.map((item, idx) => ({
@@ -41,20 +42,29 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
     setMenuItems(updatedMenuItems);
   };
 
+  const handleSubItemClick = (subItem: string) => {
+    if (subItem === "Portfolio") {
+      setLoading(true); // Set loading true before navigation
+      router.push("/portfolio");
+      onClose(); // Optional: close the sidebar after navigation
+    }
+    // Add more conditions here for other subItems if needed
+  };
+
   const handleSignOut = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
+      setLoading(true);
       loginService.logout();
       router.push("/login?loggedOut=true");
       onClose();
     } catch {
-      //TODO: Use logger
       toastr({
         message: "Failed to sign out. Please try again.",
         toastrType: "warning",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -103,7 +113,8 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
                   {item.subItems.map((subItem) => (
                     <dd
                       key={subItem}
-                      className="pl-5 pt-1 pb-1 cursor-pointer font-regular text-menu-text"
+                      className="pl-5 pt-1 pb-1 cursor-pointer font-regular text-menu-text hover:text-blue-600"
+                      onClick={() => handleSubItemClick(subItem)}
                     >
                       {subItem}
                     </dd>

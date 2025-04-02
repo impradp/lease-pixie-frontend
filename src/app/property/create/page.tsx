@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { Locale } from "@/locales";
 import toastr from "@/lib/func/toastr";
 import { getMessages } from "@/locales/locale";
+import { sampleStar, sampleSeats } from "@/data/workflowStars";
 import { sampleBankAccounts } from "@/data/accounts";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import PropertyInfoCard from "@/components/property/PropertyInfoCard";
@@ -26,11 +26,13 @@ import {
   roofStructureOptions,
   sprinklerSystemOptions,
 } from "@/data/Properties";
+import WorkflowStars from "@/components/property/WorkflowStars";
+import WorkflowSeats from "@/components/property/WorkflowSeats";
+import { sampleVendors } from "@/data/users";
 
 export default function PropertyPage() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
-
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -41,8 +43,30 @@ export default function PropertyPage() {
   };
 
   const handleSectionClose = () => {
-    //TODO: Set selected file
     setEditingSection(null);
+  };
+
+  const workflowInactivityThresholdOptions = [
+    { label: "Select Threshold", value: "" },
+    { label: "multiple of 15", value: "-15" },
+    { label: "multiple of -10", value: "-10" },
+    { label: "multiple of -5", value: "-5" },
+    { label: "multiple of 5", value: "5" },
+  ];
+
+  const starOptions = {
+    maintainenceStars: sampleStar,
+    accountingStars: sampleStar,
+    leaseStars: sampleStar,
+    billPayStars: sampleStar,
+    workflowInactivityThresholds: workflowInactivityThresholdOptions,
+  };
+
+  const seatOptions = {
+    maintenanceSeats: sampleVendors, // Reusing sampleStar; replace with actual seat data if different
+    accountingSeats: sampleVendors,
+    leaseSeats: sampleVendors,
+    billPaySeats: sampleVendors,
   };
 
   const handleFileSelect = (file: File | null) => {
@@ -59,9 +83,8 @@ export default function PropertyPage() {
       return;
     }
 
-    // Validate file size
     if (file.size <= 10 * 1024 * 1024) {
-      //TODO: Set selected file
+      // TODO: Set selected file
     } else {
       toastr({
         message: "File size exceeds 10MB limit",
@@ -89,6 +112,30 @@ export default function PropertyPage() {
   useEffect(() => {
     setIsLoading(false);
   }, []);
+
+  const emptyStarOption = sampleStar.find((opt) => opt.value === "");
+  const emptySeatOption = sampleSeats.find((opt) => opt.value === "");
+  const emptyThresholdOption = workflowInactivityThresholdOptions.find(
+    (opt) => opt.value === ""
+  );
+
+  const [workflowStarsFormData, setWorkflowStarsFormData] = useState({
+    maintainenceStar: emptyStarOption,
+    accountingStar: emptyStarOption,
+    leaseStar: emptyStarOption,
+    billPayStar: emptyStarOption,
+    maintainenceStarThreshold: emptyThresholdOption,
+    accountingStarThreshold: emptyThresholdOption,
+    leaseStarThreshold: emptyThresholdOption,
+    billPayStarThreshold: emptyThresholdOption,
+  });
+
+  const [workflowSeatsFormData, setWorkflowSeatsFormData] = useState({
+    maintenanceSeat: emptySeatOption,
+    accountingSeat: emptySeatOption,
+    leaseSeat: emptySeatOption,
+    billPaySeat: emptySeatOption,
+  });
 
   const breadcrumbItems = [
     { href: "/admin", label: "Admin Dashboard" },
@@ -150,7 +197,6 @@ export default function PropertyPage() {
               "Invoice Settings: This info is related to invoice settings."
             }
           />
-
           <BankSettingsCard
             onEdit={handleEdit}
             sectionId="bankSettingsCard"
@@ -166,7 +212,6 @@ export default function PropertyPage() {
               "Bank Settings: This info is related to bank accounts."
             }
           />
-
           <WorkflowAutomationSync
             label={messages?.property?.automation?.title}
             title={messages?.property?.automation?.syncTitle}
@@ -175,6 +220,52 @@ export default function PropertyPage() {
             editingSection={editingSection}
             onSectionEdit={handleSectionEdit}
             onSectionClose={handleSectionClose}
+          />
+          <WorkflowStars
+            label={"Workflow Stars"}
+            initialFormData={workflowStarsFormData}
+            onFormDataChange={setWorkflowStarsFormData}
+            starOptions={starOptions}
+            sectionId="workflowStars"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+            subLabels={[
+              "Maintainence star",
+              "Accounting star",
+              "Lease star",
+              "Bill-pay star",
+            ]}
+            showInfo={true}
+            infoContents={[
+              "Maintainence Star: Sample Info",
+              "Accounting Star: Sample Info",
+              "Lease Star: Sample Info",
+              "Bill Pay Star: Sample Info",
+            ]}
+          />
+          <WorkflowSeats
+            label={"Workflow Seats"}
+            initialFormData={workflowSeatsFormData}
+            onFormDataChange={setWorkflowSeatsFormData}
+            seatOptions={seatOptions}
+            sectionId="workflowSeats"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+            subLabels={[
+              "Tax reporting seat",
+              "Insurance seat",
+              "Leasing seat (Licensed broker or property owner only)",
+              "Attorney seat (Licensed attorney only)",
+            ]}
+            showInfo={true}
+            infoContents={[
+              "Tax reporting seat: Sample Info",
+              "Insurance seat: Sample Info",
+              "Leasing seat (Licensed broker or property owner only): Sample Info",
+              "Attorney seat (Licensed attorney only): Sample Info",
+            ]}
           />
         </div>
       </div>

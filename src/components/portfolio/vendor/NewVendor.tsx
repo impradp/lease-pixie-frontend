@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 import { Locale } from "@/locales";
+import toastr from "@/lib/func/toastr";
 import { getMessages } from "@/locales/locale";
 import { NewVendorFormData } from "@/types/vendor";
 import CustomInput from "@/components/ui/input/CustomInput";
@@ -21,7 +22,10 @@ const AddressAutocompleteInput = dynamic(
 
 interface NewVendorProps {
   onClose: () => void;
-  onSubmit: (userData: NewVendorFormData) => void;
+  onSubmit: (
+    userData: NewVendorFormData,
+    setLoading: (loading: boolean) => void
+  ) => Promise<void>;
 }
 
 export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
@@ -30,17 +34,18 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
     serviceDescripton: "",
     companyAddress: "",
     officePhoneNumber: "",
-    vendorFirstName: "",
-    vendorLastName: "",
-    vendorEmailId: "",
-    vendorMobileNumber: "",
-    getW9: false,
+    contactFirstName: "",
+    contactLastName: "",
+    email: "",
+    mobileNumber: "",
+    requestW9: false,
     send1099: false,
     getInsuranceCert: false,
   });
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const scrollbarWidth =
@@ -56,10 +61,42 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
+
+    if (!validateForm()) {
+      toastr({
+        message: "Required fields (*) are empty.",
+        toastrType: "error",
+      });
+      return;
+    }
+    try {
+      setIsLoading(true);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      onSubmit(
+        {
+          ...formData,
+          mobileNumber: formData.mobileNumber.replaceAll("-", ""),
+          officePhoneNumber: formData.officePhoneNumber.replaceAll("-", ""),
+        },
+        setIsLoading
+      );
+    } catch {
+      setIsLoading(false);
+    }
+  };
+
+  const validateForm = (): boolean => {
+    // Only check if required fields are empty, don't store specific errors
+    const isValid =
+      formData.companyName.trim() &&
+      formData.contactFirstName.trim() &&
+      formData.contactLastName.trim() &&
+      formData.mobileNumber.trim() &&
+      formData.email.trim;
+
+    return !!isValid;
   };
 
   const handleCheckboxChange = (field: keyof NewVendorFormData) => {
@@ -95,6 +132,8 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 setFormData((prev) => ({ ...prev, companyName: value }))
               }
               isEditing={true}
+              disabled={isLoading}
+              isRequired={true}
             />
 
             <CustomInput
@@ -105,6 +144,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               }
               isEditing={true}
               placeholder="i.e. Electrician"
+              disabled={isLoading}
             />
 
             <AddressAutocompleteInput
@@ -116,6 +156,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               isEditing={true}
               placeholder="Start typing address..."
               inputId="company-address-input"
+              disabled={isLoading}
             />
 
             <CustomInput
@@ -126,54 +167,65 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               }
               isEditing={true}
               placeholder="800-555-1234"
+              type="mobile"
+              disabled={isLoading}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CustomInput
                 label="Vendor contact first name"
-                value={formData.vendorFirstName}
+                value={formData.contactFirstName}
                 onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, vendorFirstName: value }))
+                  setFormData((prev) => ({ ...prev, contactFirstName: value }))
                 }
                 isEditing={true}
                 placeholder="First"
+                disabled={isLoading}
+                isRequired={true}
               />
 
               <CustomInput
                 label="Vendor contact last name"
-                value={formData.vendorLastName}
+                value={formData.contactLastName}
                 onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, vendorLastName: value }))
+                  setFormData((prev) => ({ ...prev, contactLastName: value }))
                 }
                 isEditing={true}
                 placeholder="Last"
+                disabled={isLoading}
+                isRequired={true}
               />
             </div>
 
             <CustomInput
               label="Email address"
-              value={formData.vendorEmailId}
+              value={formData.email}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, vendorEmailId: value }))
+                setFormData((prev) => ({ ...prev, email: value }))
               }
               isEditing={true}
+              disabled={isLoading}
+              isRequired={true}
             />
 
             <CustomInput
               label="Mobile phone number"
-              value={formData.vendorMobileNumber}
+              value={formData.mobileNumber}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, vendorMobileNumber: value }))
+                setFormData((prev) => ({ ...prev, mobileNumber: value }))
               }
               isEditing={true}
               placeholder="800-555-1234"
+              type="mobile"
+              disabled={isLoading}
+              isRequired={true}
             />
 
             <div className="space-y-4 pt-2">
               <CustomCheckbox
                 id="getW9"
-                checked={formData.getW9}
-                onChange={() => handleCheckboxChange("getW9")}
+                checked={formData.requestW9}
+                onChange={() => handleCheckboxChange("requestW9")}
                 label="Get W-9"
                 isEditing={true}
               />
@@ -197,9 +249,10 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
             <div className="flex flex-col gap-3 pb-6">
               <PixieButton
                 label={messages?.portfolio?.vendor?.modal?.button?.label}
-                disabled={false}
                 type={messages?.portfolio?.vendor?.modal?.button?.type}
                 formId="new-vendor-form"
+                disabled={isLoading}
+                isLoading={isLoading}
               />
               <CancelButton onClick={onClose} />
             </div>

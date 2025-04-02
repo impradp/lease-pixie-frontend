@@ -56,7 +56,7 @@ function LoginContent() {
         toastrType: "success",
       });
       hasShownResetToastr.current = true;
-      router.replace("/login");
+      router.push("/login");
     }
   }, [searchParams, router]);
 

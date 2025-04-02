@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
 
 import { Locale } from "@/locales";
+import toastr from "@/lib/func/toastr";
 import { getMessages } from "@/locales/locale";
 import { NewVendorFormData } from "@/types/vendor";
+import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
+import { NewUserFormData, DropdownOption } from "@/types/user";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { NewVendor } from "@/components/portfolio/vendor/NewVendor";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
-import { NewUserFormData, DropdownOption } from "@/types/user";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
-import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
-import { NewPortfolioUser } from "@/components/portfolio/user/NewPortfolioUser";
+import NewPortfolioUser from "@/components/portfolio/user/NewPortfolioUser";
 
 interface PortfolioUserProps {
   label?: string;
   selectedUser?: DropdownOption;
   onUserChange?: (user: DropdownOption) => void;
   users: DropdownOption[];
-  onAddUser?: (userData: NewUserFormData) => void;
-  onAddVendor?: (vendorData: NewVendorFormData) => void;
   showInfo?: boolean;
   infoContent?: string;
   userType?: string;
@@ -36,8 +35,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   selectedUser,
   onUserChange,
   users,
-  onAddUser,
-  onAddVendor,
   showInfo,
   infoContent,
   userType = "Portfolio User",
@@ -50,11 +47,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showNewVendorModal, setShowNewVendorModal] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [confirmationContent, setConfirmationContent] = useState({
-    title: "",
-    message: "",
-  });
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalUser] = useState(selectedUser); // Store original selection
   const [editedUser, setEditedUser] = useState(selectedUser); // Track edited selection
@@ -64,7 +56,7 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
   const messages = getMessages(locale);
 
   useEffect(() => {
-    if (showNewUserModal || showNewVendorModal || showConfirmation) {
+    if (showNewUserModal || showNewVendorModal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -72,30 +64,68 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showNewUserModal, showNewVendorModal, showConfirmation]);
+  }, [showNewUserModal, showNewVendorModal]);
 
-  const handleAddUser = (userData: NewUserFormData) => {
-    if (onAddUser) {
-      onAddUser(userData);
+  const handleAddUser = async (
+    userData: NewUserFormData,
+    setLoading: (loading: boolean) => void
+  ) => {
+    try {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const response = await portfolioService.addUser(userData);
+      if (response?.status === "SUCCESS") {
+        setShowNewUserModal(false);
+        toastr({
+          message: "New portfolio user added successfully.",
+          toastrType: "success",
+        });
+      } else {
+        toastr({
+          message: "Error adding new portfolio user.",
+          toastrType: "error",
+        });
+      }
+    } catch {
+      //TODO: Handle log
+      toastr({
+        message: "Exception occured adding new portfolio user.",
+        toastrType: "error",
+      });
+    } finally {
+      setLoading(false);
     }
-    setShowNewUserModal(false);
-    setConfirmationContent({
-      title: messages?.portfolio?.user?.confirmModal?.title,
-      message: messages?.portfolio?.user?.confirmModal?.message,
-    });
-    setShowConfirmation(true);
   };
 
-  const handleAddVendor = (vendorData: NewVendorFormData) => {
-    if (onAddVendor) {
-      onAddVendor(vendorData);
+  const handleAddVendor = async (
+    userData: NewVendorFormData,
+    setLoading: (loading: boolean) => void
+  ) => {
+    try {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const response = await portfolioService.addVendor(userData);
+      if (response?.status === "SUCCESS") {
+        setShowNewVendorModal(false);
+        toastr({
+          message: "New portfolio vendor added successfully.",
+          toastrType: "success",
+        });
+      } else {
+        toastr({
+          message: "Error adding new portfolio vendor.",
+          toastrType: "error",
+        });
+      }
+    } catch {
+      //TODO: Handle log
+      toastr({
+        message: "Exception occured adding new portfolio vendor.",
+        toastrType: "error",
+      });
+    } finally {
+      setLoading(false);
     }
-    setShowNewVendorModal(false);
-    setConfirmationContent({
-      title: messages?.portfolio?.vendor?.confirmModal?.title,
-      message: messages?.portfolio?.vendor?.confirmModal?.message,
-    });
-    setShowConfirmation(true);
   };
 
   const handleCloseUserModal = () => {
@@ -104,10 +134,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
 
   const handleCloseVendorModal = () => {
     setShowNewVendorModal(false);
-  };
-
-  const handleConfirmationClose = () => {
-    setShowConfirmation(false);
   };
 
   const handleEdit = () => {
@@ -208,13 +234,6 @@ export const PortfolioUser: React.FC<PortfolioUserProps> = ({
           </div>
         </div>
       )}
-
-      <ConfirmationDialog
-        isOpen={showConfirmation}
-        onClose={handleConfirmationClose}
-        title={confirmationContent.title}
-        message={confirmationContent.message}
-      />
     </>
   );
 };

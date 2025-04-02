@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import { Locale } from "@/locales";
 import { getMessages } from "@/locales/locale";
 import CustomInput from "@/components/ui/input/CustomInput";
@@ -27,12 +26,18 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
   onSectionClose,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [originalName, setOriginalName] = useState(portfolioName); // Store original value
-  const [editedName, setEditedName] = useState(portfolioName); // Track edited value
+  const [originalName, setOriginalName] = useState(portfolioName);
+  const [editedName, setEditedName] = useState(portfolioName);
   const isEditing = isEditMode;
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
+
+  // Sync original and edited name with props when they change
+  useEffect(() => {
+    setOriginalName(portfolioName);
+    setEditedName(portfolioName);
+  }, [portfolioName]);
 
   const handleEdit = () => {
     if (editingSection === null || editingSection === sectionId) {
@@ -50,13 +55,16 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
 
   const handleTextUpdate = () => {
     setIsEditMode(false);
-    setOriginalName(editedName); // Update original value with edited value
+    if (onNameChange && editedName) {
+      onNameChange(editedName);
+    }
     onSectionClose();
   };
 
   const handleNameChange = (value: string) => {
-    setEditedName(value);
-    if (onNameChange) onNameChange(value);
+    if (isEditing) {
+      setEditedName(value);
+    }
   };
 
   const isEditDisabled =
@@ -78,7 +86,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
       />
       <CustomInput
         label={messages?.portfolio?.name}
-        value={editedName} // Use edited value
+        value={editedName}
         onChange={handleNameChange}
         readOnly={!isEditing}
         isEditing={isEditing}

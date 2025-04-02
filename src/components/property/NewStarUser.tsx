@@ -9,7 +9,7 @@ import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
-interface NewPortfolioUserProps {
+interface NewStarUserProps {
   onClose: () => void;
   onSubmit: (
     userData: NewUserFormData,
@@ -17,17 +17,14 @@ interface NewPortfolioUserProps {
   ) => Promise<void>;
 }
 
-const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
-  onClose,
-  onSubmit,
-}) => {
+const NewStarUser: React.FC<NewStarUserProps> = ({ onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<NewUserFormData>({
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: "",
     mobilePhone: "",
+    phoneNumber: "",
   });
 
   const [locale] = useState<Locale>("en");
@@ -62,10 +59,7 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
     try {
       setIsLoading(true);
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      onSubmit(
-        { ...formData, phoneNumber: formData?.phoneNumber.replaceAll("-", "") },
-        setIsLoading
-      );
+      onSubmit({ ...formData }, setIsLoading);
     } catch {
       setIsLoading(false);
     }
@@ -77,7 +71,7 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
       formData.email.trim() &&
       formData.firstName.trim() &&
       formData.lastName.trim() &&
-      formData.phoneNumber.trim();
+      formData.mobilePhone.trim();
 
     return !!isValid;
   };
@@ -92,7 +86,7 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <SectionHeader
-              title={messages?.portfolio?.user?.modal?.title}
+              title={"Create Property User"}
               showCloseButton={true}
               onClose={onClose}
             />
@@ -136,8 +130,8 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
 
             <CustomInput
               label="Mobile phone"
-              value={formData.phoneNumber}
-              onChange={(value) => handleInputChange("phoneNumber", value)}
+              value={formData.mobilePhone}
+              onChange={(value) => handleInputChange("mobilePhone", value)}
               isEditing={true}
               placeholder="800-555-1234"
               type="mobile"
@@ -161,4 +155,4 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
   );
 };
 
-export default NewPortfolioUser;
+export default NewStarUser;

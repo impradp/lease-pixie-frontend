@@ -24,6 +24,7 @@ export const NewReadOnlyAdminUser: React.FC<NewReadOnlyAdminUserProps> = ({
     firstName: "",
     lastName: "",
     email: "",
+    phoneNumber: "",
     mobilePhone: "",
     smsActive: false,
   });
@@ -107,7 +108,7 @@ export const NewReadOnlyAdminUser: React.FC<NewReadOnlyAdminUserProps> = ({
 
               <CustomInput
                 label="Mobile phone"
-                value={formData.mobilePhone}
+                value={formData.phoneNumber}
                 onChange={(value) =>
                   setFormData((prev) => ({ ...prev, mobilePhone: value }))
                 }

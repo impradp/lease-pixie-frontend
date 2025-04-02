@@ -2,7 +2,12 @@ import { cookieHandler } from "@/lib/services/cookieHandler";
 
 export const roleAccessMap: Record<string, string[]> = {
   ADMINUSER: ["/admin", "/dashboard", "/workflows", "/portfolio", "/account"],
-  ACCOUNTUSER: ["/account", "/account/profile", "/account/settings"],
+  ACCOUNTUSER: [
+    "/account",
+    "/account/profile",
+    "/account/settings",
+    "/portfolio",
+  ],
   PORTFOLIO: ["/portfolio", "/portfolio/view", "/portfolio/reports"],
   WORKFLOW: [
     "/workflow",
@@ -27,6 +32,7 @@ export const publicRoutes = [
   "/reset-password",
   "/api/login",
   "/api/refresh-token",
+  "/property/create",
 ];
 
 export const FALLBACK_DEFAULT_PAGE = "/login";

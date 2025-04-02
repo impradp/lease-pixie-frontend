@@ -5,9 +5,11 @@ export interface User {
 }
 
 export interface NewUserFormData {
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string;
   mobilePhone: string;
   smsActive?: boolean;
 }

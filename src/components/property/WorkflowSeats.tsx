@@ -11,80 +11,66 @@ import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
 
-interface PortfolioVendorsProps {
+interface WorkflowSeatsFormData {
+  maintenanceSeat: DropdownOption | undefined;
+  accountingSeat: DropdownOption | undefined;
+  leaseSeat: DropdownOption | undefined;
+  billPaySeat: DropdownOption | undefined;
+}
+
+interface SeatOptions {
+  maintenanceSeats: DropdownOption[];
+  accountingSeats: DropdownOption[];
+  leaseSeats: DropdownOption[];
+  billPaySeats: DropdownOption[];
+}
+
+interface WorkflowSeatsProps {
   label?: string;
-  selectedVendor?: DropdownOption;
-  selectedSecondaryVendor?: DropdownOption;
-  selectedTertiaryVendor?: DropdownOption;
-  onVendorChange?: (vendor: DropdownOption) => void;
-  onSecondaryVendorChange?: (vendor: DropdownOption) => void;
-  onTertiaryVendorChange?: (vendor: DropdownOption) => void;
-  vendors: DropdownOption[];
-  secondaryVendors: DropdownOption[];
-  tertiaryVendors: DropdownOption[];
-  onAddVendor?: (vendorData: NewVendorFormData) => void;
+  initialFormData: WorkflowSeatsFormData;
+  onFormDataChange: (formData: WorkflowSeatsFormData) => void;
+  seatOptions: SeatOptions;
   showInfo?: boolean;
   infoContents?: string[];
-  vendorType?: string;
   sectionId: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
   onSectionClose: () => void;
   subLabels: string[];
-  refreshVendors: () => void;
 }
 
-export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
+const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
   label = "",
-  selectedVendor,
-  selectedSecondaryVendor,
-  selectedTertiaryVendor,
-  onVendorChange,
-  onSecondaryVendorChange,
-  onTertiaryVendorChange,
-  vendors,
-  secondaryVendors,
-  tertiaryVendors,
+  initialFormData,
+  onFormDataChange,
+  seatOptions,
   showInfo,
   infoContents = [],
-  vendorType = "Vendor",
   sectionId,
   editingSection,
   onSectionEdit,
   onSectionClose,
-  subLabels = ["Selected Vendor 1", "Selected Vendor 2", "Selected Vendor 3"],
-  refreshVendors,
+  subLabels = [
+    "Selected Seat 1",
+    "Selected Seat 2",
+    "Selected Seat 3",
+    "Selected Seat 4",
+  ],
 }) => {
-  const [showNewVendorModal, setShowNewVendorModal] = useState(false);
+  const [formData, setFormData] =
+    useState<WorkflowSeatsFormData>(initialFormData);
+  const [originalFormData, setOriginalFormData] =
+    useState<WorkflowSeatsFormData>(initialFormData);
+  const [showNewSeatModal, setShowNewSeatModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editedVendor, setEditedVendor] = useState(selectedVendor);
-  const [editedSecondaryVendor, setEditedSecondaryVendor] = useState(
-    selectedSecondaryVendor
-  );
-  const [editedTertiaryVendor, setEditedTertiaryVendor] = useState(
-    selectedTertiaryVendor
-  );
-  const [originalVendor, setOriginalVendor] = useState(selectedVendor);
-  const [originalSecondaryVendor, setOriginalSecondaryVendor] = useState(
-    selectedSecondaryVendor
-  );
-  const [originalTertiaryVendor, setOriginalTertiaryVendor] = useState(
-    selectedTertiaryVendor
-  );
-
-  const isEditing = isEditMode;
 
   useEffect(() => {
-    setOriginalVendor(selectedVendor);
-    setOriginalSecondaryVendor(selectedSecondaryVendor);
-    setOriginalTertiaryVendor(selectedTertiaryVendor);
-    setEditedVendor(selectedVendor);
-    setEditedSecondaryVendor(selectedSecondaryVendor);
-    setEditedTertiaryVendor(selectedTertiaryVendor);
-  }, [selectedVendor, selectedSecondaryVendor, selectedTertiaryVendor]);
+    setFormData(initialFormData);
+    setOriginalFormData(initialFormData);
+  }, [initialFormData]);
 
   useEffect(() => {
-    if (showNewVendorModal) {
+    if (showNewSeatModal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -92,7 +78,7 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showNewVendorModal]);
+  }, [showNewSeatModal]);
 
   const handleAddVendor = async (
     userData: NewVendorFormData,
@@ -103,12 +89,11 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
 
       const response = await portfolioService.addVendor(userData);
       if (response?.status === "SUCCESS") {
-        setShowNewVendorModal(false);
+        setShowNewSeatModal(false);
         toastr({
           message: "New portfolio vendor added successfully.",
           toastrType: "success",
         });
-        refreshVendors();
       } else {
         toastr({
           message: "Error adding new portfolio vendor.",
@@ -126,8 +111,8 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     }
   };
 
-  const handleCloseVendorModal = () => {
-    setShowNewVendorModal(false);
+  const handleCloseSeatModal = () => {
+    setShowNewSeatModal(false);
   };
 
   const handleEdit = () => {
@@ -139,36 +124,21 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
 
   const handleTextClose = () => {
     setIsEditMode(false);
-    setEditedVendor(originalVendor);
-    setEditedSecondaryVendor(originalSecondaryVendor);
-    setEditedTertiaryVendor(originalTertiaryVendor);
+    setFormData(originalFormData);
     onSectionClose();
   };
 
   const handleUpdate = () => {
     setIsEditMode(false);
-    if (onVendorChange && editedVendor) {
-      onVendorChange(editedVendor);
-    }
-    if (onSecondaryVendorChange && editedSecondaryVendor) {
-      onSecondaryVendorChange(editedSecondaryVendor);
-    }
-    if (onTertiaryVendorChange && editedTertiaryVendor) {
-      onTertiaryVendorChange(editedTertiaryVendor);
-    }
+    onFormDataChange(formData);
     onSectionClose();
   };
 
-  const handleVendorChange = (vendor: DropdownOption) => {
-    setEditedVendor(vendor);
-  };
-
-  const handleSecondaryVendorChange = (vendor: DropdownOption) => {
-    setEditedSecondaryVendor(vendor);
-  };
-
-  const handleTertiaryVendorChange = (vendor: DropdownOption) => {
-    setEditedTertiaryVendor(vendor);
+  const handleFieldChange = (
+    field: keyof WorkflowSeatsFormData,
+    value: DropdownOption | undefined
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const isEditDisabled =
@@ -191,54 +161,89 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
         />
 
         <CustomDropdown
-          options={vendors}
-          value={editedVendor?.value}
-          onChange={isEditing ? handleVendorChange : undefined}
-          readOnly={!isEditing}
-          isEditing={isEditing}
+          options={seatOptions.maintenanceSeats}
+          value={formData.maintenanceSeat?.value}
+          onChange={
+            isEditMode
+              ? (option) => handleFieldChange("maintenanceSeat", option)
+              : undefined
+          }
+          readOnly={!isEditMode}
+          isEditing={isEditMode}
           label={subLabels[0]}
           showInfo={showInfo}
           infoContent={infoContents[0]}
         />
+
         {isEditMode && (
           <IconLinkButton
-            label={`Add ${vendorType}`}
-            onClick={() => setShowNewVendorModal(true)}
+            label={`Add Vendor`}
+            onClick={() => setShowNewSeatModal(true)}
           />
         )}
 
         <CustomDropdown
-          options={secondaryVendors}
-          value={editedSecondaryVendor?.value}
-          onChange={isEditing ? handleSecondaryVendorChange : undefined}
-          readOnly={!isEditing}
-          isEditing={isEditing}
+          options={seatOptions.accountingSeats}
+          value={formData.accountingSeat?.value}
+          onChange={
+            isEditMode
+              ? (option) => handleFieldChange("accountingSeat", option)
+              : undefined
+          }
+          readOnly={!isEditMode}
+          isEditing={isEditMode}
           label={subLabels[1]}
           showInfo={showInfo}
           infoContent={infoContents[1]}
         />
         {isEditMode && (
           <IconLinkButton
-            label={`Add ${vendorType}`}
-            onClick={() => setShowNewVendorModal(true)}
+            label={`Add Vendor`}
+            onClick={() => setShowNewSeatModal(true)}
           />
         )}
 
         <CustomDropdown
-          options={tertiaryVendors}
-          value={editedTertiaryVendor?.value}
-          onChange={isEditing ? handleTertiaryVendorChange : undefined}
-          readOnly={!isEditing}
-          isEditing={isEditing}
+          options={seatOptions.leaseSeats}
+          value={formData.leaseSeat?.value}
+          onChange={
+            isEditMode
+              ? (option) => handleFieldChange("leaseSeat", option)
+              : undefined
+          }
+          readOnly={!isEditMode}
+          isEditing={isEditMode}
           label={subLabels[2]}
           showInfo={showInfo}
           infoContent={infoContents[2]}
         />
         {isEditMode && (
+          <IconLinkButton
+            label={`Add Vendor`}
+            onClick={() => setShowNewSeatModal(true)}
+          />
+        )}
+
+        <CustomDropdown
+          options={seatOptions.billPaySeats}
+          value={formData.billPaySeat?.value}
+          onChange={
+            isEditMode
+              ? (option) => handleFieldChange("billPaySeat", option)
+              : undefined
+          }
+          readOnly={!isEditMode}
+          isEditing={isEditMode}
+          label={subLabels[3]}
+          showInfo={showInfo}
+          infoContent={infoContents[3]}
+        />
+
+        {isEditMode && (
           <>
             <IconLinkButton
-              label={`Add ${vendorType}`}
-              onClick={() => setShowNewVendorModal(true)}
+              label={`Add Vendor`}
+              onClick={() => setShowNewSeatModal(true)}
             />
             <div className="flex flex-col gap-3">
               <PixieButton
@@ -253,11 +258,11 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
         )}
       </div>
 
-      {showNewVendorModal && (
+      {showNewSeatModal && (
         <div className="fixed inset-0 z-50">
           <div className="relative z-50">
             <NewVendor
-              onClose={handleCloseVendorModal}
+              onClose={handleCloseSeatModal}
               onSubmit={handleAddVendor}
             />
           </div>
@@ -266,3 +271,5 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     </>
   );
 };
+
+export default WorkflowSeats;

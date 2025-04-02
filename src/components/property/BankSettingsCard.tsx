@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
+
+import toastr from "@/lib/func/toastr";
+import { DropdownOption } from "@/types/user";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
-import { CustomDropdown } from "../ui/input/CustomDropdown";
-import { DropdownOption } from "@/types/user";
-import { CustomCheckbox } from "../ui/input/CustomCheckbox";
+import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
+import PlaidPaymentSetup from "@/components/ui/PlaidPaymentSetup";
+import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 
 interface BankSettingsCardProps {
   onEdit?: () => void;
@@ -46,6 +49,8 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
     pendingAccountApprovalFlag: pendingAccountApproval,
   };
 
+  const [showPlaidSetup, setShowPlaidSetup] = useState(false);
+
   const [formData, setFormData] = useState<BankSettingsData>(initialBankData);
   const [initialFormData, setInitialFormData] =
     useState<BankSettingsData>(initialBankData);
@@ -86,6 +91,41 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
   const isEditDisabled =
     editingSection !== null && editingSection !== sectionId;
 
+  const handleToggle = (field: keyof BankSettingsData) => () => {
+    if (isEditMode) {
+      setInitialFormData((prev) => {
+        const newValue = !prev[field];
+        if (!prev[field]) {
+          setShowPlaidSetup(true);
+        }
+        return {
+          ...prev,
+          [field]: newValue,
+        };
+      });
+    }
+  };
+
+  const initiatePlaidSetup = async (setLoading: (loading: boolean) => void) => {
+    try {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      //TODO: Call plaid setup API here
+    } catch {
+      //TODO: Handle log
+      toastr({
+        message: "Exception occured adding new portfolio vendor.",
+        toastrType: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closePlaidSetup = () => {
+    setShowPlaidSetup(false);
+  };
+
   return (
     <div
       className={`flex items-start rounded-xl p-6 flex flex-col gap-4 ${
@@ -112,19 +152,24 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
         isEditing={isEditMode}
       />
 
-      <CustomCheckbox
-        id="pendingAccountApprovalFlag"
-        checked={formData.pendingAccountApprovalFlag}
-        onChange={(value) =>
-          setFormData((prev) => ({
-            ...prev,
-            pendingAccountApprovalFlag: value,
-          }))
-        }
-        label="Manage transfers of reconciled payments to property operating account (pending Account approval)"
-        isEditing={isEditMode}
-        labelClassName="text-tertiary-slateBlue text-sm font-medium"
-      />
+      <div className="flex items-center gap-3">
+        <span className="text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
+          {"Off"}
+        </span>
+        <ToggleSwitch
+          isOn={
+            isEditMode
+              ? initialFormData.pendingAccountApprovalFlag
+              : formData.pendingAccountApprovalFlag
+          }
+          onToggle={handleToggle("pendingAccountApprovalFlag")}
+          isDisabled={!isEditMode}
+          className="w-9"
+        />
+        <span className="text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
+          {"Operating Account Transfers"}
+        </span>
+      </div>
 
       {isEditMode && (
         <div className="w-full flex flex-col gap-3">
@@ -136,6 +181,13 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
           />
           <CancelButton onClick={handleTextClose} />
         </div>
+      )}
+
+      {showPlaidSetup && (
+        <PlaidPaymentSetup
+          onSubmit={initiatePlaidSetup}
+          onClose={closePlaidSetup}
+        />
       )}
     </div>
   );

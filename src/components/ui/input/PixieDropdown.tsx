@@ -63,7 +63,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
       "self-stretch flex flex-col justify-start items-start gap-1.5";
     sizeCustomInputClassName =
       customInputClassName ??
-      "h-11 px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke text-tertiary-light text-base font-normal font-['Inter'] leading-normal";
+      "h-11 px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]  outline-none text-tertiary-light text-base font-normal font-['Inter'] leading-normal";
     dropdownPosition = "top-[calc(100%+0.375rem)]";
     optionItemClassName =
       "py-2.5 text-tertiary-light text-base font-normal font-['Inter'] leading-normal cursor-pointer"; // Matches input text size and height
@@ -172,17 +172,17 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           className={`w-full grow shrink basis-0 px-3.5 py-2.5 bg-white rounded-lg border border-tertiary-stroke justify-start items-center gap-2 flex overflow-hidden ${sizeCustomInputClassName} ${
-            isEditing && !readOnly && !isLocked
-              ? "cursor-pointer"
-              : "cursor-default"
+            isEditing && !isLocked ? "cursor-pointer" : "cursor-default"
           }`}
           aria-label={label || "Dropdown selection"}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={`${inputId}-options`}
-          aria-disabled={readOnly || !isEditing}
+          aria-disabled={readOnly}
         >
-          <div className="grow shrink basis-0 h-5 justify-between items-center flex">
+          <div
+            className={`grow shrink basis-0 h-5 justify-between items-center flex`}
+          >
             <div className="justify-start items-center gap-2 flex">
               <div
                 className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight`}

@@ -5,6 +5,7 @@ interface CancelButtonProps {
   className?: string;
   disabled?: boolean; // Added disabled prop
   isLoading?: boolean; // Added isLoading prop
+  label?: string;
 }
 
 const CancelButton: React.FC<CancelButtonProps> = ({
@@ -12,6 +13,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({
   className = "",
   disabled = false,
   isLoading = false,
+  label = "Cancel",
 }) => {
   const isButtonDisabled = disabled || isLoading;
 
@@ -30,7 +32,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({
         isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
     >
-      {isLoading ? "Cancelling..." : "Cancel"}
+      {isLoading ? "Cancelling..." : label}
     </button>
   );
 };

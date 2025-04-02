@@ -12,4 +12,11 @@ export const ENDPOINTS = {
   ACCOUNT: {
     CREATE: "/api/v1/account",
   },
+  PORTFOLIO: {
+    ADD_USER: "/api/v1/portfolio/user",
+    GET_USERS: "/api/v1/portfolio/users",
+    ADD_VENDOR: "/api/v1/portfolio/vendor",
+    GET_VENDORS: "/api/v1/portfolio/vendors",
+    ADD: "/api/v1/portfolio",
+  },
 } as const;

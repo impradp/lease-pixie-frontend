@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Locale } from "@/locales";
-import { getMessages } from "@/locales/locale";
+
+import toastr from "@/lib/func/toastr";
+import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
+import { NewUserFormData, DropdownOption } from "@/types/user";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
-import { NewUserFormData, DropdownOption } from "@/types/user";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
-import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
-import { NewPortfolioUser } from "@/components/portfolio/user/NewPortfolioUser";
+import NewPortfolioUser from "@/components/portfolio/user/NewPortfolioUser";
 
 interface PortfolioUsersProps {
   label?: string;
@@ -18,7 +18,6 @@ interface PortfolioUsersProps {
   onSecondaryUserChange?: (user: DropdownOption) => void;
   users: DropdownOption[];
   secondaryUsers: DropdownOption[];
-  onAddUser?: (userData: NewUserFormData) => void;
   showInfo?: boolean;
   infoContent?: string;
   userType?: string;
@@ -28,6 +27,8 @@ interface PortfolioUsersProps {
   onSectionClose: () => void;
   subLabels: string[];
   isSecondaryUserLocked?: boolean;
+  isLoading?: boolean;
+  refreshUserList: () => void;
 }
 
 export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
@@ -38,7 +39,6 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   onSecondaryUserChange,
   users,
   secondaryUsers,
-  onAddUser,
   showInfo,
   infoContent,
   userType = "Portfolio User",
@@ -48,13 +48,10 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   onSectionClose,
   subLabels = ["Selected User 1", "Selected User 2"],
   isSecondaryUserLocked = false,
+  isLoading = false,
+  refreshUserList,
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [confirmationContent, setConfirmationContent] = useState({
-    title: "",
-    message: "",
-  });
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedUser, setEditedUser] = useState(selectedUser);
   const [editedSecondaryUser, setEditedSecondaryUser] = useState(
@@ -73,9 +70,6 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   const isSecondaryUnlocked =
     !isSecondaryUserLocked || (editedUser && editedUser.value !== "");
 
-  const [locale] = useState<Locale>("en");
-  const messages = getMessages(locale);
-
   // Sync original and edited values with props whenever they change
   useEffect(() => {
     setOriginalUser(selectedUser);
@@ -85,7 +79,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   }, [selectedUser, selectedSecondaryUser]);
 
   useEffect(() => {
-    if (showNewUserModal || showConfirmation) {
+    if (showNewUserModal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -93,26 +87,42 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showNewUserModal, showConfirmation]);
+  }, [showNewUserModal]);
 
-  const handleAddUser = (userData: NewUserFormData) => {
-    if (onAddUser) {
-      onAddUser(userData);
+  const handleAddUser = async (
+    userData: NewUserFormData,
+    setLoading: (loading: boolean) => void
+  ) => {
+    try {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const response = await portfolioService.addUser(userData);
+      if (response?.status === "SUCCESS") {
+        setShowNewUserModal(false);
+        toastr({
+          message: "New portfolio user added successfully.",
+          toastrType: "success",
+        });
+        refreshUserList();
+      } else {
+        toastr({
+          message: "Error adding new portfolio user.",
+          toastrType: "error",
+        });
+      }
+    } catch {
+      //TODO: Handle log
+      toastr({
+        message: "Exception occured adding new portfolio user.",
+        toastrType: "error",
+      });
+    } finally {
+      setLoading(false);
     }
-    setShowNewUserModal(false);
-    setConfirmationContent({
-      title: messages?.portfolio?.user?.confirmModal?.title,
-      message: messages?.portfolio?.user?.confirmModal?.message,
-    });
-    setShowConfirmation(true);
   };
 
   const handleCloseUserModal = () => {
     setShowNewUserModal(false);
-  };
-
-  const handleConfirmationClose = () => {
-    setShowConfirmation(false);
   };
 
   const handleEdit = () => {
@@ -210,6 +220,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
                 disabled={false}
                 onClick={handleUpdate}
                 className="w-full"
+                isLoading={isLoading}
               />
               <CancelButton onClick={handleTextClose} />
             </div>
@@ -227,13 +238,6 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
           </div>
         </div>
       )}
-
-      <ConfirmationDialog
-        isOpen={showConfirmation}
-        onClose={handleConfirmationClose}
-        title={confirmationContent.title}
-        message={confirmationContent.message}
-      />
     </>
   );
 };

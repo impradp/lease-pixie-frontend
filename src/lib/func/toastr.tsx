@@ -17,13 +17,16 @@ const toastr = ({
     <div
       style={{
         width: "322px",
-        height: "14px",
+        minHeight: "100%", // Corrected line
         color: "#0C111D",
         fontSize: "13px",
         fontFamily: "Inter",
         fontWeight: 500,
         lineHeight: "14px",
         wordWrap: "break-word",
+        display: "flex",
+        alignItems: "center",
+        padding: "8px",
       }}
     >
       {message}
