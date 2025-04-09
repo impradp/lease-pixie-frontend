@@ -197,7 +197,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
             }
             isEditing={isEditMode}
             readOnly={!isEditMode}
-            className="w-[165px]"
+            className="w-[162px]"
           />
         </div>
 
@@ -232,7 +232,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
             }
             isEditing={isEditMode}
             readOnly={!isEditMode}
-            className="w-[165px]"
+            className="w-[162px]"
           />
         </div>
         {isEditMode && (
@@ -266,7 +266,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
             }
             isEditing={isEditMode}
             readOnly={!isEditMode}
-            className="w-[165px]"
+            className="w-[162px]"
           />
         </div>
         {isEditMode && (
@@ -300,7 +300,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
             }
             isEditing={isEditMode}
             readOnly={!isEditMode}
-            className="w-[165px]"
+            className="w-[162px]"
           />
         </div>
 

@@ -1,13 +1,11 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { debounce } from "lodash";
+import { RadarAddress } from "@/types/RadarAutoComplete";
 import { RadarAutocompleteAddress } from "radar-sdk-js/dist/types";
 
-interface RadarAddress {
-  formattedAddress: string;
-  placeId?: string;
-  [key: string]: unknown;
-}
-
+/**
+ * Props for the AddressAutocompleteInput component
+ */
 interface AddressAutocompleteInputProps {
   label: string;
   value: string;
@@ -16,10 +14,15 @@ interface AddressAutocompleteInputProps {
   placeholder?: string;
   inputId?: string;
   disabled?: boolean;
-  error?: string; // External error from parent, renamed from formError to match CustomInput
+  error?: string;
   isRequired?: boolean;
 }
 
+/**
+ * Renders an autocomplete input for addresses using Radar SDK
+ * @param props - The properties for configuring the input
+ * @returns JSX.Element - The rendered autocomplete input
+ */
 const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   label,
   value,
@@ -28,27 +31,23 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   placeholder = "",
   inputId = "autocomplete-input",
   disabled = false,
-  error = "", // External error, defaults to empty string
+  error = "",
   isRequired = false,
 }) => {
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<RadarAddress[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [internalError, setInternalError] = useState<string | null>(null); // Internal errors (e.g., API failures)
+  const [internalError, setInternalError] = useState<string | null>(null);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [radarInitialized, setRadarInitialized] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
 
-  // Sync query with value prop and reset internal error when value changes
   useEffect(() => {
     setQuery(value);
-    if (value.trim() && internalError) {
-      setInternalError(null); // Clear internal error if user provides a value
-    }
+    if (value.trim() && internalError) setInternalError(null);
   }, [value]);
 
-  // Initialize Radar
   useEffect(() => {
     const initializeRadar = async () => {
       if (typeof window === "undefined") return;
@@ -60,9 +59,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
           return;
         }
 
-        const RadarModule = await import("radar-sdk-js");
-        const Radar = RadarModule.default;
-
+        const { default: Radar } = await import("radar-sdk-js");
         Radar.initialize(API_KEY);
         setRadarInitialized(true);
       } catch {
@@ -72,9 +69,8 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     };
 
     initializeRadar();
-  }, [error]); // Include error to respect its precedence
+  }, [error]);
 
-  // Handle click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -86,18 +82,15 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const debouncedSearch = debounce(async (input: string) => {
     if (!radarInitialized || disabled) {
-      if (!error) {
+      if (!error)
         setInternalError(
           disabled ? null : "Address service is initializing..."
         );
-      }
       setSuggestions([]);
       setIsLoading(false);
       return;
@@ -113,9 +106,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     setIsLoading(true);
 
     try {
-      const RadarModule = await import("radar-sdk-js");
-      const Radar = RadarModule.default;
-
+      const { default: Radar } = await import("radar-sdk-js");
       const response = await Radar.autocomplete({
         query: input,
         limit: 5,
@@ -132,13 +123,10 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
         );
 
         const addressSuggestions: RadarAddress[] =
-          addressesWithFormattedAddress.map((address) => {
-            const addressAsUnknown = address as unknown;
-            return {
-              formattedAddress: address.formattedAddress,
-              ...(addressAsUnknown as Record<string, unknown>),
-            };
-          });
+          addressesWithFormattedAddress.map((address) => ({
+            formattedAddress: address.formattedAddress,
+            ...(address as unknown as Record<string, unknown>),
+          }));
 
         setSuggestions(addressSuggestions);
         if (!error) setInternalError(null);
@@ -154,24 +142,15 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     }
   }, 300);
 
-  const handleSearchChange = useCallback(
-    (input: string) => {
-      debouncedSearch(input);
-    },
-    [debouncedSearch]
-  );
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (disabled || !isEditing) return;
 
     const newValue = e.target.value;
     setQuery(newValue);
     onChange(newValue);
-    handleSearchChange(newValue);
+    debouncedSearch(newValue);
     setSelectedValue(null);
-    if (error && newValue.trim()) {
-      setInternalError(null); // Clear internal error when user starts typing and there was an external error
-    }
+    if (error && newValue.trim()) setInternalError(null);
   };
 
   const handleOptionClick = (suggestion: RadarAddress) => {
@@ -184,7 +163,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     setSelectedValue(
       suggestion.placeId?.toString() || suggestion.formattedAddress
     );
-    if (error) setInternalError(null); // Clear internal error on selection
+    if (error) setInternalError(null);
   };
 
   const handleOptionKeyDown = (
@@ -204,14 +183,10 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     label: suggestion.formattedAddress,
   }));
 
-  // Display error: external (error) takes precedence over internal
   const displayError = error || internalError;
 
   return (
-    <div
-      ref={wrapperRef}
-      className="flex flex-col gap-1.5 w-full autocomplete-input-wrapper relative"
-    >
+    <div ref={wrapperRef} className="flex flex-col gap-1.5 w-full relative">
       <label
         htmlFor={inputId}
         className={`text-card-input-label text-sm font-medium font-['Inter'] leading-tight ${
@@ -220,10 +195,10 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
       >
         {label}
         {isRequired && (
-          <span className="text-tertiary-muteBlueGray text-sm "> *</span>
+          <span className="text-tertiary-muteBlueGray text-sm"> *</span>
         )}
       </label>
-      <div className="autocomplete-input-container">
+      <div className="relative">
         <div
           className={`px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-card-input-stroke flex items-center ${
             disabled ? "opacity-50 cursor-not-allowed" : ""
@@ -287,10 +262,8 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
                     isSelected ? "bg-dropdown-selected font-medium" : ""
                   } ${!isLast ? "border-b border-dropdown-stroke" : ""}`}
                 >
-                  <div className="flex flex-col gap-2">
-                    <div className="text-dropdown-semibold text-base font-semibold font-['Inter'] leading-normal">
-                      {option.label}
-                    </div>
+                  <div className="text-dropdown-semibold text-base font-semibold font-['Inter'] leading-normal">
+                    {option.label}
                   </div>
                 </li>
               );
@@ -299,12 +272,10 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
         )}
       </div>
       {isLoading && !disabled && (
-        <span className="autocomplete-loading">Loading...</span>
+        <span className="text-sm text-gray-500 mt-1">Loading...</span>
       )}
       {displayError && !disabled && (
-        <span className="autocomplete-error text-red-500 text-sm mt-1">
-          {displayError}
-        </span>
+        <span className="text-red-500 text-sm mt-1">{displayError}</span>
       )}
     </div>
   );

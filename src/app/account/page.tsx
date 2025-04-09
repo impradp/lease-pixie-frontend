@@ -7,9 +7,9 @@ import toastr from "@/lib/func/toastr";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
+import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import DepositAccountsCard from "@/components/account/DepositAccountCard";
-import PropertyApprovalCard from "@/components/dashboard/PropertyApprovalCard";
+import PropertyApprovalCard from "@/components/dashboard/property/PropertyApprovalCard";
 
 function AccountContent() {
   const router = useRouter();

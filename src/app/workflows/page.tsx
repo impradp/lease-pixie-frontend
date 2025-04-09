@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import toastr from "@/lib/func/toastr";
@@ -9,10 +9,9 @@ import { loginService } from "@/lib/services/login";
 import WelcomeCard from "@/components/welcome/WelcomeCard";
 import { workflows as WorkflowList } from "@/data/workflows";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
-import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
+import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 
-function DashboardContent() {
+function WorkflowPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,12 +65,4 @@ function DashboardContent() {
   );
 }
 
-const DashboardPage: React.FC = () => {
-  return (
-    <Suspense fallback={<LoadingOverlay />}>
-      <DashboardContent />;
-    </Suspense>
-  );
-};
-
-export default DashboardPage;
+export default WorkflowPage;

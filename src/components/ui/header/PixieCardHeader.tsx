@@ -1,61 +1,73 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ArrowDownUpIcon, RotateCcw, Plus, Search } from "lucide-react";
 
+/**
+ * Props for the PixieCardHeader component
+ */
 interface PixieCardHeaderProps {
-  onSortIconClick?: () => void;
-  onRefreshClick?: () => void;
-  onAddClick?: () => void;
-  onSearchChange?: (value: string) => void;
-  isEditable?: boolean;
-  isPlusClicked?: boolean;
-  isRefreshClicked?: boolean;
-  label: string;
-  showSortIcon?: boolean;
-  showRefreshIcon?: boolean;
-  showAddIcon?: boolean;
-  showSearchFeat?: boolean;
-  showSearchIcon?: boolean;
+  onSortIconClick?: () => void; // Callback for sort button click
+  onRefreshClick?: () => void; // Callback for refresh button click
+  onAddClick?: () => void; // Callback for add button click
+  onSearchChange?: (value: string) => void; // Callback for search input changes
+  isEditable?: boolean; // Whether the header is interactive (default: false)
+  isPlusClicked?: boolean; // Whether the add button is in clicked state (default: false)
+  isRefreshClicked?: boolean; // Whether the refresh button is in clicked state (default: false)
+  label: string; // Header title
+  showSortIcon?: boolean; // Show sort button (default: false)
+  showRefreshIcon?: boolean; // Show refresh button (default: false)
+  showAddIcon?: boolean; // Show add button (default: false)
+  showSearchFeat?: boolean; // Show search input (default: false)
+  showSearchIcon?: boolean; // Show search icon in input (default: false)
 }
 
-export default function PixieCardHeader({
+/**
+ * Renders a card header with optional sort, refresh, add, and search features
+ * @param props - The properties for configuring the header
+ * @returns JSX.Element - The rendered card header
+ */
+function PixieCardHeader({
   onSortIconClick,
   onRefreshClick,
   onAddClick,
   onSearchChange,
   isEditable = false,
   isPlusClicked = false,
-  label,
-  showAddIcon = false,
   isRefreshClicked = false,
-  showRefreshIcon = false,
+  label,
   showSortIcon = false,
+  showRefreshIcon = false,
+  showAddIcon = false,
   showSearchFeat = false,
   showSearchIcon = false,
 }: PixieCardHeaderProps) {
-  const [searchValue, setSearchValue] = React.useState("");
+  const [searchValue, setSearchValue] = useState("");
 
+  // Handle refresh button click and reset search
   const handleRefreshClicked = () => {
-    onRefreshClick?.();
-    setSearchValue("");
+    if (isEditable) {
+      onRefreshClick?.();
+      setSearchValue("");
+    }
   };
 
+  // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    if (onSearchChange) {
-      onSearchChange(value);
+    if (isEditable) {
+      const value = e.target.value;
+      setSearchValue(value);
+      onSearchChange?.(value);
     }
   };
 
   return (
     <div className="w-full">
-      <div className="w-full flex justify-between items-center mb-[15px]">
+      <div className="flex justify-between items-center mb-[15px]">
         <h3 className="text-tertiary-midnightBlue text-[16px] font-semibold font-['Inter']">
           {label}
         </h3>
-        <div className="flex justify-start items-center gap-[4px]">
+        <div className="flex items-center gap-[4px]">
           {showSortIcon && (
             <button
               onClick={isEditable ? onSortIconClick : undefined}
@@ -63,6 +75,7 @@ export default function PixieCardHeader({
                 isEditable ? "hover:bg-tertiary-blueTint" : "cursor-not-allowed"
               }`}
               disabled={!isEditable}
+              aria-label="Sort"
             >
               <ArrowDownUpIcon className="w-[18px] h-[18px] stroke-secondary-button" />
             </button>
@@ -78,6 +91,7 @@ export default function PixieCardHeader({
                   : "cursor-not-allowed bg-transparent"
               }`}
               disabled={!isEditable}
+              aria-label="Refresh"
             >
               <RotateCcw className="w-[18px] h-[18px] stroke-secondary-button" />
             </button>
@@ -93,13 +107,13 @@ export default function PixieCardHeader({
                   : "cursor-not-allowed bg-transparent"
               }`}
               disabled={!isEditable}
+              aria-label="Add"
             >
               <Plus className="w-[20px] h-[20px] stroke-secondary-button" />
             </button>
           )}
         </div>
       </div>
-
       {showSearchFeat && (
         <div className="w-full mb-4">
           <div className="relative">
@@ -112,12 +126,11 @@ export default function PixieCardHeader({
                 !isEditable ? "cursor-not-allowed" : ""
               }`}
               disabled={!isEditable}
+              aria-label="Search"
             />
             {showSearchIcon && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
-                <div className="w-5 h-5 relative overflow-hidden">
-                  <Search className="w-[20px] h-[20px] stroke-secondary-button" />
-                </div>
+                <Search className="w-[20px] h-[20px] stroke-secondary-button" />
               </div>
             )}
           </div>
@@ -126,3 +139,5 @@ export default function PixieCardHeader({
     </div>
   );
 }
+
+export default PixieCardHeader;

@@ -21,7 +21,7 @@ import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
+import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";

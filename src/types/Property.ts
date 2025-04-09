@@ -3,3 +3,8 @@ export interface Property {
   name: string; // Property name
   address: string; // Property address
 }
+
+export interface BankSettingsData {
+  selectedBankAccount: string;
+  pendingAccountApprovalFlag: boolean;
+}

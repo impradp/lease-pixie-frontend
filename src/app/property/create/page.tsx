@@ -9,7 +9,7 @@ import { sampleBankAccounts } from "@/data/accounts";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import PropertyInfoCard from "@/components/property/PropertyInfoCard";
 import BankSettingsCard from "@/components/property/BankSettingsCard";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs/Breadcrumbs";
+import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import SpaceSettingsCard from "@/components/property/SpaceSettingsCard";
 import InvoiceSettingsCard from "@/components/property/InvoiceSettingsCard";
 import { WorkflowAutomationSync } from "@/components/property/WorkflowAutomationSync";

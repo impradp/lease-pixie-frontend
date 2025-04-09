@@ -2,13 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 
+/**
+ * Props for the CircularProgressBar component
+ */
 interface CircularProgressBarProps {
-  percentage: number;
-  size?: number; // Diameter of the circle in pixels
-  strokeWidth?: number; // Thickness of the ring
+  percentage: number; // The progress percentage (0-100)
+  size?: number; // Diameter of the circle in pixels (default: 18)
+  strokeWidth?: number; // Thickness of the ring (default: 4.5)
 }
 
-export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
+/**
+ * Renders an animated circular progress bar with a gradient
+ * @param props - The properties for configuring the progress bar
+ * @returns JSX.Element - The rendered circular progress bar
+ */
+const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
   percentage,
   size = 18,
   strokeWidth = 4.5,
@@ -17,28 +25,28 @@ export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
   const circumference = 2 * Math.PI * radius;
   const [currentPercentage, setCurrentPercentage] = useState(0);
 
+  // Animate the progress bar when percentage changes
   useEffect(() => {
-    const start = 0; // Changed from 'let' to 'const' since it's never reassigned
-    const end = Math.min(Math.max(percentage, 0), 100); // Clamp between 0 and 100
-    const duration = 1000; // Animation duration in milliseconds (1 second)
+    const clampedPercentage = Math.min(Math.max(percentage, 0), 100); // Clamp between 0 and 100
+    const duration = 1000; // Animation duration in milliseconds
     const startTime = performance.now();
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1); // Progress from 0 to 1
-      const newPercentage = start + (end - start) * progress;
+      const progress = Math.min(elapsed / duration, 1);
+      const newPercentage = progress * clampedPercentage;
 
       setCurrentPercentage(newPercentage);
 
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        setCurrentPercentage(end); // Ensure it hits the exact target
+        setCurrentPercentage(clampedPercentage); // Ensure exact final value
       }
     };
 
     const animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame); // Cleanup
+    return () => cancelAnimationFrame(animationFrame); // Cleanup on unmount or percentage change
   }, [percentage]);
 
   const strokeDashoffset =
@@ -49,7 +57,6 @@ export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
       className="relative flex items-center justify-center"
       style={{ width: size, height: size }}
     >
-      {/* Background Circle */}
       <svg width={size} height={size} className="absolute">
         <circle
           stroke="#d0d5dd"
@@ -60,8 +67,6 @@ export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
           cy={size / 2}
         />
       </svg>
-
-      {/* Progress Circle with Gradient */}
       <svg width={size} height={size} className="absolute">
         <defs>
           <linearGradient
