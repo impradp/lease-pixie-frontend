@@ -115,7 +115,7 @@ function PixieCardHeader({
         </div>
       </div>
       {showSearchFeat && (
-        <div className="w-full mb-4">
+        <div className="w-full mb-2">
           <div className="relative">
             <input
               type="text"

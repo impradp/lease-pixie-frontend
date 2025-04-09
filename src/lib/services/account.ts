@@ -2,26 +2,30 @@
 
 import { apiService } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/constants/endpoints";
-import { Account } from "@/types/Account";
+import { Account, AccountResponse } from "@/types/Account";
 
-// Define the raw response structure
-interface AccountResponse {
-  status?: string;
-  message?: string;
-  data?: string;
-}
-
+/**
+ * Service class for managing account-related API operations
+ */
 class AccountService {
+  /**
+   * Creates a new account
+   * @param accountPayload - The account data to create
+   * @returns Promise resolving to the account creation response
+   */
   async create(accountPayload: Account): Promise<AccountResponse> {
-    const response = await apiService.post<AccountResponse>(
-      ENDPOINTS.ACCOUNT.CREATE,
+    return await apiService.post<AccountResponse>(
+      ENDPOINTS.ACCOUNT.DEFAULT,
       accountPayload
     );
+  }
 
-    if (typeof response === "string") {
-      return { message: response };
-    }
-    return response;
+  /**
+   * Fetches account data
+   * @returns Promise resolving to the account data response
+   */
+  async fetch(): Promise<AccountResponse> {
+    return await apiService.get<AccountResponse>(ENDPOINTS.ACCOUNT.DEFAULT);
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import toastr from "@/lib/func/toastr";
@@ -9,10 +9,11 @@ import { emailService } from "@/lib/services/email";
 import { loginService } from "@/lib/services/login";
 import LoginCard from "@/components/login/LoginCard";
 import { getDefaultPage } from "@/config/roleAccess";
+import ResetCard from "@/components/reset/ResetCard";
 import { cookieHandler } from "@/lib/services/cookieHandler";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
-import ResetCard from "@/components/reset/ResetCard";
+import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 
 function LoginContent() {
   const router = useRouter();
@@ -76,6 +77,7 @@ function LoginContent() {
   }) => {
     try {
       setLoading(true); // Set loading immediately
+      setShowAuthForm(false); //Close the form
       await new Promise((resolve) => requestAnimationFrame(resolve)); // Ensure UI updates
 
       const response = await loginService.login({
@@ -317,6 +319,12 @@ function LoginContent() {
   );
 }
 
-export default function LoginPage() {
-  return <LoginContent />;
-}
+const LoginPage: React.FC = () => {
+  return (
+    <Suspense fallback={<LoadingOverlay />}>
+      <LoginContent />
+    </Suspense>
+  );
+};
+
+export default LoginPage;

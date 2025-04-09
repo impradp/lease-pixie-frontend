@@ -1,14 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  Suspense,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import toastr from "@/lib/func/toastr";
+import { Account } from "@/types/Account";
+import handleError from "@/lib/utils/errorHandler";
 import { samplePortfolios } from "@/data/portfolio";
 import { sampleProperties } from "@/data/Properties";
+import { accountService } from "@/lib/services/account";
 import BlankCard from "@/components/dashboard/BlankCard";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
+import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import ROAdminUsersCard from "@/components/dashboard/ROAdminUsersCard";
 import AccountsCard from "@/components/dashboard/account/AccountsCard";
 import PropertyUsersCard from "@/components/dashboard/property/PropertyUsersCard";
@@ -20,15 +31,62 @@ import PropertyAndPortfolioCard from "@/components/dashboard/property/PropertyAn
  * Renders the admin dashboard page with cards, filtering, and navigation
  * @returns React.ReactElement - The rendered dashboard page
  */
-function DashboardPage(): React.ReactElement {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const hasShownSuccessToastr = React.useRef(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
+  const { isLoading, setLoading } = useContext(LoadingContext);
+
+  // Filter accounts based on search term
+  const filterAccounts = useCallback(
+    (accountsToFilter: Account[], term: string) => {
+      return accountsToFilter.filter((company) =>
+        [company.companyName, company.contactFirstName, company.email].some(
+          (field) => field?.toLowerCase().includes(term.toLowerCase())
+        )
+      );
+    },
+    []
+  );
+
+  // Update filtered accounts whenever accounts or searchTerm changes
+  useEffect(() => {
+    setFilteredAccounts(filterAccounts(accounts, searchTerm));
+  }, [accounts, searchTerm, filterAccounts]);
+
+  // Fetch accounts for admin
+  const fetchAccounts = async () => {
+    setLoading(true);
+    setSearchTerm(""); // Reset search term on fetch
+    try {
+      const response = await accountService.fetch();
+      if (response.status === "SUCCESS") {
+        setAccounts(response?.data);
+      } else {
+        handleError({ message: "Error fetching accounts." });
+      }
+    } catch (error) {
+      handleError({
+        message: "Exception occurred while fetching accounts.",
+        error,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial data fetch on component mount
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
+    // No need to manually filter here as the useEffect will handle it
   };
 
   // Handle adding a new user (placeholder for future implementation)
@@ -87,11 +145,24 @@ function DashboardPage(): React.ReactElement {
           <ROAdminUsersCard onAddUser={handleAddUser} />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
-          <AccountsCard isEditable={true} onSearchChange={handleSearchChange} />
+          <AccountsCard
+            accountData={filteredAccounts}
+            isEditable={!isLoading}
+            onSearchChange={handleSearchChange}
+            refreshAccounts={fetchAccounts}
+          />
         </div>
       </div>
     </>
   );
 }
+
+const DashboardPage: React.FC = () => {
+  return (
+    <Suspense fallback={<LoadingOverlay />}>
+      <DashboardContent />
+    </Suspense>
+  );
+};
 
 export default DashboardPage;

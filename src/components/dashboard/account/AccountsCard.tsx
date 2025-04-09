@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from "react";
 import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
-import { sampleCompanyInfoData } from "@/data/company";
 import { accountService } from "@/lib/services/account";
 import CompanyInfo from "@/components/dashboard/CompanyInfo";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { NewAccount } from "@/components/dashboard/account/NewAccount";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
+import handleError from "@/lib/utils/errorHandler";
 
 /**
  * Props for the AccountsCard component
@@ -16,6 +16,8 @@ import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog"
 interface AccountsCardProps {
   isEditable?: boolean; // Whether the card is editable (default: false)
   onSearchChange?: (value: string) => void; // Callback for search input changes
+  accountData: Account[]; // Optional account data to display
+  refreshAccounts?: () => void; // Function to refresh accounts data (corrected type)
 }
 
 /**
@@ -26,24 +28,17 @@ interface AccountsCardProps {
 const AccountsCard: React.FC<AccountsCardProps> = ({
   isEditable = false,
   onSearchChange,
+  accountData = [],
+  refreshAccounts,
 }) => {
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
   const [isAccessLocked, setIsAccessLocked] = useState(false);
-  const [filteredCompanies, setFilteredCompanies] = useState([
-    sampleCompanyInfoData,
-  ]);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
 
   // Handle search input changes and filter companies
   const handleSearchChange = (value: string) => {
     onSearchChange?.(value);
-    const filtered = [sampleCompanyInfoData].filter((company) =>
-      [company.companyName, company.contactName, company.email].some((field) =>
-        field.toLowerCase().includes(value.toLowerCase())
-      )
-    );
-    setFilteredCompanies(filtered);
   };
 
   // Handle add account button click
@@ -60,33 +55,32 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   }, [showNewAccountModal]);
 
   // Handle new account submission
-  const handleAddAccount = async (
-    userData: Account,
-    setLoading: (loading: boolean) => void
-  ) => {
-    setLoading(true);
+  const handleAddAccount = async (userData: Account) => {
     try {
+      setShowNewAccountModal(false);
       await new Promise((resolve) => requestAnimationFrame(resolve)); // Simulate async delay
       const response = await accountService.create(userData);
 
       if (response?.status === "SUCCESS") {
-        setShowNewAccountModal(false);
         toastr({
           message: "Account created successfully.",
           toastrType: "success",
         });
+
+        // Refresh accounts after successful creation
+        if (refreshAccounts) {
+          refreshAccounts();
+        }
       } else {
-        toastr({ message: "Account creation failed.", toastrType: "error" });
-        // TODO: Log error
+        handleError({
+          message: "Account creation failed.",
+        });
       }
-    } catch {
-      toastr({
-        message: "Failed to create account. Please view logs for more info.",
-        toastrType: "error",
+    } catch (error) {
+      handleError({
+        message: "Exception occurred while creating account.",
+        error,
       });
-      // TODO: Log error
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -117,21 +111,16 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           showSearchIcon={true}
           showAddIcon={true}
           onAddClick={handleAccountAdd}
+          showRefreshIcon={true}
+          onRefreshClick={refreshAccounts}
         />
         <div className="flex flex-col gap-3">
-          {filteredCompanies.length > 0 ? (
-            filteredCompanies.map((company, index) => (
+          {accountData.length > 0 ? (
+            accountData.map((company, index) => (
               <CompanyInfo
-                key={index} // Consider using a unique ID if available
-                companyName={company.companyName}
-                contactName={company.contactName}
-                email={company.email}
-                services={company.services}
-                actions={company.actions}
-                isAccessLocked={isAccessLocked}
+                key={index}
+                details={company}
                 onToggleAccess={() => setIsAccessLocked(!isAccessLocked)}
-                invoices={company.invoices}
-                portfolios={company.portfolios}
               />
             ))
           ) : (

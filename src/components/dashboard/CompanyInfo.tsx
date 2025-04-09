@@ -2,35 +2,21 @@
 
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { sampleCompanyInfoData } from "@/data/company";
-import { Invoice, Portfolio } from "@/types/Company";
-import { getServicePill } from "@/lib/utils/pillsColors";
+
+import { Account } from "@/types/Account";
+import { Pills } from "@/components/ui/pills";
 import { ServicePill } from "@/types/ServicePills";
-import { Pills } from "../ui/pills";
-import { ToggleSwitch } from "../ui/input/ToggleSwitch";
+import { getServicePill } from "@/lib/utils/pillsColors";
+import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 
 interface CompanyInfoProps {
-  companyName: string;
-  contactName: string;
-  email: string;
-  services: string[];
-  actions: string[];
-  isAccessLocked: boolean;
+  details?: Account;
   onToggleAccess?: () => void;
-  invoices: Invoice[];
-  portfolios: Portfolio[];
 }
 
 export const CompanyInfo: React.FC<CompanyInfoProps> = ({
-  companyName = sampleCompanyInfoData.companyName,
-  contactName = sampleCompanyInfoData.contactName,
-  email = sampleCompanyInfoData.email,
-  services = sampleCompanyInfoData.services,
-  actions = sampleCompanyInfoData.actions,
-  isAccessLocked = sampleCompanyInfoData.isAccessLocked,
+  details,
   onToggleAccess,
-  invoices = sampleCompanyInfoData.invoices,
-  portfolios = sampleCompanyInfoData.portfolios,
 }) => {
   const [isInvoicesOpen, setIsInvoicesOpen] = useState(false);
   const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false);
@@ -48,9 +34,8 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   };
 
   // Map raw service labels to ServicePill objects
-  const servicePills: ServicePill[] = services.map((label) =>
-    getServicePill(label)
-  );
+  const servicePills: ServicePill[] =
+    details?.services?.map((label) => getServicePill(label)) ?? [];
 
   return (
     <div className="w-full p-3 bg-secondary-fill rounded-xl inline-flex flex-col justify-start items-start gap-3">
@@ -59,7 +44,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
           <div className="self-stretch flex flex-col justify-start items-start gap-1">
             <div className="w-full inline-flex justify-start items-start gap-1">
               <div className="flex-1 justify-start text-secondary-light text-sm font-bold font-['Inter'] leading-tight">
-                {companyName}
+                {details?.companyName}
               </div>
               <div
                 data-hierarchy="Link gray"
@@ -77,7 +62,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   Contact Name
                 </div>
                 <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                  {contactName}
+                  {details?.contactFirstName} {details?.contactLastName}
                 </div>
               </div>
               <div
@@ -96,7 +81,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   Email
                 </div>
                 <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                  {email}
+                  {details?.email}
                 </div>
               </div>
               <div
@@ -118,7 +103,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
           <div className="self-stretch flex flex-col justify-start items-start gap-4">
             <div className="self-stretch flex flex-col justify-center items-center gap-1">
               <div className="self-stretch inline-flex justify-center items-center gap-3">
-                {actions.map((action, index) => (
+                {(details?.actions ?? []).map((action, index) => (
                   <div
                     key={index}
                     className="px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1"
@@ -143,7 +128,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   </div>
                   {/* Use the ToggleSwitch component */}
                   <ToggleSwitch
-                    isOn={isAccessLocked}
+                    isOn={details?.isAccessLocked || false}
                     onToggle={onToggleAccess || (() => {})}
                     isDisabled={false}
                   />
@@ -175,7 +160,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
             </div>
             {isInvoicesOpen && (
               <div className="w-full flex flex-col justify-start items-start gap-1">
-                {invoices.map((invoice, index) => (
+                {(details?.invoices ?? []).map((invoice, index) => (
                   <div
                     key={index}
                     className="self-stretch p-2 bg-gray-50 rounded-md flex flex-col justify-start items-start gap-1 overflow-hidden"
@@ -219,7 +204,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
             </div>
             {isPortfoliosOpen && (
               <div className="w-full flex flex-col justify-start items-start gap-1">
-                {portfolios.map((portfolio, index) => (
+                {(details?.portfolioList ?? []).map((portfolio, index) => (
                   <div
                     key={index}
                     className="self-stretch p-2 bg-gray-50 rounded-md flex flex-col justify-start items-start gap-3 overflow-hidden"
@@ -233,12 +218,12 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                       <div className="w-[310px] h-[18px] inline-flex justify-start items-start gap-1">
                         <div className="w-[321px] self-stretch flex justify-start items-center gap-2">
                           <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px]">
-                            {portfolio.propertyId}
+                            {portfolio?.id}
                           </div>
                           <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
                           <div className="flex justify-start items-center gap-0.5">
                             <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                              {portfolio.propertyCount}
+                              {portfolio?.totalProperties}
                             </div>
                           </div>
                           <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
@@ -272,13 +257,13 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                         </div>
                         {portfolioCostOpen[portfolio.name] && (
                           <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                            {portfolio.costMargins.map((cost, idx) => (
+                            {(portfolio.costMargins ?? []).map((cost, idx) => (
                               <div
                                 key={idx}
                                 className="self-stretch h-[18px] inline-flex justify-start items-start gap-1"
                               >
                                 <div className="w-[54px] justify-start text-tertiary-midnightBlue text-xs font-normal font-['Inter'] leading-[18px]">
-                                  {cost.date}
+                                  {cost?.month} `{cost?.year}
                                 </div>
                                 <div className="w-[190px] justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
                                   {cost.cost} ({cost.margin})

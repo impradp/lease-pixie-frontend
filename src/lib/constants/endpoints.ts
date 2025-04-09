@@ -10,7 +10,7 @@ export const ENDPOINTS = {
     SELF: "/api/index",
   },
   ACCOUNT: {
-    CREATE: "/api/v1/account",
+    DEFAULT: "/api/v1/account",
   },
   PORTFOLIO: {
     ADD_USER: "/api/v1/portfolio/user",

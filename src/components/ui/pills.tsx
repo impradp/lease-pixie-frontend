@@ -2,11 +2,11 @@ import React from "react";
 import { PillItem } from "@/types/Pills";
 
 interface PillsProps {
-  items: PillItem[];
+  items?: PillItem[];
   className?: string;
 }
 
-export const Pills: React.FC<PillsProps> = ({ items, className = "" }) => {
+export const Pills: React.FC<PillsProps> = ({ items = [], className = "" }) => {
   return (
     <div
       className={`inline-flex justify-start items-center gap-3 ${className}`}
