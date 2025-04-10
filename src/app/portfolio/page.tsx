@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useContext, useCallback } from "react";
-
+import React, { useState, useEffect, useContext, Suspense } from "react";
 import {
   emptyUserOption,
   emptyVendorOption,
@@ -12,38 +11,38 @@ import toastr from "@/lib/func/toastr";
 import { DropdownOption } from "@/types/user";
 import { getMessages } from "@/locales/locale";
 import {
-  PortfolioDto,
-  PortfolioUserResponse,
+  Portfolio,
+  PortfolioUser,
   PortfolioVendorResponse,
 } from "@/types/Portfolio";
 import handleError from "@/lib/utils/errorHandler";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import { LoadingContext } from "@/components/ClientLoadingWrapper";
-import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
+import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
+import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
 
-export default function PortfolioPage() {
+/**
+ * Renders the content for the portfolio page
+ * @returns JSX.Element - The rendered portfolio content
+ */
+function PortfolioContent() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
   const { setLoading, isLoading } = useContext(LoadingContext);
 
-  // State management
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isSecondaryUserLocked, setIsSecondaryUserLocked] = useState(true);
   const [portfolioName, setPortfolioName] = useState("");
-
-  // Dropdown options
   const [users, setUsers] = useState<DropdownOption[]>([emptyUserOption]);
   const [secondaryUsers, setSecondaryUsers] = useState<DropdownOption[]>([
     emptySecondaryUserOption,
   ]);
   const [vendors, setVendors] = useState<DropdownOption[]>([emptyVendorOption]);
-
-  // Selected values
   const [primaryUser, setPrimaryUser] =
     useState<DropdownOption>(emptyUserOption);
   const [secondaryUser, setSecondaryUser] = useState<DropdownOption>(
@@ -56,27 +55,22 @@ export default function PortfolioPage() {
   const [tertiaryVendor, setTertiaryVendor] =
     useState<DropdownOption>(emptyVendorOption);
 
-  // Memoized fetch functions
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = async () => {
     setLoading(true);
     try {
       const response = await portfolioService.getUsers();
       if (response.status === "SUCCESS") {
-        const fetchedUsers = response.data.map(
-          (user: PortfolioUserResponse["data"]) => ({
-            value: String(user.id),
-            label: `${user.firstName} ${user.lastName}`,
-            subLabel: user.email,
-          })
-        );
+        const fetchedUsers = response.data.map((user: PortfolioUser) => ({
+          value: String(user.id),
+          label: `${user.firstName} ${user.lastName}`,
+          subLabel: user.email,
+        }));
         setUsers([emptyUserOption, ...fetchedUsers]);
         setSecondaryUsers([emptySecondaryUserOption, ...fetchedUsers]);
         setPrimaryUser(emptyUserOption);
         setSecondaryUser(emptySecondaryUserOption);
       } else {
-        handleError({
-          message: "Error fetching portfolio users",
-        });
+        handleError({ message: "Error fetching portfolio users" });
       }
     } catch (error) {
       handleError({
@@ -88,9 +82,9 @@ export default function PortfolioPage() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  };
 
-  const fetchVendors = useCallback(async () => {
+  const fetchVendors = async () => {
     setLoading(true);
     try {
       const response = await portfolioService.getVendors();
@@ -107,9 +101,7 @@ export default function PortfolioPage() {
         setSecondaryVendor(emptyVendorOption);
         setTertiaryVendor(emptyVendorOption);
       } else {
-        handleError({
-          message: "Error fetching portfolio vendors",
-        });
+        handleError({ message: "Error fetching portfolio vendors" });
       }
     } catch (error) {
       handleError({
@@ -120,31 +112,43 @@ export default function PortfolioPage() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  };
 
-  // Form submission
-  const handleSubmit = useCallback(async () => {
+  const validateForm = (): boolean => {
+    // Only check if required fields are empty, don't store specific errors
+    const isValid = portfolioName && primaryUser.value !== "";
+
+    return !!isValid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      handleError({
+        message: "Required fields (*) are empty.",
+      });
+      return;
+    }
     setLoading(true);
     try {
-      const formData: PortfolioDto = {
+      const formData: Portfolio = {
         name: portfolioName,
         primaryUser: { id: parseInt(primaryUser.value) },
-        secondaryUser: secondaryUser.value
-          ? { id: parseInt(secondaryUser.value) }
-          : {},
-        preferredInsuranceSeats: primaryVendor.value
-          ? { id: parseInt(primaryVendor.value) }
-          : {},
-        preferredAttorneys: secondaryVendor.value
-          ? { id: parseInt(secondaryVendor.value) }
-          : {},
-        preferredAccountingSeats: tertiaryVendor.value
-          ? { id: parseInt(tertiaryVendor.value) }
-          : {},
+        ...(secondaryUser.value && {
+          secondaryUser: { id: parseInt(secondaryUser.value) },
+        }),
+        ...(primaryVendor.value && {
+          preferredInsuranceSeats: { id: parseInt(primaryVendor.value) },
+        }),
+        ...(secondaryVendor.value && {
+          preferredAttorneys: { id: parseInt(secondaryVendor.value) },
+        }),
+        ...(tertiaryVendor.value && {
+          preferredAccountingSeats: { id: parseInt(tertiaryVendor.value) },
+        }),
       };
 
       const response = await portfolioService.create(formData);
-      if (response.status == "SUCCESS") {
+      if (response.status === "SUCCESS") {
         toastr({
           message: "Portfolio created successfully.",
           toastrType: "success",
@@ -157,9 +161,7 @@ export default function PortfolioPage() {
         setTertiaryVendor(emptyVendorOption);
         setEditingSection(null);
       } else {
-        handleError({
-          message: "Error creating portfolio",
-        });
+        handleError({ message: "Error creating portfolio" });
       }
     } catch (error) {
       handleError({
@@ -169,31 +171,21 @@ export default function PortfolioPage() {
     } finally {
       setLoading(false);
     }
-  }, [
-    portfolioName,
-    primaryUser,
-    secondaryUser,
-    primaryVendor,
-    secondaryVendor,
-    tertiaryVendor,
-    setLoading,
-  ]);
+  };
 
-  // Event handlers
-  const handlePrimaryUserChange = useCallback((user: DropdownOption) => {
+  const handlePrimaryUserChange = (user: DropdownOption) => {
     setPrimaryUser(user);
     setIsSecondaryUserLocked(user.value === "");
     setSecondaryUser(emptySecondaryUserOption);
-  }, []);
+  };
 
-  const toggleEditingSection = useCallback((section: string | null) => {
+  const toggleEditingSection = (section: string | null) => {
     setEditingSection(section);
-  }, []);
+  };
 
-  // Initial data fetch
   useEffect(() => {
     Promise.all([fetchUsers(), fetchVendors()]);
-  }, [fetchUsers, fetchVendors]);
+  }, []);
 
   const breadcrumbItems = [
     { href: "/portfolio", label: "Portfolio Dashboard" },
@@ -214,7 +206,6 @@ export default function PortfolioPage() {
             onSectionClose={() => toggleEditingSection(null)}
             onNameChange={setPortfolioName}
           />
-
           <PortfolioUsers
             label={messages?.portfolio?.users?.title}
             users={users}
@@ -234,7 +225,6 @@ export default function PortfolioPage() {
             isSecondaryUserLocked={isSecondaryUserLocked}
             refreshUserList={fetchUsers}
           />
-
           <PortfolioVendors
             label={messages?.portfolio?.vendors?.title}
             vendors={vendors}
@@ -263,7 +253,6 @@ export default function PortfolioPage() {
             ]}
             refreshVendors={fetchVendors}
           />
-
           <PortfolioAutomationSync
             label={messages?.portfolio?.automation?.title}
             title={messages?.portfolio?.automation?.syncTitle}
@@ -274,7 +263,6 @@ export default function PortfolioPage() {
             onSectionClose={() => toggleEditingSection(null)}
           />
         </div>
-
         <div className="pt-8 flex justify-center">
           <PixieButton
             label={messages?.portfolio?.button?.label}
@@ -288,3 +276,17 @@ export default function PortfolioPage() {
     </>
   );
 }
+
+/**
+ * Renders the portfolio page with suspense fallback
+ * @returns JSX.Element - The rendered portfolio page
+ */
+const PortfolioPage: React.FC = () => {
+  return (
+    <Suspense fallback={<LoadingOverlay />}>
+      <PortfolioContent />
+    </Suspense>
+  );
+};
+
+export default PortfolioPage;

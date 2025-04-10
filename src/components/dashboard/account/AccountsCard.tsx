@@ -1,23 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+
 import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
+import handleError from "@/lib/utils/errorHandler";
 import { accountService } from "@/lib/services/account";
 import CompanyInfo from "@/components/dashboard/CompanyInfo";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { NewAccount } from "@/components/dashboard/account/NewAccount";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
-import handleError from "@/lib/utils/errorHandler";
 
 /**
  * Props for the AccountsCard component
  */
 interface AccountsCardProps {
   isEditable?: boolean; // Whether the card is editable (default: false)
-  onSearchChange?: (value: string) => void; // Callback for search input changes
-  accountData: Account[]; // Optional account data to display
-  refreshAccounts?: () => void; // Function to refresh accounts data (corrected type)
+  isSubmitting: (value: boolean) => void;
 }
 
 /**
@@ -27,18 +26,63 @@ interface AccountsCardProps {
  */
 const AccountsCard: React.FC<AccountsCardProps> = ({
   isEditable = false,
-  onSearchChange,
-  accountData = [],
-  refreshAccounts,
+  isSubmitting,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
   const [isAccessLocked, setIsAccessLocked] = useState(false);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
 
-  // Handle search input changes and filter companies
+  // Filter accounts based on search term
+  const filterAccounts = useCallback(
+    (accountsToFilter: Account[], term: string) => {
+      return accountsToFilter.filter((company) =>
+        [company.companyName, company.contactFirstName, company.email].some(
+          (field) => field?.toLowerCase().includes(term.toLowerCase())
+        )
+      );
+    },
+    []
+  );
+
+  // Update filtered accounts whenever accounts or searchTerm changes
+  useEffect(() => {
+    setFilteredAccounts(filterAccounts(accounts, searchTerm));
+  }, [accounts, searchTerm, filterAccounts]);
+
+  // Fetch accounts for admin
+  const fetchAccounts = async () => {
+    isSubmitting(true);
+    setSearchTerm(""); // Reset search term on fetch
+    try {
+      const response = await accountService.fetch();
+      if (response.status === "SUCCESS") {
+        setAccounts(response?.data);
+      } else {
+        handleError({ message: "Error fetching accounts." });
+      }
+    } catch (error) {
+      handleError({
+        message: "Exception occurred while fetching accounts.",
+        error,
+      });
+    } finally {
+      isSubmitting(false);
+    }
+  };
+
+  // Initial data fetch on component mount
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
+  // Handle search input changes
   const handleSearchChange = (value: string) => {
-    onSearchChange?.(value);
+    setSearchTerm(value);
+    // No need to manually filter here as the useEffect will handle it
   };
 
   // Handle add account button click
@@ -68,9 +112,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
         });
 
         // Refresh accounts after successful creation
-        if (refreshAccounts) {
-          refreshAccounts();
-        }
+        fetchAccounts();
       } else {
         handleError({
           message: "Account creation failed.",
@@ -112,11 +154,11 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           showAddIcon={true}
           onAddClick={handleAccountAdd}
           showRefreshIcon={true}
-          onRefreshClick={refreshAccounts}
+          onRefreshClick={fetchAccounts}
         />
         <div className="flex flex-col gap-3">
-          {accountData.length > 0 ? (
-            accountData.map((company, index) => (
+          {filteredAccounts.length > 0 ? (
+            filteredAccounts.map((company, index) => (
               <CompanyInfo
                 key={index}
                 details={company}

@@ -13,6 +13,7 @@ interface CustomDropdownProps {
   lockMessage?: string;
   showInfo?: boolean;
   infoContent?: string;
+  isRequired?: boolean;
 }
 
 export const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -26,6 +27,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   isLocked = false,
   showInfo = false,
   infoContent = "",
+  isRequired = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | "undefined">(
@@ -125,6 +127,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
         >
           {label}
+          {isRequired && <span className="text-[#878aa4] text-sm "> *</span>}
         </label>
         {showInfo && (
           <div className="relative">

@@ -90,6 +90,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
         onChange={handleNameChange}
         readOnly={!isEditing}
         isEditing={isEditing}
+        isRequired={true}
       />
       {isEditMode && (
         <div className="flex flex-col gap-3">

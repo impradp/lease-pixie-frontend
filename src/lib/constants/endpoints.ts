@@ -14,7 +14,7 @@ export const ENDPOINTS = {
   },
   PORTFOLIO: {
     ADD_USER: "/api/v1/portfolio/user",
-    GET_USERS: "/api/v1/portfolio/users",
+    GET_USERS: "/api/v1/portfolio/users?attachPortfolio=%s",
     ADD_VENDOR: "/api/v1/portfolio/vendor",
     GET_VENDORS: "/api/v1/portfolio/vendors",
     ADD: "/api/v1/portfolio",

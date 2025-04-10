@@ -4,9 +4,10 @@ import { apiService } from "@/lib/api";
 import { NewUserFormData } from "@/types/user";
 import { NewVendorFormData } from "@/types/vendor";
 import { ENDPOINTS } from "@/lib/constants/endpoints";
+import { interpolate } from "@/lib/utils/stringUtils";
 import {
-  PortfolioDto,
-  PortfolioResponseDto,
+  Portfolio,
+  PortfolioResponse,
   PortfolioUserListResponse,
   PortfolioUserResponse,
   PortfolioVendorListResponse,
@@ -21,9 +22,12 @@ class PortfolioService {
     );
   }
 
-  async getUsers(): Promise<PortfolioUserListResponse> {
+  async getUsers(
+    options: { attachPortfolio?: boolean } = { attachPortfolio: false }
+  ): Promise<PortfolioUserListResponse> {
+    const { attachPortfolio } = options;
     return await apiService.get<PortfolioUserListResponse>(
-      ENDPOINTS.PORTFOLIO.GET_USERS
+      interpolate(ENDPOINTS.PORTFOLIO.GET_USERS, attachPortfolio ?? false)
     );
   }
 
@@ -42,8 +46,8 @@ class PortfolioService {
     );
   }
 
-  async create(portfolioData: PortfolioDto): Promise<PortfolioResponseDto> {
-    return await apiService.post<PortfolioResponseDto>(
+  async create(portfolioData: Portfolio): Promise<PortfolioResponse> {
+    return await apiService.post<PortfolioResponse>(
       ENDPOINTS.PORTFOLIO.ADD,
       portfolioData
     );

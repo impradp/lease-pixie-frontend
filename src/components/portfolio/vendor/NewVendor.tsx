@@ -31,7 +31,7 @@ interface NewVendorProps {
 export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState<NewVendorFormData>({
     companyName: "",
-    serviceDescripton: "",
+    serviceDescription: "",
     companyAddress: "",
     officePhoneNumber: "",
     contactFirstName: "",
@@ -138,9 +138,9 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
 
             <CustomInput
               label="Service description (40 character limit)"
-              value={formData.serviceDescripton}
+              value={formData.serviceDescription}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, serviceDescripton: value }))
+                setFormData((prev) => ({ ...prev, serviceDescription: value }))
               }
               isEditing={true}
               placeholder="i.e. Electrician"

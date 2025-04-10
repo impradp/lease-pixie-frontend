@@ -34,14 +34,14 @@ const PortfolioTabContent: React.FC<PortfolioTabContentProps> = ({
               <div className="self-stretch flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                    {portfolio.propertyCount}{" "}
+                    {portfolio?.totalProperties}{" "}
                     <span className="text-tertiary-light font-normal">
                       properties
                     </span>
                   </div>
                   <div className="w-2 h-2 bg-icon-info rounded-full" />
                   <div className="text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                    {portfolio?.sqft?.toLocaleString() ?? "N/A"}{" "}
+                    {portfolio?.squareFootage?.toLocaleString() ?? "N/A"}{" "}
                     <span className="text-tertiary-light font-normal">
                       sqft
                     </span>

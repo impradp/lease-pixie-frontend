@@ -2,8 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { ellipseCharacter } from "@/lib/utils/textUtils";
 import { BreadcrumbItem } from "@/types/BreadcrumbItem";
+import { ellipseCharacter } from "@/lib/utils/stringUtils";
 
 /**
  * Props for the Breadcrumbs component

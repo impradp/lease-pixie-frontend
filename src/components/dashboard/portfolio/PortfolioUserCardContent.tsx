@@ -24,7 +24,7 @@ export const PortfolioUserCardContent: React.FC<
           <div className="self-stretch flex flex-col justify-center items-start gap-1">
             <div className="self-stretch inline-flex justify-between items-center">
               <div className="justify-start text-secondary-light text-sm font-bold font-['Inter'] leading-[18px]">
-                {user.name}
+                {user.firstName + " " + user.lastName}
               </div>
               <div
                 data-hierarchy="Link gray"
@@ -37,10 +37,10 @@ export const PortfolioUserCardContent: React.FC<
               </div>
             </div>
             <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-              {user.email}
+              {user?.email}
             </div>
             <div className="justify-start text-tertiary-midnightBlue text-xs font-normal font-['Inter'] leading-tight">
-              {user.phone}
+              {user?.mobileNumber}
             </div>
           </div>
           <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -64,7 +64,7 @@ export const PortfolioUserCardContent: React.FC<
             </div>
             {isPortfoliosOpen && (
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                {user.portfolios.map((portfolio) => (
+                {user?.portfolioList?.map((portfolio, index) => (
                   <div
                     key={portfolio.id}
                     className="self-stretch inline-flex justify-start items-center gap-1"
@@ -72,7 +72,7 @@ export const PortfolioUserCardContent: React.FC<
                     <div className="bg-tertiary-neutralGray outline outline-1 outline-offset-[-1px] outline-black flex justify-center items-start gap-1">
                       <div className="w-6 h-6 relative">
                         <div className="w-3 left-[6px] top-0 absolute text-center justify-start text-tertiary-midnightBlue text-base font-bold font-['Inter'] leading-normal">
-                          {portfolio.propertyCount}
+                          {index + 1}
                         </div>
                       </div>
                     </div>

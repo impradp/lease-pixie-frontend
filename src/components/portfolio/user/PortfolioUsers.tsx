@@ -190,6 +190,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
           readOnly={!isEditing}
           isEditing={isEditing}
           label={subLabels[0]}
+          isRequired={true}
         />
         {isEditMode && (
           <IconLinkButton

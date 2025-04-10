@@ -1,7 +1,7 @@
 export interface NewVendorFormData {
   id?: number;
   companyName: string;
-  serviceDescripton: string;
+  serviceDescription: string;
   companyAddress: string;
   officePhoneNumber: string;
   contactFirstName: string;

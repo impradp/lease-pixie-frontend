@@ -1,89 +1,78 @@
+interface CostMargin {
+  month: string | null;
+  year: number | null;
+  cost: string;
+  margin: string;
+  isHighlighted?: boolean;
+}
+
 export interface Portfolio {
   id?: string;
   name: string; // The portfolio's name or title
-  propertyCount: number; // Number of properties in the portfolio
-  sqft?: number; // Total square footage
   completionPercentage?: number; // Completion percentage (0-100)
+  category?: string;
+  totalSquareFeet?: number;
+  totalProperties?: number;
+  squareFootage?: string;
+  costMargins?: CostMargin[];
+  primaryUser?: {
+    id: string | number;
+  };
+  secondaryUser?: {
+    id?: string | number; // Optional since it uses optional chaining in the original
+  };
+  preferredInsuranceSeats?: {
+    id?: string | number; // Optional since it uses optional chaining in the original
+  };
+  preferredAttorneys?: {
+    id?: string | number; // Optional since it uses optional chaining in the original
+  };
+  preferredAccountingSeats?: {
+    id?: string | number; // Optional since it uses optional chaining in the original
+  };
+}
+
+export interface PortfolioUser {
+  id?: number;
+  email: string;
+  mobileNumber?: string;
+  firstName: string;
+  lastName: string;
+  role?: string;
+  portfolioList?: Portfolio[];
+}
+
+export interface PortfolioVendor {
+  id?: number;
+  email: string;
+  mobileNumber: string;
+  companyName: string;
+  companyAddress: string;
+  PortfolioList?: Portfolio[];
 }
 
 // Define PortfolioUserResponse type
 export interface PortfolioUserResponse {
   status: string;
-  data: {
-    id: number;
-    email: string;
-    mobileNumber: string;
-    firstName: string;
-    lastName: string;
-  };
+  data: PortfolioUser;
 }
 
 export interface PortfolioUserListResponse {
   status: string;
-  data: PortfolioUserResponse["data"][];
-}
-
-export interface PortfolioVendorListResponse {
-  status: string;
-  data: PortfolioVendorResponse["data"][];
+  data: PortfolioUser[];
 }
 
 export interface PortfolioVendorResponse {
   status: string;
-  data: {
-    id: number;
-    email: string;
-    mobileNumber: string;
-    companyName: string;
-    companyAddress: string;
-  };
+  data: PortfolioVendor;
 }
 
-export interface PortfolioUser {
-  id: string; // Unique identifier for the user
-  name: string; // User name
-  email: string; // User email
-  phone: string; // User phone number
-  portfolios: Portfolio[]; // List of portfolios associated with the user
-}
-
-export interface PortfolioDto {
-  name: string;
-  primaryUser: {
-    id: number;
-  };
-  secondaryUser: {
-    id?: number; // Optional since it uses optional chaining in the original
-  };
-  preferredInsuranceSeats: {
-    id?: number; // Optional since it uses optional chaining in the original
-  };
-  preferredAttorneys: {
-    id?: number; // Optional since it uses optional chaining in the original
-  };
-  preferredAccountingSeats: {
-    id?: number; // Optional since it uses optional chaining in the original
-  };
-}
-
-export interface PortfolioResponseDto {
+export interface PortfolioVendorListResponse {
   status: string;
-  data: {
-    name: string;
-    primaryUser: {
-      id: string | number;
-    };
-    secondaryUser: {
-      id?: string | number; // Optional since it uses optional chaining in the original
-    };
-    preferredInsuranceSeats: {
-      id?: string | number; // Optional since it uses optional chaining in the original
-    };
-    preferredAttorneys: {
-      id?: string | number; // Optional since it uses optional chaining in the original
-    };
-    preferredAccountingSeats: {
-      id?: string | number; // Optional since it uses optional chaining in the original
-    };
-  };
+  data: PortfolioVendor[];
+}
+
+export interface PortfolioResponse {
+  status: string;
+  data: Portfolio;
 }

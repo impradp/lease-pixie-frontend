@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Locale } from "@/locales";
 import toastr from "@/lib/func/toastr";
 import { getMessages } from "@/locales/locale";
@@ -30,7 +30,11 @@ import WorkflowStars from "@/components/property/WorkflowStars";
 import WorkflowSeats from "@/components/property/WorkflowSeats";
 import { sampleVendors } from "@/data/users";
 
-export default function PropertyPage() {
+/**
+ * Renders the content for the property page
+ * @returns JSX.Element - The rendered property content
+ */
+function PropertyContent() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -272,3 +276,17 @@ export default function PropertyPage() {
     </>
   );
 }
+
+/**
+ * Renders the dashboard page with suspense fallback
+ * @returns JSX.Element - The rendered property page
+ */
+const PropertyPage: React.FC = () => {
+  return (
+    <Suspense fallback={<LoadingOverlay />}>
+      <PropertyContent />
+    </Suspense>
+  );
+};
+
+export default PropertyPage;

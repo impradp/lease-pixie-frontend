@@ -220,18 +220,27 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                           <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px]">
                             {portfolio?.id}
                           </div>
-                          <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
-                          <div className="flex justify-start items-center gap-0.5">
-                            <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                              {portfolio?.totalProperties}
-                            </div>
-                          </div>
-                          <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
-                          <div className="flex justify-start items-center gap-0.5">
-                            <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                              {portfolio.squareFootage}
-                            </div>
-                          </div>
+                          {portfolio?.totalProperties && (
+                            <>
+                              <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
+                              <div className="flex justify-start items-center gap-0.5">
+                                <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
+                                  {portfolio?.totalProperties}
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          {portfolio.squareFootage && (
+                            <>
+                              <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
+                              <div className="flex justify-start items-center gap-0.5">
+                                <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
+                                  {portfolio.squareFootage}
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

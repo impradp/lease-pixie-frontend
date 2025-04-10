@@ -1,20 +1,11 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-  Suspense,
-} from "react";
+import React, { useState, useEffect, useContext, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import toastr from "@/lib/func/toastr";
-import { Account } from "@/types/Account";
-import handleError from "@/lib/utils/errorHandler";
 import { samplePortfolios } from "@/data/portfolio";
 import { sampleProperties } from "@/data/Properties";
-import { accountService } from "@/lib/services/account";
 import BlankCard from "@/components/dashboard/BlankCard";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
@@ -36,52 +27,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const hasShownSuccessToastr = React.useRef(false);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
   const { isLoading, setLoading } = useContext(LoadingContext);
-
-  // Filter accounts based on search term
-  const filterAccounts = useCallback(
-    (accountsToFilter: Account[], term: string) => {
-      return accountsToFilter.filter((company) =>
-        [company.companyName, company.contactFirstName, company.email].some(
-          (field) => field?.toLowerCase().includes(term.toLowerCase())
-        )
-      );
-    },
-    []
-  );
-
-  // Update filtered accounts whenever accounts or searchTerm changes
-  useEffect(() => {
-    setFilteredAccounts(filterAccounts(accounts, searchTerm));
-  }, [accounts, searchTerm, filterAccounts]);
-
-  // Fetch accounts for admin
-  const fetchAccounts = async () => {
-    setLoading(true);
-    setSearchTerm(""); // Reset search term on fetch
-    try {
-      const response = await accountService.fetch();
-      if (response.status === "SUCCESS") {
-        setAccounts(response?.data);
-      } else {
-        handleError({ message: "Error fetching accounts." });
-      }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while fetching accounts.",
-        error,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial data fetch on component mount
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
@@ -112,7 +58,7 @@ function DashboardContent() {
         toastrType: "success",
       });
       hasShownSuccessToastr.current = true;
-      router.replace("/workflows");
+      router.replace("/dashboard");
     }
   }, [searchParams, router]);
 
@@ -140,16 +86,17 @@ function DashboardContent() {
             portfolios={filteredPortfolios}
             properties={filteredProperties}
           />
-          <PortfolioUsersCard />
+          <PortfolioUsersCard
+            isEditable={!isLoading}
+            isSubmitting={(value: boolean) => setLoading(value)}
+          />
           <PropertyUsersCard />
           <ROAdminUsersCard onAddUser={handleAddUser} />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
           <AccountsCard
-            accountData={filteredAccounts}
             isEditable={!isLoading}
-            onSearchChange={handleSearchChange}
-            refreshAccounts={fetchAccounts}
+            isSubmitting={(value: boolean) => setLoading(value)}
           />
         </div>
       </div>
@@ -157,6 +104,10 @@ function DashboardContent() {
   );
 }
 
+/**
+ * Renders the dashboard page with suspense fallback
+ * @returns JSX.Element - The rendered dashboard page
+ */
 const DashboardPage: React.FC = () => {
   return (
     <Suspense fallback={<LoadingOverlay />}>

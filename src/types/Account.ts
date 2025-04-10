@@ -1,3 +1,5 @@
+import { Portfolio } from "./Portfolio";
+
 export interface AccountResponse {
   status: string;
   data: Account[];
@@ -13,33 +15,15 @@ export interface Account {
   email: string;
   mobileNumber: string;
   officePhoneNumber: string;
-  portfolioList: Portfolio[] | null;
-  services: string[] | null; // Updated to string[] for raw backend data
-  actions: string[] | null;
+  portfolioList?: Portfolio[];
+  services?: string[]; // Updated to string[] for raw backend data
+  actions?: string[];
   isAccessLocked: boolean;
-  invoices: Invoice[] | null;
-}
-
-export interface Portfolio {
-  id: string;
-  name: string;
-  category: string | null;
-  totalSquareFeet: number | null;
-  totalProperties: number | null;
-  squareFootage: string;
-  costMargins: CostMargin[] | null;
+  invoices?: Invoice[];
 }
 
 export interface Invoice {
   date: string;
   amount: string;
   status: string;
-}
-
-export interface CostMargin {
-  month: string | null;
-  year: number | null;
-  cost: string;
-  margin: string;
-  isHighlighted?: boolean;
 }
