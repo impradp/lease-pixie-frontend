@@ -7,7 +7,7 @@ export interface AccountResponse {
 }
 
 export interface Account {
-  id?: number;
+  id?: string;
   companyName: string;
   address: string;
   contactFirstName: string;
@@ -15,7 +15,7 @@ export interface Account {
   email: string;
   mobileNumber: string;
   officePhoneNumber: string;
-  portfolioList?: Portfolio[];
+  portfolios?: Portfolio[];
   services?: string[]; // Updated to string[] for raw backend data
   actions?: string[];
   isAccessLocked: boolean;

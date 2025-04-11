@@ -1,3 +1,4 @@
+import { Account } from "@/types/Account";
 import { DropdownOption } from "@/types/user";
 
 //TODO: Remove this sample data later after integrating with the API
@@ -30,3 +31,18 @@ export const sampleBankAccounts: DropdownOption[] = [
     value: "10",
   },
 ];
+
+export const defaultData: Account = {
+  companyName: "",
+  contactFirstName: "",
+  contactLastName: "",
+  email: "",
+  address: "",
+  mobileNumber: "",
+  officePhoneNumber: "",
+  portfolios: [],
+  services: [],
+  actions: [],
+  isAccessLocked: false,
+  invoices: [],
+};

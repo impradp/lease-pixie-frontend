@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-
 import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
 import CustomInput from "@/components/ui/input/CustomInput";
@@ -8,6 +9,7 @@ import PixieButton from "@/components/ui/buttons/PixieButton";
 import CancelButton from "@/components/ui/buttons/CancelButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
+// Dynamically import AddressAutocompleteInput with SSR disabled
 const AddressAutocompleteInput = dynamic(
   () =>
     import("@/components/ui/addressAutoCompleteInput/AddressAutoCompleteInput"),
@@ -17,39 +19,37 @@ const AddressAutocompleteInput = dynamic(
   }
 );
 
-interface NewAccountProps {
-  onClose: () => void;
+/**
+ * Props for the AccountForm component
+ */
+interface AccountFormProps {
+  onClose: () => void; // Callback to close the form
   onSubmit: (
     userData: Account,
     setLoading: (loading: boolean) => void
-  ) => Promise<void>;
-  disabled?: boolean; // Added disabled prop
+  ) => Promise<void>; // Callback to submit form data
+  disabled?: boolean; // Whether the form is disabled (default: false)
+  data: Account; // Initial account data
+  isEditForm?: boolean; // Whether this is an edit form (default: false)
 }
 
-export const NewAccount: React.FC<NewAccountProps> = ({
+/**
+ * Renders a form for creating or editing an account
+ * @param props - The properties for configuring the form
+ * @returns JSX.Element - The rendered account form
+ */
+const AccountForm: React.FC<AccountFormProps> = ({
   onClose,
   onSubmit,
-  disabled = false, // Default to false
+  disabled = false,
+  data,
+  isEditForm = false,
 }) => {
-  const [formData, setFormData] = useState<Account>({
-    companyName: "",
-    contactFirstName: "",
-    contactLastName: "",
-    email: "",
-    address: "",
-    mobileNumber: "",
-    officePhoneNumber: "",
-    portfolioList: [],
-    services: [],
-    actions: [],
-    isAccessLocked: false,
-    invoices: [],
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState<Account>(data); // State for form data
+  const [isLoading, setIsLoading] = useState(false); // State for form submission loading
+  const isFormDisabled = isLoading || disabled; // Combined disabled state
 
-  // Combine component's internal loading state with parent's disabled state
-  const isFormDisabled = isLoading || disabled;
-
+  // Effect to manage body overflow and scrollbar padding
   useEffect(() => {
     const scrollbarWidth =
       window.innerWidth - document.documentElement.clientWidth;
@@ -64,8 +64,11 @@ export const NewAccount: React.FC<NewAccountProps> = ({
     };
   }, []);
 
+  /**
+   * Validates the form data for required fields
+   * @returns boolean - Whether the form is valid
+   */
   const validateForm = (): boolean => {
-    // Only check if required fields are empty, don't store specific errors
     const isValid =
       formData.companyName.trim() &&
       formData.address.trim() &&
@@ -73,14 +76,15 @@ export const NewAccount: React.FC<NewAccountProps> = ({
       formData.contactLastName.trim() &&
       formData.email.trim() &&
       formData.mobileNumber.trim();
-
     return !!isValid;
   };
 
+  /**
+   * Handles form submission
+   * @param e - The form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Prevent submission if form is already disabled
     if (isFormDisabled) return;
 
     if (!validateForm()) {
@@ -93,7 +97,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
 
     try {
       setIsLoading(true);
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      await new Promise((resolve) => requestAnimationFrame(resolve)); // Simulate async operation
       await onSubmit(
         {
           ...formData,
@@ -108,11 +112,18 @@ export const NewAccount: React.FC<NewAccountProps> = ({
     }
   };
 
+  /**
+   * Updates form data for a specific field
+   * @param field - The field to update
+   * @param value - The new value for the field
+   */
   const handleInputChange = (field: keyof Account, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Handle close with disabled state check
+  /**
+   * Handles form close action
+   */
   const handleClose = () => {
     if (!isFormDisabled) {
       onClose();
@@ -125,16 +136,15 @@ export const NewAccount: React.FC<NewAccountProps> = ({
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <SectionHeader
-              title={"Create Account"}
+              title={isEditForm ? "Update Account" : "Create Account"}
               showCloseButton={true}
               onClose={handleClose}
             />
           </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <CustomInput
               label="Company"
-              value={formData.companyName}
+              value={formData.companyName ?? ""}
               onChange={(value) => handleInputChange("companyName", value)}
               isEditing={true}
               disabled={isFormDisabled}
@@ -142,7 +152,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
             />
             <AddressAutocompleteInput
               label="Address"
-              value={formData.address}
+              value={formData.address ?? ""}
               onChange={(value) => handleInputChange("address", value)}
               isEditing={true}
               placeholder="Start typing address..."
@@ -153,7 +163,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <CustomInput
                 label="First name"
-                value={formData.contactFirstName}
+                value={formData.contactFirstName ?? ""}
                 onChange={(value) =>
                   handleInputChange("contactFirstName", value)
                 }
@@ -163,7 +173,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
               />
               <CustomInput
                 label="Last name"
-                value={formData.contactLastName}
+                value={formData.contactLastName ?? ""}
                 onChange={(value) =>
                   handleInputChange("contactLastName", value)
                 }
@@ -175,7 +185,7 @@ export const NewAccount: React.FC<NewAccountProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <CustomInput
                 label="Office phone"
-                value={formData.officePhoneNumber}
+                value={formData.officePhoneNumber ?? ""}
                 onChange={(value) =>
                   handleInputChange("officePhoneNumber", value)
                 }
@@ -183,11 +193,10 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                 placeholder="800-555-1234"
                 type="mobile"
                 disabled={isFormDisabled}
-                isRequired={true}
               />
               <CustomInput
                 label="Mobile phone"
-                value={formData.mobileNumber}
+                value={formData.mobileNumber ?? ""}
                 onChange={(value) => handleInputChange("mobileNumber", value)}
                 isEditing={true}
                 placeholder="800-555-1234"
@@ -196,22 +205,20 @@ export const NewAccount: React.FC<NewAccountProps> = ({
                 isRequired={true}
               />
             </div>
-
             <CustomInput
               label="Email"
-              value={formData.email}
+              value={formData.email ?? ""}
               onChange={(value) => handleInputChange("email", value)}
               isEditing={true}
               type="email"
               disabled={isFormDisabled}
               isRequired={true}
             />
-
             <div className="flex flex-col gap-3">
               <PixieButton
-                label={"Add Account"}
+                label={isEditForm ? "Update" : "Add Account"}
                 disabled={isFormDisabled}
-                type={"submit"}
+                type="submit"
                 isLoading={isLoading}
               />
               <CancelButton onClick={handleClose} disabled={isFormDisabled} />
@@ -222,3 +229,5 @@ export const NewAccount: React.FC<NewAccountProps> = ({
     </div>
   );
 };
+
+export default AccountForm;

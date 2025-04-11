@@ -4,11 +4,12 @@ import React, { useState, useEffect, useCallback } from "react";
 
 import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
+import { defaultData } from "@/data/accounts";
 import handleError from "@/lib/utils/errorHandler";
 import { accountService } from "@/lib/services/account";
 import CompanyInfo from "@/components/dashboard/CompanyInfo";
+import AccountForm from "@/components/dashboard/account/AccountForm";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
-import { NewAccount } from "@/components/dashboard/account/NewAccount";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 
 /**
@@ -29,12 +30,14 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   isSubmitting,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showNewAccountModal, setShowNewAccountModal] = useState(false);
+  const [showAccountForm, setShowAccountForm] = useState(false);
   const [isAccessLocked, setIsAccessLocked] = useState(false);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
+  const [displayEditFeature, setDisplayEditFeature] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account>(defaultData);
 
   // Filter accounts based on search term
   const filterAccounts = useCallback(
@@ -54,11 +57,12 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   }, [accounts, searchTerm, filterAccounts]);
 
   // Fetch accounts for admin
-  const fetchAccounts = async () => {
+  const fetchAccounts = useCallback(async () => {
     isSubmitting(true);
     setSearchTerm(""); // Reset search term on fetch
     try {
       const response = await accountService.fetch();
+      console.log(response);
       if (response.status === "SUCCESS") {
         setAccounts(response?.data);
       } else {
@@ -72,7 +76,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     } finally {
       isSubmitting(false);
     }
-  };
+  }, [isSubmitting]);
 
   // Initial data fetch on component mount
   useEffect(() => {
@@ -92,16 +96,15 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
 
   // Manage body overflow when modal is open
   useEffect(() => {
-    document.body.style.overflow = showNewAccountModal ? "hidden" : "unset";
+    document.body.style.overflow = showAccountForm ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset"; // Cleanup on unmount
     };
-  }, [showNewAccountModal]);
+  }, [showAccountForm]);
 
-  // Handle new account submission
   const handleAddAccount = async (userData: Account) => {
     try {
-      setShowNewAccountModal(false);
+      setShowAccountForm(false);
       await new Promise((resolve) => requestAnimationFrame(resolve)); // Simulate async delay
       const response = await accountService.create(userData);
 
@@ -126,15 +129,53 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     }
   };
 
+  const handleEditAccount = async (accountId: string, userData: Account) => {
+    try {
+      handleCloseAccountModal();
+      await new Promise((resolve) => requestAnimationFrame(resolve)); // Simulate async delay
+      const response = await accountService.update(accountId, userData);
+
+      if (response?.status === "SUCCESS") {
+        toastr({
+          message: "Account updated successfully.",
+          toastrType: "success",
+        });
+
+        // Refresh accounts after successful creation
+        fetchAccounts();
+      } else {
+        handleError({
+          message: "Account update failed.",
+        });
+      }
+    } catch (error) {
+      handleError({
+        message: "Exception occurred while updating account.",
+        error,
+      });
+    }
+  };
+
+  // Handle account submission
+  const handleAddorEditAccount = async (userData: Account) => {
+    if (userData?.id) {
+      await handleEditAccount(userData.id, userData);
+    } else {
+      await handleAddAccount(userData);
+    }
+  };
+
   // Close the new account modal
   const handleCloseAccountModal = () => {
-    setShowNewAccountModal(false);
+    setShowAccountForm(false);
+    setDisplayEditFeature(false);
+    setSelectedAccount(defaultData);
   };
 
   // Confirm pre-confirmation dialog
   const handlePreConfirm = () => {
     setShowPreConfirmationDialog(false);
-    setShowNewAccountModal(true);
+    setShowAccountForm(true);
   };
 
   // Close pre-confirmation dialog
@@ -142,6 +183,17 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     setShowPreConfirmationDialog(false);
   };
 
+  const onEditAccountClick = (id: string) => {
+    console.log(id);
+    const selectedAccount = filteredAccounts.filter(
+      (account) => account.id === id
+    );
+    if (selectedAccount.length > 0) {
+      setSelectedAccount(selectedAccount[0]);
+      setDisplayEditFeature(true);
+      setShowAccountForm(true);
+    }
+  };
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -163,6 +215,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
                 key={index}
                 details={company}
                 onToggleAccess={() => setIsAccessLocked(!isAccessLocked)}
+                onEditClick={onEditAccountClick}
               />
             ))
           ) : (
@@ -173,11 +226,13 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
         </div>
       </div>
 
-      {showNewAccountModal && (
+      {showAccountForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <NewAccount
+          <AccountForm
+            data={selectedAccount}
+            isEditForm={displayEditFeature}
             onClose={handleCloseAccountModal}
-            onSubmit={handleAddAccount}
+            onSubmit={handleAddorEditAccount}
           />
         </div>
       )}

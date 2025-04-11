@@ -25,7 +25,7 @@ interface AddressAutocompleteInputProps {
  */
 const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
   label,
-  value,
+  value = "",
   onChange,
   isEditing = true,
   placeholder = "",
@@ -48,6 +48,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
     if (value.trim() && internalError) setInternalError(null);
   }, [value]);
 
+  const setInternalErrorRef = useRef(setInternalError);
   useEffect(() => {
     const initializeRadar = async () => {
       if (typeof window === "undefined") return;
@@ -55,7 +56,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
       try {
         const API_KEY = process.env.NEXT_PUBLIC_RADAR_API_KEY;
         if (!API_KEY) {
-          if (!error) setInternalError("Radar API key is missing");
+          if (!error) setInternalErrorRef.current("Radar API key is missing");
           return;
         }
 
@@ -64,7 +65,9 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
         setRadarInitialized(true);
       } catch {
         if (!error)
-          setInternalError("Failed to initialize address autocomplete");
+          setInternalErrorRef.current(
+            "Failed to initialize address autocomplete"
+          );
       }
     };
 

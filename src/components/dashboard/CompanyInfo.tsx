@@ -12,11 +12,13 @@ import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 interface CompanyInfoProps {
   details?: Account;
   onToggleAccess?: () => void;
+  onEditClick?: (id: string) => void;
 }
 
 export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   details,
   onToggleAccess,
+  onEditClick,
 }) => {
   const [isInvoicesOpen, setIsInvoicesOpen] = useState(false);
   const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false);
@@ -31,6 +33,15 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
       ...prev,
       [portfolioName]: !prev[portfolioName],
     }));
+  };
+
+  const onDashboardClick = () => {
+    console.log("Dashboard clicked");
+    // Add your dashboard navigation logic here
+  };
+
+  const onEditAccountClick = ({ accountId }: { accountId: string }) => {
+    onEditClick?.(accountId);
   };
 
   // Map raw service labels to ServicePill objects
@@ -94,7 +105,6 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 <div className="justify-start text-tertiary-light text-xs font-semibold font-['Inter'] underline leading-tight"></div>
               </div>
             </div>
-            {/* Use the Pills component */}
             <Pills items={servicePills} className="self-stretch py-[3px]" />
           </div>
           <div className="w-full flex flex-col justify-start items-start gap-2">
@@ -103,16 +113,24 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
           <div className="self-stretch flex flex-col justify-start items-start gap-4">
             <div className="self-stretch flex flex-col justify-center items-center gap-1">
               <div className="self-stretch inline-flex justify-center items-center gap-3">
-                {(details?.actions ?? []).map((action, index) => (
-                  <div
-                    key={index}
-                    className="px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1"
-                  >
-                    <div className="justify-start text-primary-button text-xs font-medium font-['Inter'] leading-[18px]">
-                      {action}
-                    </div>
+                <button
+                  onClick={onDashboardClick}
+                  className="px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1 cursor-pointer hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                >
+                  <div className="justify-start text-primary-button text-xs font-medium font-['Inter'] leading-[18px]">
+                    Dashboard
                   </div>
-                ))}
+                </button>
+                <button
+                  onClick={() =>
+                    details?.id && onEditAccountClick({ accountId: details.id })
+                  }
+                  className="px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1 cursor-pointer hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                >
+                  <div className="justify-start text-primary-button text-xs font-medium font-['Inter'] leading-[18px]">
+                    Edit Account
+                  </div>
+                </button>
               </div>
             </div>
             <div className="w-full flex flex-col justify-start items-start gap-2">
@@ -126,7 +144,6 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
                     Unlocked
                   </div>
-                  {/* Use the ToggleSwitch component */}
                   <ToggleSwitch
                     isOn={details?.isAccessLocked || false}
                     onToggle={onToggleAccess || (() => {})}
@@ -204,7 +221,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
             </div>
             {isPortfoliosOpen && (
               <div className="w-full flex flex-col justify-start items-start gap-1">
-                {(details?.portfolioList ?? []).map((portfolio, index) => (
+                {(details?.portfolios ?? []).map((portfolio, index) => (
                   <div
                     key={index}
                     className="self-stretch p-2 bg-gray-50 rounded-md flex flex-col justify-start items-start gap-3 overflow-hidden"
@@ -230,7 +247,6 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                               </div>
                             </>
                           )}
-
                           {portfolio.squareFootage && (
                             <>
                               <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />

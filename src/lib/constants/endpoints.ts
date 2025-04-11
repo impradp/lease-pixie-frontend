@@ -11,6 +11,7 @@ export const ENDPOINTS = {
   },
   ACCOUNT: {
     DEFAULT: "/api/v1/account",
+    EDIT: "/api/v1/account/%s",
   },
   PORTFOLIO: {
     ADD_USER: "/api/v1/portfolio/user",
