@@ -1,33 +1,62 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-
 import { Account } from "@/types/Account";
 import { Pills } from "@/components/ui/pills";
 import { ServicePill } from "@/types/ServicePills";
 import { getServicePill } from "@/lib/utils/pillsColors";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 
+/**
+ * Props for the CompanyInfo component
+ */
 interface CompanyInfoProps {
-  details?: Account;
-  onToggleAccess?: () => void;
-  onEditClick?: (id: string) => void;
+  details?: Account; // Account details to display
+  onToggleAccess?: (accountId: string, isLocked: boolean) => Promise<boolean>; // Callback for toggling access
+  onEditClick?: (id: string) => void; // Callback for edit button click
 }
 
+/**
+ * Renders detailed information about a company, including services, invoices, and portfolios
+ * @param props - The properties for configuring the component
+ * @returns JSX.Element - The rendered company info component
+ */
 export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   details,
   onToggleAccess,
   onEditClick,
 }) => {
-  const [isInvoicesOpen, setIsInvoicesOpen] = useState(false);
-  const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false);
+  const [isInvoicesOpen, setIsInvoicesOpen] = useState(false); // State for invoices section visibility
+  const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false); // State for portfolios section visibility
   const [portfolioCostOpen, setPortfolioCostOpen] = useState<{
     [key: string]: boolean;
-  }>({});
+  }>({}); // State for individual portfolio cost visibility
+  const [isAccessLocked, setIsAccessLocked] = useState(
+    details?.isAccessLocked || false
+  ); // State for access lock status
 
+  /**
+   * Syncs local access lock state with prop changes
+   */
+  useEffect(() => {
+    setIsAccessLocked(details?.isAccessLocked || false);
+  }, [details?.isAccessLocked]);
+
+  /**
+   * Toggles the visibility of the invoices section
+   */
   const toggleInvoices = () => setIsInvoicesOpen(!isInvoicesOpen);
+
+  /**
+   * Toggles the visibility of the portfolios section
+   */
   const togglePortfolios = () => setIsPortfoliosOpen(!isPortfoliosOpen);
+
+  /**
+   * Toggles the visibility of cost details for a specific portfolio
+   * @param portfolioName - The name of the portfolio
+   */
   const togglePortfolioCost = (portfolioName: string) => {
     setPortfolioCostOpen((prev) => ({
       ...prev,
@@ -35,11 +64,34 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
     }));
   };
 
-  const onDashboardClick = () => {
-    console.log("Dashboard clicked");
-    // Add your dashboard navigation logic here
+  /**
+   * Handles toggling the access lock state with optimistic UI update
+   */
+  const handleToggleAccess = async () => {
+    if (!details?.id) return;
+
+    const previousLockedState = isAccessLocked;
+    const newLockedState = !isAccessLocked;
+    setIsAccessLocked(newLockedState);
+
+    const success = await onToggleAccess?.(details.id, newLockedState);
+    if (!success) {
+      setIsAccessLocked(previousLockedState);
+    }
   };
 
+  /**
+   * Handles dashboard button click
+   */
+  const onDashboardClick = () => {
+    console.log("Dashboard clicked");
+    // TODO: Add dashboard navigation logic
+  };
+
+  /**
+   * Handles edit account button click
+   * @param param - Object containing the account ID
+   */
   const onEditAccountClick = ({ accountId }: { accountId: string }) => {
     onEditClick?.(accountId);
   };
@@ -140,13 +192,13 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                     Access
                   </div>
                 </div>
-                <div className="w-1/2 flex justify-end items-end gap-3">
+                <div className="w-1/2 flex justify-end items-center gap-3">
                   <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
                     Unlocked
                   </div>
                   <ToggleSwitch
-                    isOn={details?.isAccessLocked || false}
-                    onToggle={onToggleAccess || (() => {})}
+                    isOn={isAccessLocked}
+                    onToggle={handleToggleAccess}
                     isDisabled={false}
                   />
                   <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">

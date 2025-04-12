@@ -31,7 +31,6 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAccountForm, setShowAccountForm] = useState(false);
-  const [isAccessLocked, setIsAccessLocked] = useState(false);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -59,10 +58,9 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   // Fetch accounts for admin
   const fetchAccounts = useCallback(async () => {
     isSubmitting(true);
-    setSearchTerm(""); // Reset search term on fetch
+    setSearchTerm("");
     try {
       const response = await accountService.fetch();
-      console.log(response);
       if (response.status === "SUCCESS") {
         setAccounts(response?.data);
       } else {
@@ -81,12 +79,11 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   // Initial data fetch on component mount
   useEffect(() => {
     fetchAccounts();
-  }, []);
+  }, [fetchAccounts]);
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    // No need to manually filter here as the useEffect will handle it
   };
 
   // Handle add account button click
@@ -98,14 +95,14 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   useEffect(() => {
     document.body.style.overflow = showAccountForm ? "hidden" : "unset";
     return () => {
-      document.body.style.overflow = "unset"; // Cleanup on unmount
+      document.body.style.overflow = "unset";
     };
   }, [showAccountForm]);
 
   const handleAddAccount = async (userData: Account) => {
     try {
       setShowAccountForm(false);
-      await new Promise((resolve) => requestAnimationFrame(resolve)); // Simulate async delay
+      await new Promise((resolve) => requestAnimationFrame(resolve));
       const response = await accountService.create(userData);
 
       if (response?.status === "SUCCESS") {
@@ -113,8 +110,6 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           message: "Account created successfully.",
           toastrType: "success",
         });
-
-        // Refresh accounts after successful creation
         fetchAccounts();
       } else {
         handleError({
@@ -131,8 +126,8 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
 
   const handleEditAccount = async (accountId: string, userData: Account) => {
     try {
-      handleCloseAccountModal();
-      await new Promise((resolve) => requestAnimationFrame(resolve)); // Simulate async delay
+      setShowAccountForm(false);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
       const response = await accountService.update(accountId, userData);
 
       if (response?.status === "SUCCESS") {
@@ -140,8 +135,6 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           message: "Account updated successfully.",
           toastrType: "success",
         });
-
-        // Refresh accounts after successful creation
         fetchAccounts();
       } else {
         handleError({
@@ -156,7 +149,55 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     }
   };
 
-  // Handle account submission
+  const handleToggleAccess = async (
+    accountId: string,
+    isLocked: boolean
+  ): Promise<boolean> => {
+    // Store previous accounts state for reversion
+    const previousAccounts = [...accounts];
+
+    try {
+      // Optimistically update accounts state
+      setAccounts((prev) =>
+        prev.map((acc) =>
+          acc.id === accountId ? { ...acc, isAccessLocked: isLocked } : acc
+        )
+      );
+
+      const account = accounts.find((acc) => acc.id === accountId);
+      if (!account) {
+        throw new Error("Account not found");
+      }
+
+      const response = await accountService.updateAccess(accountId, isLocked);
+
+      if (response?.status === "SUCCESS") {
+        toastr({
+          message: `Account access ${
+            isLocked ? "locked" : "unlocked"
+          } successfully.`,
+          toastrType: "success",
+        });
+        return true;
+      } else {
+        // Revert on failure
+        setAccounts(previousAccounts);
+        handleError({
+          message: "Failed to update account access.",
+        });
+        return false;
+      }
+    } catch (error) {
+      // Revert on exception
+      setAccounts(previousAccounts);
+      handleError({
+        message: "Exception occurred while updating account access.",
+        error,
+      });
+      return false;
+    }
+  };
+
   const handleAddorEditAccount = async (userData: Account) => {
     if (userData?.id) {
       await handleEditAccount(userData.id, userData);
@@ -165,35 +206,32 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     }
   };
 
-  // Close the new account modal
   const handleCloseAccountModal = () => {
     setShowAccountForm(false);
     setDisplayEditFeature(false);
     setSelectedAccount(defaultData);
   };
 
-  // Confirm pre-confirmation dialog
   const handlePreConfirm = () => {
     setShowPreConfirmationDialog(false);
     setShowAccountForm(true);
   };
 
-  // Close pre-confirmation dialog
   const handlePreConfirmationClose = () => {
     setShowPreConfirmationDialog(false);
   };
 
   const onEditAccountClick = (id: string) => {
-    console.log(id);
-    const selectedAccount = filteredAccounts.filter(
+    const selectedAccount = filteredAccounts.find(
       (account) => account.id === id
     );
-    if (selectedAccount.length > 0) {
-      setSelectedAccount(selectedAccount[0]);
+    if (selectedAccount) {
+      setSelectedAccount(selectedAccount);
       setDisplayEditFeature(true);
       setShowAccountForm(true);
     }
   };
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -214,7 +252,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
               <CompanyInfo
                 key={index}
                 details={company}
-                onToggleAccess={() => setIsAccessLocked(!isAccessLocked)}
+                onToggleAccess={handleToggleAccess}
                 onEditClick={onEditAccountClick}
               />
             ))

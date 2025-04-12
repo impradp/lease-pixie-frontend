@@ -32,8 +32,18 @@ class AccountService {
     accountPayload: Account
   ): Promise<AccountResponse> {
     return await apiService.put<AccountResponse>(
-      interpolate(ENDPOINTS.ACCOUNT.EDIT, accountId),
+      interpolate(ENDPOINTS.ACCOUNT.EDIT.DEFAULT, accountId),
       accountPayload
+    );
+  }
+
+  async updateAccess(
+    accountId: string,
+    isLocked: boolean
+  ): Promise<AccountResponse> {
+    return await apiService.patch<AccountResponse>(
+      interpolate(ENDPOINTS.ACCOUNT.EDIT.ACCESS, accountId),
+      { isLocked: isLocked }
     );
   }
 
