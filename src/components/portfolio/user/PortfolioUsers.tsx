@@ -1,36 +1,46 @@
-import React, { useState, useEffect } from "react";
+"use client";
 
-import toastr from "@/lib/func/toastr";
+import React, { useState, useEffect } from "react";
+import handleInfo from "@/lib/utils/errorHandler";
+
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { NewUserFormData, DropdownOption } from "@/types/user";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
 import NewPortfolioUser from "@/components/portfolio/user/NewPortfolioUser";
 
+/**
+ * Props for the PortfolioUsers component
+ */
 interface PortfolioUsersProps {
-  label?: string;
-  selectedUser?: DropdownOption;
-  selectedSecondaryUser?: DropdownOption;
-  onUserChange?: (user: DropdownOption) => void;
-  onSecondaryUserChange?: (user: DropdownOption) => void;
-  users: DropdownOption[];
-  secondaryUsers: DropdownOption[];
-  showInfo?: boolean;
-  infoContent?: string;
-  userType?: string;
-  sectionId: string;
-  editingSection: string | null;
-  onSectionEdit: (section: string) => void;
-  onSectionClose: () => void;
-  subLabels: string[];
-  isSecondaryUserLocked?: boolean;
-  isLoading?: boolean;
-  refreshUserList: () => void;
+  label?: string; // Label for the component
+  selectedUser?: DropdownOption; // Primary selected user
+  selectedSecondaryUser?: DropdownOption; // Secondary selected user
+  onUserChange?: (user: DropdownOption) => void; // Callback for primary user change
+  onSecondaryUserChange?: (user: DropdownOption) => void; // Callback for secondary user change
+  users: DropdownOption[]; // List of available primary users
+  secondaryUsers: DropdownOption[]; // List of available secondary users
+  showInfo?: boolean; // Whether to show info tooltip
+  infoContent?: string; // Content for info tooltip
+  userType?: string; // Type of user (e.g., Portfolio User)
+  sectionId: string; // Unique identifier for the section
+  editingSection: string | null; // Currently editing section ID
+  onSectionEdit: (section: string) => void; // Callback for entering edit mode
+  onSectionClose: () => void; // Callback for closing edit mode
+  subLabels: string[]; // Labels for dropdowns
+  isSecondaryUserLocked?: boolean; // Whether secondary user dropdown is locked
+  isLoading?: boolean; // Loading state for the component
+  refreshUserList: () => void; // Callback to refresh user list
 }
 
+/**
+ * Renders a component for managing primary and secondary portfolio users
+ * @param props - The properties for configuring the component
+ * @returns JSX.Element - The rendered portfolio users component
+ */
 export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   label = "",
   selectedUser,
@@ -51,34 +61,39 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   isLoading = false,
   refreshUserList,
 }) => {
-  const [showNewUserModal, setShowNewUserModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedUser, setEditedUser] = useState(selectedUser);
+  const [showNewUserModal, setShowNewUserModal] = useState(false); // Controls new user modal visibility
+  const [isEditMode, setIsEditMode] = useState(false); // Tracks edit mode state
+  const [editedUser, setEditedUser] = useState(selectedUser); // Tracks edited primary user
   const [editedSecondaryUser, setEditedSecondaryUser] = useState(
     selectedSecondaryUser
-  );
-  const [originalUser, setOriginalUser] = useState(selectedUser);
+  ); // Tracks edited secondary user
+  const [originalUser, setOriginalUser] = useState(selectedUser); // Stores original primary user
   const [originalSecondaryUser, setOriginalSecondaryUser] = useState(
     selectedSecondaryUser
-  );
+  ); // Stores original secondary user
   const [secondarySampleUsers, setSecondarySampleUsers] =
-    useState(secondaryUsers);
+    useState(secondaryUsers); // Filtered secondary users list
 
-  const isEditing = isEditMode;
-
-  // Locally determine if secondary user dropdown should be unlocked
+  const isEditing = isEditMode; // Alias for edit mode state
   const isSecondaryUnlocked =
-    !isSecondaryUserLocked || (editedUser && editedUser.value !== "");
+    !isSecondaryUserLocked || (editedUser && editedUser.value !== ""); // Determines if secondary dropdown is unlocked
 
-  // Sync original and edited values with props whenever they change
+  /**
+   * Syncs original and edited user selections with props
+   */
   useEffect(() => {
+    // Updates state when selected users change
     setOriginalUser(selectedUser);
     setOriginalSecondaryUser(selectedSecondaryUser);
     setEditedUser(selectedUser);
     setEditedSecondaryUser(selectedSecondaryUser);
   }, [selectedUser, selectedSecondaryUser]);
 
+  /**
+   * Manages body overflow based on modal visibility
+   */
   useEffect(() => {
+    // Locks/unlocks scroll when modal is open
     if (showNewUserModal) {
       document.body.style.overflow = "hidden";
     } else {
@@ -89,57 +104,68 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     };
   }, [showNewUserModal]);
 
+  /**
+   * Handles adding a new user via API
+   * @param userData - Data for the new user
+   * @param setLoading - Function to toggle loading state
+   */
   const handleAddUser = async (
     userData: NewUserFormData,
     setLoading: (loading: boolean) => void
   ) => {
+    // Submits new user data and refreshes list
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
-
       const response = await portfolioService.addUser(userData);
       if (response?.status === "SUCCESS") {
         setShowNewUserModal(false);
-        toastr({
-          message: "New portfolio user added successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100507 });
         refreshUserList();
       } else {
-        toastr({
-          message: "Error adding new portfolio user.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100508 });
       }
-    } catch {
-      //TODO: Handle log
-      toastr({
-        message: "Exception occured adding new portfolio user.",
-        toastrType: "error",
-      });
+    } catch (err) {
+      handleInfo({ code: 100509, error: err });
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Closes the new user modal
+   */
   const handleCloseUserModal = () => {
+    // Hides the new user modal
     setShowNewUserModal(false);
   };
 
+  /**
+   * Enters edit mode for the section
+   */
   const handleEdit = () => {
+    // Initiates edit mode if allowed
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
     }
   };
 
+  /**
+   * Cancels edit mode and reverts changes
+   */
   const handleTextClose = () => {
+    // Exits edit mode and reverts selections
     setIsEditMode(false);
     setEditedUser(originalUser);
     setEditedSecondaryUser(originalSecondaryUser);
     onSectionClose();
   };
 
+  /**
+   * Saves changes and exits edit mode
+   */
   const handleUpdate = () => {
+    // Applies changes and exits edit mode
     setIsEditMode(false);
     if (onUserChange && editedUser) {
       onUserChange(editedUser);
@@ -150,20 +176,29 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     onSectionClose();
   };
 
+  /**
+   * Updates the edited primary user and filters secondary users
+   * @param user - The selected user
+   */
   const handleUserChange = (user: DropdownOption) => {
+    // Updates primary user and adjusts secondary options
     setEditedUser(user);
-
     setSecondarySampleUsers(
       secondaryUsers.filter((opt) => opt.value !== user.value)
     );
   };
 
+  /**
+   * Updates the edited secondary user
+   * @param user - The selected user
+   */
   const handleSecondaryUserChange = (user: DropdownOption) => {
+    // Updates secondary user selection
     setEditedSecondaryUser(user);
   };
 
   const isEditDisabled =
-    editingSection !== null && editingSection !== sectionId;
+    editingSection !== null && editingSection !== sectionId; // Determines if edit is disabled
 
   return (
     <>
@@ -182,7 +217,6 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
           infoContent={infoContent}
           editDisabled={isEditDisabled}
         />
-
         <CustomDropdown
           options={users}
           value={editedUser?.value}
@@ -198,7 +232,6 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
             onClick={() => setShowNewUserModal(true)}
           />
         )}
-
         <CustomDropdown
           options={secondarySampleUsers}
           value={editedSecondaryUser?.value}
@@ -223,12 +256,11 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
                 className="w-full"
                 isLoading={isLoading}
               />
-              <CancelButton onClick={handleTextClose} />
+              <LinkButton onClick={handleTextClose} />
             </div>
           </>
         )}
       </div>
-
       {showNewUserModal && (
         <div className="fixed inset-0 z-50">
           <div className="relative z-50">

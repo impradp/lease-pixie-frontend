@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Download, Upload } from "lucide-react";
 import SubHeader from "@/components/ui/header/SubHeader";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 
 interface SpaceSettingsCardProps {
@@ -169,7 +169,7 @@ const SpaceSettingsCard: React.FC<SpaceSettingsCardProps> = ({
             onClick={handleUpdate}
             className="w-full"
           />
-          <CancelButton onClick={handleTextClose} />
+          <LinkButton onClick={handleTextClose} />
         </div>
       )}
     </div>

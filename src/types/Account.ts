@@ -6,6 +6,12 @@ export interface AccountResponse {
   message?: string;
 }
 
+export interface AccountDetailResponse {
+  status: string;
+  data: Account;
+  message?: string;
+}
+
 export interface Account {
   id?: string;
   companyName: string;

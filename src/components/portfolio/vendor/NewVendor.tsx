@@ -3,11 +3,12 @@ import dynamic from "next/dynamic";
 
 import { Locale } from "@/locales";
 import toastr from "@/lib/func/toastr";
+import { defaultData } from "@/data/vendor";
 import { getMessages } from "@/locales/locale";
 import { NewVendorFormData } from "@/types/vendor";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
 
@@ -29,19 +30,7 @@ interface NewVendorProps {
 }
 
 export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState<NewVendorFormData>({
-    companyName: "",
-    serviceDescription: "",
-    companyAddress: "",
-    officePhoneNumber: "",
-    contactFirstName: "",
-    contactLastName: "",
-    email: "",
-    mobileNumber: "",
-    requestW9: false,
-    send1099: false,
-    getInsuranceCert: false,
-  });
+  const [formData, setFormData] = useState<NewVendorFormData>(defaultData);
 
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
@@ -254,7 +243,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 disabled={isLoading}
                 isLoading={isLoading}
               />
-              <CancelButton onClick={onClose} />
+              <LinkButton onClick={onClose} />
             </div>
           </form>
         </div>

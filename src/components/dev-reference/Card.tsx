@@ -1,7 +1,7 @@
 //This component is used to display the card functionality like edit/close and section display
 import React, { useState } from "react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 
 interface CardProps {
@@ -68,7 +68,7 @@ const Card: React.FC<CardProps> = ({
             onClick={handleUpdate}
             className="w-full"
           />
-          <CancelButton onClick={handleTextClose} />
+          <LinkButton onClick={handleTextClose} />
         </div>
       )}
     </div>

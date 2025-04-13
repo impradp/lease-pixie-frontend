@@ -1,49 +1,63 @@
 import React, { useState, useEffect } from "react";
 
-import toastr from "@/lib/func/toastr";
+import handleInfo from "@/lib/utils/errorHandler";
 import NewStarUser from "@/components/property/NewStarUser";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { DropdownOption, NewUserFormData } from "@/types/user";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
 
+/**
+ * Form data structure for workflow stars
+ */
 interface WorkflowStarsFormData {
-  maintainenceStar: DropdownOption | undefined;
-  accountingStar: DropdownOption | undefined;
-  leaseStar: DropdownOption | undefined;
-  billPayStar: DropdownOption | undefined;
-  maintainenceStarThreshold: DropdownOption | undefined;
-  accountingStarThreshold: DropdownOption | undefined;
-  leaseStarThreshold: DropdownOption | undefined;
-  billPayStarThreshold: DropdownOption | undefined;
+  maintainenceStar: DropdownOption | undefined; // Selected maintenance star
+  accountingStar: DropdownOption | undefined; // Selected accounting star
+  leaseStar: DropdownOption | undefined; // Selected lease star
+  billPayStar: DropdownOption | undefined; // Selected bill pay star
+  maintainenceStarThreshold: DropdownOption | undefined; // Maintenance star threshold
+  accountingStarThreshold: DropdownOption | undefined; // Accounting star threshold
+  leaseStarThreshold: DropdownOption | undefined; // Lease star threshold
+  billPayStarThreshold: DropdownOption | undefined; // Bill pay star threshold
 }
 
+/**
+ * Options for star dropdowns and thresholds
+ */
 interface StarOptions {
-  maintainenceStars: DropdownOption[];
-  accountingStars: DropdownOption[];
-  leaseStars: DropdownOption[];
-  billPayStars: DropdownOption[];
-  workflowInactivityThresholds: DropdownOption[];
+  maintainenceStars: DropdownOption[]; // Options for maintenance stars
+  accountingStars: DropdownOption[]; // Options for accounting stars
+  leaseStars: DropdownOption[]; // Options for lease stars
+  billPayStars: DropdownOption[]; // Options for bill pay stars
+  workflowInactivityThresholds: DropdownOption[]; // Options for inactivity thresholds
 }
 
+/**
+ * Props for the WorkflowStars component
+ */
 interface WorkflowStarsProps {
-  label?: string;
-  initialFormData: WorkflowStarsFormData;
-  onFormDataChange: (formData: WorkflowStarsFormData) => void;
-  starOptions: StarOptions;
-  showInfo?: boolean;
-  infoContents?: string[];
-  sectionId: string;
-  editingSection: string | null;
-  onSectionEdit: (section: string) => void;
-  onSectionClose: () => void;
-  subLabels: string[];
+  label?: string; // Label for the component
+  initialFormData: WorkflowStarsFormData; // Initial star and threshold selections
+  onFormDataChange: (formData: WorkflowStarsFormData) => void; // Callback for form data changes
+  starOptions: StarOptions; // Available star and threshold options
+  showInfo?: boolean; // Whether to show info tooltips
+  infoContents?: string[]; // Content for info tooltips
+  sectionId: string; // Unique identifier for the section
+  editingSection: string | null; // Currently editing section ID
+  onSectionEdit: (section: string) => void; // Callback for entering edit mode
+  onSectionClose: () => void; // Callback for closing edit mode
+  subLabels: string[]; // Labels for dropdowns
 }
 
+/**
+ * Renders a component for managing workflow stars with dropdowns for roles and thresholds
+ * @param props - The properties for configuring the component
+ * @returns JSX.Element - The rendered workflow stars component
+ */
 const WorkflowStars: React.FC<WorkflowStarsProps> = ({
   label = "",
   initialFormData,
@@ -63,18 +77,26 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
   ],
 }) => {
   const [formData, setFormData] =
-    useState<WorkflowStarsFormData>(initialFormData);
+    useState<WorkflowStarsFormData>(initialFormData); // Current form data
   const [originalFormData, setOriginalFormData] =
-    useState<WorkflowStarsFormData>(initialFormData);
-  const [showNewStarModal, setShowNewStarModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+    useState<WorkflowStarsFormData>(initialFormData); // Original form data
+  const [showNewStarModal, setShowNewStarModal] = useState(false); // Controls new user modal visibility
+  const [isEditMode, setIsEditMode] = useState(false); // Tracks edit mode state
 
+  /**
+   * Syncs form data with initial props
+   */
   useEffect(() => {
+    // Updates state when initial form data changes
     setFormData(initialFormData);
     setOriginalFormData(initialFormData);
   }, [initialFormData]);
 
+  /**
+   * Manages body overflow based on modal visibility
+   */
   useEffect(() => {
+    // Locks/unlocks scroll when modal is open
     if (showNewStarModal) {
       document.body.style.overflow = "hidden";
     } else {
@@ -85,69 +107,94 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
     };
   }, [showNewStarModal]);
 
+  /**
+   * Handles adding a new star user via API
+   * @param userData - Data for the new user
+   * @param setLoading - Function to toggle loading state
+   */
   const handleAddStar = async (
     userData: NewUserFormData,
     setLoading: (loading: boolean) => void
   ) => {
+    // Submits new user data
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
       const response = await portfolioService.addUser(userData);
       if (response?.status === "SUCCESS") {
         setShowNewStarModal(false);
-        toastr({
-          message: "New property user added successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100600 });
       } else {
-        toastr({
-          message: "Error adding new property user.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100601 });
       }
-    } catch {
-      toastr({
-        message: "Exception occurred adding new property user.",
-        toastrType: "error",
-      });
+    } catch (err) {
+      handleInfo({ code: 100602, error: err });
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Closes the new star user modal
+   */
   const handleCloseStarModal = () => {
+    // Hides the new user modal
     setShowNewStarModal(false);
   };
 
+  /**
+   * Enters edit mode for the section
+   */
   const handleEdit = () => {
+    // Initiates edit mode if allowed
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
     }
   };
 
+  /**
+   * Cancels edit mode and reverts changes
+   */
   const handleTextClose = () => {
+    // Exits edit mode and reverts form data
     setIsEditMode(false);
     setFormData(originalFormData);
     onSectionClose();
   };
 
+  /**
+   * Saves changes and exits edit mode
+   */
   const handleUpdate = () => {
+    // Applies form changes and exits edit mode
     setIsEditMode(false);
     onFormDataChange(formData);
     onSectionClose();
   };
 
+  /**
+   * Updates a specific field in the form data
+   * @param field - The field to update
+   * @param value - The new value
+   */
   const handleFieldChange = (
     field: keyof WorkflowStarsFormData,
     value: DropdownOption | undefined
   ) => {
+    // Updates a single star selection
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  /**
+   * Updates a threshold field based on selected value
+   * @param field - The threshold field to update
+   * @param value - The selected value
+   */
   const handleThresholdChange = (
     field: keyof WorkflowStarsFormData,
     value: string
   ) => {
+    // Updates a threshold selection
     const selectedOption = starOptions.workflowInactivityThresholds.find(
       (opt) => opt.value === value
     );
@@ -155,7 +202,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
   };
 
   const isEditDisabled =
-    editingSection !== null && editingSection !== sectionId;
+    editingSection !== null && editingSection !== sectionId; // Determines if edit is disabled
 
   return (
     <>
@@ -317,7 +364,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <CancelButton onClick={handleTextClose} />
+              <LinkButton onClick={handleTextClose} />
             </div>
           </>
         )}

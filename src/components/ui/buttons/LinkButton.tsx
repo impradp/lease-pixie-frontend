@@ -1,6 +1,6 @@
 import React from "react";
 
-interface CancelButtonProps {
+interface LinkButtonProps {
   onClick: () => void;
   className?: string;
   disabled?: boolean; // Added disabled prop
@@ -8,7 +8,7 @@ interface CancelButtonProps {
   label?: string;
 }
 
-const CancelButton: React.FC<CancelButtonProps> = ({
+const LinkButton: React.FC<LinkButtonProps> = ({
   onClick,
   className = "",
   disabled = false,
@@ -32,9 +32,9 @@ const CancelButton: React.FC<CancelButtonProps> = ({
         isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
     >
-      {isLoading ? "Cancelling..." : label}
+      {label}
     </button>
   );
 };
 
-export default CancelButton;
+export default LinkButton;

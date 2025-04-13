@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext, Suspense } from "react";
+import { useState, useEffect, useContext, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import toastr from "@/lib/func/toastr";
+import handleToast from "@/lib/utils/toastr";
+import handleInfo from "@/lib/utils/errorHandler";
 import { authService } from "@/lib/services/auth";
 import { emailService } from "@/lib/services/email";
 import { loginService } from "@/lib/services/login";
@@ -36,29 +37,9 @@ function LoginContent() {
     phoneNumber: "",
   });
 
-  const hasShownLogoutToastr = useRef(false);
-  const hasShownResetToastr = useRef(false);
-
   useEffect(() => {
-    const loggedOut = searchParams.get("loggedOut");
-    if (loggedOut === "true" && !hasShownLogoutToastr.current) {
-      toastr({
-        message: "Logged out successfully.",
-        toastrType: "success",
-      });
-      hasShownLogoutToastr.current = true;
-      router.replace("/login");
-    }
-
-    const resetSuccess = searchParams.get("reset");
-    if (resetSuccess === "true" && !hasShownResetToastr.current) {
-      toastr({
-        message: "SMS sent sucessfully.",
-        toastrType: "success",
-      });
-      hasShownResetToastr.current = true;
-      router.push("/login");
-    }
+    handleToast(searchParams);
+    router.push("/login");
   }, [searchParams, router]);
 
   useEffect(() => {
@@ -90,12 +71,9 @@ function LoginContent() {
         setShowAuthForm(false);
         const now = new Date().toISOString();
         cookieHandler.setLoginAttempts(0, now, null, 86400);
-        router.push(getDefaultPage()); // Trigger redirection (ClientLoadingWrapper will handle loading state)
+        router.push(getDefaultPage() + "?msg=100300"); // Trigger redirection (ClientLoadingWrapper will handle loading state)
       } else {
-        toastr({
-          message: "Login failed.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100301 });
         const now = new Date().toISOString();
         setAttempts((prev) => {
           const newAttempts = prev + 1;
@@ -109,12 +87,8 @@ function LoginContent() {
         });
         setLoading(false); // Clear loading on failure
       }
-    } catch {
-      toastr({
-        message: "Login failed.",
-        toastrType: "error",
-      });
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      handleInfo({ code: 100301, error: err });
       setLoading(false); // Clear loading on error
     }
   };
@@ -154,10 +128,7 @@ function LoginContent() {
         setIsEmailCodeVerified(true);
         setEmailSent(false);
       } else {
-        toastr({
-          message: "Reset code verification failed.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100401 });
         const now = new Date().toISOString();
         setAttempts((prev) => {
           const newAttempts = prev + 1;
@@ -170,12 +141,8 @@ function LoginContent() {
           return newAttempts;
         });
       }
-    } catch {
-      toastr({
-        message: "Reset failed.",
-        toastrType: "error",
-      });
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      handleInfo({ code: 100402, error: err });
     }
     setLoading(false);
   };
@@ -197,12 +164,9 @@ function LoginContent() {
         cookieConsentAccepted: data.cookieConsent,
       });
       if (response.status === "SUCCESS") {
-        router.push("/login?reset=true");
+        router.push("/login?msg=100400");
       } else {
-        toastr({
-          message: "SMS sending failed.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100403 });
         const now = new Date().toISOString();
         setAttempts((prev) => {
           const newAttempts = prev + 1;
@@ -215,12 +179,8 @@ function LoginContent() {
           return newAttempts;
         });
       }
-    } catch {
-      toastr({
-        message: "Reset failed.",
-        toastrType: "error",
-      });
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      handleInfo({ code: 100402, error: err });
     }
     setLoading(false);
   };
@@ -244,23 +204,12 @@ function LoginContent() {
           email: formData.email,
           phoneNumber: formData.mobileNumber.replaceAll("-", ""),
         });
-        toastr({
-          message:
-            "We have sent a reset code via e-mail if the provided information is valid.",
-          toastrType: "info",
-        });
+        handleInfo({ code: 100404 });
       } else {
-        toastr({
-          message: "Reset code is invalid. Please try again.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100405 });
       }
-    } catch {
-      toastr({
-        message: "Reset Failed.",
-        toastrType: "error",
-      });
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      handleInfo({ code: 100402, error: err });
     }
     setLoading(false);
   };

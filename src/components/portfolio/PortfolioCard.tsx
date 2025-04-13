@@ -3,7 +3,7 @@ import { Locale } from "@/locales";
 import { getMessages } from "@/locales/locale";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 interface PortfolioCardProps {
@@ -100,7 +100,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
             onClick={handleTextUpdate}
             className="w-full"
           />
-          <CancelButton onClick={handleTextClose} />
+          <LinkButton onClick={handleTextClose} />
         </div>
       )}
     </div>

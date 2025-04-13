@@ -2,7 +2,11 @@
 
 import { apiService } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/constants/endpoints";
-import { Account, AccountResponse } from "@/types/Account";
+import {
+  Account,
+  AccountDetailResponse,
+  AccountResponse,
+} from "@/types/Account";
 import { interpolate } from "../utils/stringUtils";
 
 /**
@@ -53,6 +57,16 @@ class AccountService {
    */
   async fetch(): Promise<AccountResponse> {
     return await apiService.get<AccountResponse>(ENDPOINTS.ACCOUNT.DEFAULT);
+  }
+
+  /**
+   * Fetches account data by associated account id
+   * @returns Promise resolving to the account data response
+   */
+  async fetchById(id: number): Promise<AccountDetailResponse> {
+    return await apiService.get<AccountDetailResponse>(
+      interpolate(ENDPOINTS.ACCOUNT.FETCH.BY_ID, id)
+    );
   }
 }
 

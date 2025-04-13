@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 
 import { PortfolioUser } from "@/types/Portfolio";
-import handleError from "@/lib/utils/errorHandler";
+import handleInfo from "@/lib/utils/errorHandler";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import PortfolioUserCardContent from "@/components/dashboard/portfolio/PortfolioUserCardContent";
@@ -61,13 +61,10 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
       if (response.status === "SUCCESS") {
         setPortfolioUsers(response?.data);
       } else {
-        handleError({ message: "Error fetching portfolio users." });
+        handleInfo({ code: 100501 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while fetching portfolio users.",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100502, error: err });
     } finally {
       isSubmitting(false);
     }

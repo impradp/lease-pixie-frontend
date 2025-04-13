@@ -1,32 +1,54 @@
 "use client";
 
-import React, { useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, Suspense, useState, useContext } from "react";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 
-import toastr from "@/lib/func/toastr";
+import { Account } from "@/types/Account";
+import handleToast from "@/lib/utils/toastr";
+import { getDefaultPage } from "@/config/roleAccess";
+import { accountService } from "@/lib/services/account";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
-import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
+import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
+import AccountDetailsCard from "@/components/account/AccountDetails";
 import DepositAccountsCard from "@/components/account/DepositAccountCard";
 import PropertyApprovalCard from "@/components/dashboard/property/PropertyApprovalCard";
+import PaymentMethod from "@/components/account/PaymentMethod";
 
 function AccountContent() {
   const router = useRouter();
+  const { id } = useParams();
   const searchParams = useSearchParams();
-  const hasShownSuccessToastr = React.useRef(false);
+  const { isLoading, setLoading } = useContext(LoadingContext);
+  const [selectedAccount, setSelectedAccount] = useState<Account>();
 
   useEffect(() => {
-    const success = searchParams.get("success");
-    if (success === "true" && !hasShownSuccessToastr.current) {
-      toastr({
-        message: "Login successful.",
-        toastrType: "success",
-      });
-      hasShownSuccessToastr.current = true;
-      router.replace("/workflows");
-    }
+    handleToast(searchParams);
+    router.push("/account");
   }, [searchParams, router]);
+
+  useEffect(() => {
+    const fetchAccountDetails = async () => {
+      if (id) {
+        const accountDetails = await accountService.fetchById(Number(id));
+        if (accountDetails?.status === "SUCCESS") {
+          setSelectedAccount(accountDetails?.data);
+        } else {
+          router.push(getDefaultPage() + "?msg=100101");
+        }
+      } else {
+        const accountDetails = await accountService.fetch();
+        if (accountDetails?.status === "SUCCESS") {
+          setSelectedAccount(accountDetails?.data[0]);
+        } else {
+          router.push(getDefaultPage() + "?msg=100101");
+        }
+      }
+    };
+    fetchAccountDetails();
+  }, [id]);
 
   const breadcrumbItems = [
     { href: "#", label: "Account Dashboard", isActive: true },
@@ -36,8 +58,15 @@ function AccountContent() {
     <>
       <Breadcrumbs items={breadcrumbItems} />
       <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center relative">
-        <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
+        <div className="w-[408px] flex flex-col max-w-full justify-center mb-4 custom:mb-0 gap-4">
           <WorkflowCard />
+          {selectedAccount && (
+            <AccountDetailsCard
+              isSubmitting={(value: boolean) => setLoading(value)}
+              details={selectedAccount}
+            />
+          )}
+          <PaymentMethod />
         </div>
         <div className="w-[408px] flex flex-col max-w-full flex justify-center mb-4 custom:mb-0 gap-4">
           <PropertyApprovalCard
@@ -48,7 +77,7 @@ function AccountContent() {
           />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
-          <DepositAccountsCard />
+          <DepositAccountsCard isEditable={!isLoading} />
         </div>
       </div>
     </>

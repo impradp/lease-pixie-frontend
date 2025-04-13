@@ -1,6 +1,8 @@
-import { cookieHandler } from "@/lib/services/cookieHandler";
-
+/**
+ * Maps roles to their accessible routes
+ */
 export const roleAccessMap: Record<string, string[]> = {
+  // Defines routes accessible by each role
   ADMINUSER: ["/admin", "/dashboard", "/workflows", "/portfolio", "/account"],
   ACCOUNTUSER: [
     "/account",
@@ -18,7 +20,11 @@ export const roleAccessMap: Record<string, string[]> = {
   INQUIRY: ["/inquiry", "/inquiry/new", "/inquiry/history"],
 };
 
+/**
+ * Defines default landing pages for each role
+ */
 export const defaultPages: Record<string, string> = {
+  // Specifies default page for each role
   ADMINUSER: "/dashboard",
   ACCOUNTUSER: "/account",
   PORTFOLIO: "/portfolio",
@@ -26,7 +32,11 @@ export const defaultPages: Record<string, string> = {
   INQUIRY: "/inquiry",
 };
 
+/**
+ * Lists publicly accessible routes
+ */
 export const publicRoutes = [
+  // Routes accessible without authentication
   "/reset",
   "/forgot-password",
   "/reset-password",
@@ -35,14 +45,30 @@ export const publicRoutes = [
   "/property/create",
 ];
 
-export const FALLBACK_DEFAULT_PAGE = "/login";
+/**
+ * Fallback page for invalid or missing roles
+ */
+export const FALLBACK_DEFAULT_PAGE = "/login"; // Default redirect for unauthenticated users
 
+/**
+ * Checks if a role has access to a specific path
+ * @param role - The user's role
+ * @param path - The requested path
+ * @returns boolean - Whether the role has access
+ */
 export function hasAccess(role: string, path: string): boolean {
+  // Verifies if role can access path
   const allowedURIs = roleAccessMap[role] || [];
   return allowedURIs.some((uri) => path === uri || path.startsWith(uri + "/"));
 }
 
+/**
+ * Retrieves the default page for a user based on their token
+ * @param token - Optional authentication token
+ * @returns string - The default page URL
+ */
 export function getDefaultPage(token?: string): string {
+  // Determines default page from token
   try {
     let authToken: string | undefined;
     if (token) {
@@ -67,11 +93,14 @@ export function getDefaultPage(token?: string): string {
       Buffer.from(payloadEncoded, "base64").toString("utf-8")
     );
 
-    const userRole = payload.role.toUpperCase();
+    const userRole = payload.role?.toUpperCase();
+    if (!userRole || !defaultPages[userRole]) {
+      return FALLBACK_DEFAULT_PAGE;
+    }
+
     return defaultPages[userRole];
   } catch {
-    //TODO: Log error
-    cookieHandler.clearAuthToken();
+    // Returns fallback page on error
     return FALLBACK_DEFAULT_PAGE;
   }
 }

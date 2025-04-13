@@ -2,8 +2,8 @@ import { useRouter } from "next/navigation";
 import React, { useState, useContext } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import toastr from "@/lib/func/toastr";
 import { MenuItem } from "@/types/menuItem";
+import handleInfo from "@/lib/utils/errorHandler";
 import { loginService } from "@/lib/services/login";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
@@ -56,12 +56,12 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
     try {
       setLoading(true);
       loginService.logout();
-      router.push("/login?loggedOut=true");
+      router.push("/login?msg=100303");
       onClose();
-    } catch {
-      toastr({
-        message: "Failed to sign out. Please try again.",
-        toastrType: "warning",
+    } catch (err) {
+      handleInfo({
+        code: 100302,
+        error: err,
       });
     } finally {
       setLoading(false);

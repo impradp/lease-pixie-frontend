@@ -14,8 +14,7 @@ export class CookieHandler {
 
   // Clear the auth_token cookie
   clearAuthToken(): void {
-    document.cookie =
-      "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    document.cookie = "auth_token=; path=/; max-age=0";
   }
 
   // Get login attempts data

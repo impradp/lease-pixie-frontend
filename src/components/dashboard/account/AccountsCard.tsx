@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
 import { defaultData } from "@/data/accounts";
-import handleError from "@/lib/utils/errorHandler";
+import handleInfo from "@/lib/utils/errorHandler";
 import { accountService } from "@/lib/services/account";
 import CompanyInfo from "@/components/dashboard/CompanyInfo";
 import AccountForm from "@/components/dashboard/account/AccountForm";
@@ -64,13 +63,10 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
       if (response.status === "SUCCESS") {
         setAccounts(response?.data);
       } else {
-        handleError({ message: "Error fetching accounts." });
+        handleInfo({ code: 100103 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while fetching accounts.",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100104, error: err });
     } finally {
       isSubmitting(false);
     }
@@ -106,21 +102,13 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
       const response = await accountService.create(userData);
 
       if (response?.status === "SUCCESS") {
-        toastr({
-          message: "Account created successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100100 });
         fetchAccounts();
       } else {
-        handleError({
-          message: "Account creation failed.",
-        });
+        handleInfo({ code: 100105 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while creating account.",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100106, error: err });
     }
   };
 
@@ -131,21 +119,13 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
       const response = await accountService.update(accountId, userData);
 
       if (response?.status === "SUCCESS") {
-        toastr({
-          message: "Account updated successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100107 });
         fetchAccounts();
       } else {
-        handleError({
-          message: "Account update failed.",
-        });
+        handleInfo({ code: 100108 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while updating account.",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100109, error: err });
     }
   };
 
@@ -172,28 +152,18 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
       const response = await accountService.updateAccess(accountId, isLocked);
 
       if (response?.status === "SUCCESS") {
-        toastr({
-          message: `Account access ${
-            isLocked ? "locked" : "unlocked"
-          } successfully.`,
-          toastrType: "success",
-        });
+        handleInfo({ code: isLocked ? 100110 : 100111 });
         return true;
       } else {
         // Revert on failure
         setAccounts(previousAccounts);
-        handleError({
-          message: "Failed to update account access.",
-        });
+        handleInfo({ code: 100112 });
         return false;
       }
-    } catch (error) {
+    } catch (err) {
       // Revert on exception
       setAccounts(previousAccounts);
-      handleError({
-        message: "Exception occurred while updating account access.",
-        error,
-      });
+      handleInfo({ code: 100113, error: err });
       return false;
     }
   };

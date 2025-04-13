@@ -5,7 +5,7 @@ import { DropdownOption } from "@/types/user";
 import { PropertyInfoData } from "@/types/PropertyInfo";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CustomInput from "@/components/ui/input/CustomInput";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { PixieDatePicker } from "../ui/datePicker/PixieDatePicker";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
@@ -451,7 +451,7 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <CancelButton onClick={handleTextClose} />
+              <LinkButton onClick={handleTextClose} />
             </div>
           )}
         </form>

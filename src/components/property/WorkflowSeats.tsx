@@ -1,44 +1,59 @@
-import React, { useState, useEffect } from "react";
+"use client";
 
-import toastr from "@/lib/func/toastr";
+import React, { useState, useEffect } from "react";
 import { DropdownOption } from "@/types/user";
+import handleInfo from "@/lib/utils/errorHandler";
 import { NewVendorFormData } from "@/types/vendor";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { NewVendor } from "@/components/portfolio/vendor/NewVendor";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
 
+/**
+ * Form data structure for workflow seats
+ */
 interface WorkflowSeatsFormData {
-  maintenanceSeat: DropdownOption | undefined;
-  accountingSeat: DropdownOption | undefined;
-  leaseSeat: DropdownOption | undefined;
-  billPaySeat: DropdownOption | undefined;
+  maintenanceSeat: DropdownOption | undefined; // Selected maintenance seat
+  accountingSeat: DropdownOption | undefined; // Selected accounting seat
+  leaseSeat: DropdownOption | undefined; // Selected lease seat
+  billPaySeat: DropdownOption | undefined; // Selected bill pay seat
 }
 
+/**
+ * Options for seat dropdowns
+ */
 interface SeatOptions {
-  maintenanceSeats: DropdownOption[];
-  accountingSeats: DropdownOption[];
-  leaseSeats: DropdownOption[];
-  billPaySeats: DropdownOption[];
+  maintenanceSeats: DropdownOption[]; // Options for maintenance seats
+  accountingSeats: DropdownOption[]; // Options for accounting seats
+  leaseSeats: DropdownOption[]; // Options for lease seats
+  billPaySeats: DropdownOption[]; // Options for bill pay seats
 }
 
+/**
+ * Props for the WorkflowSeats component
+ */
 interface WorkflowSeatsProps {
-  label?: string;
-  initialFormData: WorkflowSeatsFormData;
-  onFormDataChange: (formData: WorkflowSeatsFormData) => void;
-  seatOptions: SeatOptions;
-  showInfo?: boolean;
-  infoContents?: string[];
-  sectionId: string;
-  editingSection: string | null;
-  onSectionEdit: (section: string) => void;
-  onSectionClose: () => void;
-  subLabels: string[];
+  label?: string; // Label for the component
+  initialFormData: WorkflowSeatsFormData; // Initial seat selections
+  onFormDataChange: (formData: WorkflowSeatsFormData) => void; // Callback for form data changes
+  seatOptions: SeatOptions; // Available seat options
+  showInfo?: boolean; // Whether to show info tooltips
+  infoContents?: string[]; // Content for info tooltips
+  sectionId: string; // Unique identifier for the section
+  editingSection: string | null; // Currently editing section ID
+  onSectionEdit: (section: string) => void; // Callback for entering edit mode
+  onSectionClose: () => void; // Callback for closing edit mode
+  subLabels: string[]; // Labels for dropdowns
 }
 
+/**
+ * Renders a component for managing workflow seats with dropdowns for different roles
+ * @param props - The properties for configuring the component
+ * @returns JSX.Element - The rendered workflow seats component
+ */
 const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
   label = "",
   initialFormData,
@@ -58,18 +73,26 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
   ],
 }) => {
   const [formData, setFormData] =
-    useState<WorkflowSeatsFormData>(initialFormData);
+    useState<WorkflowSeatsFormData>(initialFormData); // Current form data
   const [originalFormData, setOriginalFormData] =
-    useState<WorkflowSeatsFormData>(initialFormData);
-  const [showNewSeatModal, setShowNewSeatModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+    useState<WorkflowSeatsFormData>(initialFormData); // Original form data
+  const [showNewSeatModal, setShowNewSeatModal] = useState(false); // Controls new vendor modal visibility
+  const [isEditMode, setIsEditMode] = useState(false); // Tracks edit mode state
 
+  /**
+   * Syncs form data with initial props
+   */
   useEffect(() => {
+    // Updates state when initial form data changes
     setFormData(initialFormData);
     setOriginalFormData(initialFormData);
   }, [initialFormData]);
 
+  /**
+   * Manages body overflow based on modal visibility
+   */
   useEffect(() => {
+    // Locks/unlocks scroll when modal is open
     if (showNewSeatModal) {
       document.body.style.overflow = "hidden";
     } else {
@@ -80,69 +103,86 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
     };
   }, [showNewSeatModal]);
 
+  /**
+   * Handles adding a new vendor via API
+   * @param userData - Data for the new vendor
+   * @param setLoading - Function to toggle loading state
+   */
   const handleAddVendor = async (
     userData: NewVendorFormData,
     setLoading: (loading: boolean) => void
   ) => {
+    // Submits new vendor data
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
-
       const response = await portfolioService.addVendor(userData);
       if (response?.status === "SUCCESS") {
         setShowNewSeatModal(false);
-        toastr({
-          message: "New portfolio vendor added successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100510 });
       } else {
-        toastr({
-          message: "Error adding new portfolio vendor.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100511 });
       }
-    } catch {
-      //TODO: Handle log
-      toastr({
-        message: "Exception occured adding new portfolio vendor.",
-        toastrType: "error",
-      });
+    } catch (err) {
+      handleInfo({ code: 100512, error: err });
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Closes the new vendor modal
+   */
   const handleCloseSeatModal = () => {
+    // Hides the new vendor modal
     setShowNewSeatModal(false);
   };
 
+  /**
+   * Enters edit mode for the section
+   */
   const handleEdit = () => {
+    // Initiates edit mode if allowed
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
     }
   };
 
+  /**
+   * Cancels edit mode and reverts changes
+   */
   const handleTextClose = () => {
+    // Exits edit mode and reverts form data
     setIsEditMode(false);
     setFormData(originalFormData);
     onSectionClose();
   };
 
+  /**
+   * Saves changes and exits edit mode
+   */
   const handleUpdate = () => {
+    // Applies form changes and exits edit mode
     setIsEditMode(false);
     onFormDataChange(formData);
     onSectionClose();
   };
 
+  /**
+   * Updates a specific field in the form data
+   * @param field - The field to update
+   * @param value - The new value
+   */
   const handleFieldChange = (
     field: keyof WorkflowSeatsFormData,
     value: DropdownOption | undefined
   ) => {
+    // Updates a single seat selection
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const isEditDisabled =
-    editingSection !== null && editingSection !== sectionId;
+    editingSection !== null && editingSection !== sectionId; // Determines if edit is disabled
 
   return (
     <>
@@ -159,7 +199,6 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
           showTextCloseButton={isEditMode}
           editDisabled={isEditDisabled}
         />
-
         <CustomDropdown
           options={seatOptions.maintenanceSeats}
           value={formData.maintenanceSeat?.value}
@@ -174,14 +213,12 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
           showInfo={showInfo}
           infoContent={infoContents[0]}
         />
-
         {isEditMode && (
           <IconLinkButton
             label={`Add Vendor`}
             onClick={() => setShowNewSeatModal(true)}
           />
         )}
-
         <CustomDropdown
           options={seatOptions.accountingSeats}
           value={formData.accountingSeat?.value}
@@ -202,7 +239,6 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
             onClick={() => setShowNewSeatModal(true)}
           />
         )}
-
         <CustomDropdown
           options={seatOptions.leaseSeats}
           value={formData.leaseSeat?.value}
@@ -223,7 +259,6 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
             onClick={() => setShowNewSeatModal(true)}
           />
         )}
-
         <CustomDropdown
           options={seatOptions.billPaySeats}
           value={formData.billPaySeat?.value}
@@ -238,7 +273,6 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
           showInfo={showInfo}
           infoContent={infoContents[3]}
         />
-
         {isEditMode && (
           <>
             <IconLinkButton
@@ -252,12 +286,11 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <CancelButton onClick={handleTextClose} />
+              <LinkButton onClick={handleTextClose} />
             </div>
           </>
         )}
       </div>
-
       {showNewSeatModal && (
         <div className="fixed inset-0 z-50">
           <div className="relative z-50">

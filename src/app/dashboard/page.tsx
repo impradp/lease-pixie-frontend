@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useContext, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import toastr from "@/lib/func/toastr";
+import handleToast from "@/lib/utils/toastr";
 import { samplePortfolios } from "@/data/portfolio";
 import { sampleProperties } from "@/data/Properties";
 import BlankCard from "@/components/dashboard/BlankCard";
@@ -26,7 +26,6 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
-  const hasShownSuccessToastr = React.useRef(false);
   const { isLoading, setLoading } = useContext(LoadingContext);
 
   // Handle search input changes
@@ -51,15 +50,8 @@ function DashboardContent() {
 
   // Show success toast and redirect on initial load if login succeeded
   useEffect(() => {
-    const success = searchParams.get("success");
-    if (success === "true" && !hasShownSuccessToastr.current) {
-      toastr({
-        message: "Login successful.",
-        toastrType: "success",
-      });
-      hasShownSuccessToastr.current = true;
-      router.replace("/dashboard");
-    }
+    handleToast(searchParams);
+    router.replace("/dashboard");
   }, [searchParams, router]);
 
   // Static breadcrumb items defined outside render to avoid recreation

@@ -5,7 +5,7 @@ import toastr from "@/lib/func/toastr";
 import { DropdownOption } from "@/types/user";
 import { BankSettingsData } from "@/types/Property";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import PlaidPaymentSetup from "@/components/ui/PlaidPaymentSetup";
@@ -171,7 +171,7 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
             onClick={handleUpdate}
             className="w-full"
           />
-          <CancelButton onClick={handleTextClose} />
+          <LinkButton onClick={handleTextClose} />
         </div>
       )}
       {showPlaidSetup && (

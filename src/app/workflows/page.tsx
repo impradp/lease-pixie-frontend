@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import toastr from "@/lib/func/toastr";
 import { loggedInUser } from "@/data/users";
+import handleToast from "@/lib/utils/toastr";
 import { loginService } from "@/lib/services/login";
 import WelcomeCard from "@/components/welcome/WelcomeCard";
 import { workflows as WorkflowList } from "@/data/workflows";
@@ -30,15 +30,12 @@ function WorkflowPage() {
 
   const handleSignOut = () => {
     loginService.logout();
-    router.push("/login?loggedOut=true"); // Add query parameter for logout
+    router.push("/login?msg=100303"); // Add query parameter for logout
   };
 
   useEffect(() => {
-    const success = searchParams.get("success");
-    if (success === "true") {
-      toastr({ message: "Login successful.", toastrType: "success" });
-      router.replace("/workflows");
-    }
+    handleToast(searchParams);
+    router.replace("/workflows");
   }, [searchParams, router]);
 
   const breadcrumbItems = [

@@ -64,6 +64,7 @@ const config: Config = {
           neutralGray: "#dddddd",
           offBlack: "#232323",
           muteBlueGray: "#878aa4",
+          lightPeach: "#fef6ee",
         },
         card: {
           open: {

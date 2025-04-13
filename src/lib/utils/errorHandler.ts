@@ -1,27 +1,29 @@
 import toastr from "@/lib/func/toastr";
+import { decodeMsg, MessageCode } from "@/lib/constants/message";
 
 interface HandleErrorOptions {
-  message: string;
+  code: MessageCode;
   error?: unknown; // Optional original error object for logging
 }
 
 /**
- * Handles errors by logging them and displaying a toast notification
+ * Handles info by logging them and displaying a toast notification
  * @param options - Error handling options
  */
-const handleError = ({ message, error }: HandleErrorOptions): void => {
+const handleInfo = ({ code, error }: HandleErrorOptions): void => {
   // Log the error to console (you could replace this with a more sophisticated logging service)
+  const info = decodeMsg(code);
   if (error) {
-    console.error(`Exception: ${message}`, error);
+    console.error(`Exception: ${info.message}`, error);
   } else {
-    console.error(`Error: ${message}`);
+    console.error(`Error: ${info.message}`);
   }
 
   // Display toast notification
   toastr({
-    message: `${message}`, // You could customize the format further if needed
-    toastrType: "error",
+    message: `${info.message}`, // You could customize the format further if needed
+    toastrType: `${info.type}`,
   });
 };
 
-export default handleError;
+export default handleInfo;

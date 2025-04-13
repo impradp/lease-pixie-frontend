@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 // Dynamically import AddressAutocompleteInput with SSR disabled
@@ -49,6 +49,8 @@ const AccountForm: React.FC<AccountFormProps> = ({
   const [isLoading, setIsLoading] = useState(false); // State for form submission loading
   const isFormDisabled = isLoading || disabled; // Combined disabled state
 
+  const isReadonly = isEditForm;
+
   // Effect to manage body overflow and scrollbar padding
   useEffect(() => {
     const scrollbarWidth =
@@ -70,12 +72,12 @@ const AccountForm: React.FC<AccountFormProps> = ({
    */
   const validateForm = (): boolean => {
     const isValid =
-      formData.companyName.trim() &&
-      formData.address.trim() &&
-      formData.contactFirstName.trim() &&
-      formData.contactLastName.trim() &&
-      formData.email.trim() &&
-      formData.mobileNumber.trim();
+      formData?.companyName?.trim() &&
+      formData?.address?.trim() &&
+      formData?.contactFirstName?.trim() &&
+      formData?.contactLastName?.trim() &&
+      formData?.email?.trim() &&
+      formData?.mobileNumber?.trim();
     return !!isValid;
   };
 
@@ -147,7 +149,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
               value={formData.companyName ?? ""}
               onChange={(value) => handleInputChange("companyName", value)}
               isEditing={true}
-              disabled={isFormDisabled}
+              disabled={isFormDisabled || isReadonly}
               isRequired={true}
             />
             <AddressAutocompleteInput
@@ -211,7 +213,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
               onChange={(value) => handleInputChange("email", value)}
               isEditing={true}
               type="email"
-              disabled={isFormDisabled}
+              disabled={isFormDisabled || isReadonly}
               isRequired={true}
             />
             <div className="flex flex-col gap-3">
@@ -221,7 +223,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
                 type="submit"
                 isLoading={isLoading}
               />
-              <CancelButton onClick={handleClose} disabled={isFormDisabled} />
+              <LinkButton onClick={handleClose} disabled={isFormDisabled} />
             </div>
           </form>
         </div>

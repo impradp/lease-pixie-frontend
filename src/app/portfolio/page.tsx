@@ -7,7 +7,6 @@ import {
   emptySecondaryUserOption,
 } from "@/data/users";
 import { Locale } from "@/locales";
-import toastr from "@/lib/func/toastr";
 import { DropdownOption } from "@/types/user";
 import { getMessages } from "@/locales/locale";
 import {
@@ -15,7 +14,7 @@ import {
   PortfolioUser,
   PortfolioVendorResponse,
 } from "@/types/Portfolio";
-import handleError from "@/lib/utils/errorHandler";
+import handleInfo from "@/lib/utils/errorHandler";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
@@ -70,13 +69,10 @@ function PortfolioContent() {
         setPrimaryUser(emptyUserOption);
         setSecondaryUser(emptySecondaryUserOption);
       } else {
-        handleError({ message: "Error fetching portfolio users" });
+        handleInfo({ code: 100501 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while fetching portfolio users",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100502, error: err });
       setUsers([emptyUserOption]);
       setSecondaryUsers([emptySecondaryUserOption]);
     } finally {
@@ -101,13 +97,10 @@ function PortfolioContent() {
         setSecondaryVendor(emptyVendorOption);
         setTertiaryVendor(emptyVendorOption);
       } else {
-        handleError({ message: "Error fetching portfolio vendors" });
+        handleInfo({ code: 100503 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while fetching portfolio vendors",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100504, error: err });
       setVendors([emptyVendorOption]);
     } finally {
       setLoading(false);
@@ -123,9 +116,7 @@ function PortfolioContent() {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      handleError({
-        message: "Required fields (*) are empty.",
-      });
+      handleInfo({ code: 100000 });
       return;
     }
     setLoading(true);
@@ -149,10 +140,7 @@ function PortfolioContent() {
 
       const response = await portfolioService.create(formData);
       if (response.status === "SUCCESS") {
-        toastr({
-          message: "Portfolio created successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100500 });
         setPortfolioName("");
         setPrimaryUser(emptyUserOption);
         setSecondaryUser(emptySecondaryUserOption);
@@ -161,13 +149,10 @@ function PortfolioContent() {
         setTertiaryVendor(emptyVendorOption);
         setEditingSection(null);
       } else {
-        handleError({ message: "Error creating portfolio" });
+        handleInfo({ code: 100505 });
       }
-    } catch (error) {
-      handleError({
-        message: "Exception occurred while creating portfolio",
-        error,
-      });
+    } catch (err) {
+      handleInfo({ code: 100505, error: err });
     } finally {
       setLoading(false);
     }

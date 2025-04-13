@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { Info } from "lucide-react";
 
@@ -93,7 +93,7 @@ const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
             isLoading={isLoading}
             className="w-full px-3.5 py-2.5 bg-black rounded text-white text-sm font-semibold font-['Inter'] leading-tight shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_-2px_0px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] outline outline-2 outline-offset-[-2px] outline-white/10"
           />
-          <CancelButton
+          <LinkButton
             onClick={onClose}
             label="Remove Plaid Link"
             className="w-full text-[#475466] text-sm font-semibold font-['Inter'] underline leading-tight text-center"

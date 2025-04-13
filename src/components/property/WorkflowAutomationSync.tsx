@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { RefreshCcw } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
@@ -834,7 +834,7 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
               formId="portfolio-automation-card"
               className="w-full"
             />
-            <CancelButton onClick={handleCancel} />
+            <LinkButton onClick={handleCancel} />
           </div>
         )}
       </div>

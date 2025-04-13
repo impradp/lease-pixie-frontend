@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
+
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Account } from "@/types/Account";
 import { Pills } from "@/components/ui/pills";
@@ -27,6 +29,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   onToggleAccess,
   onEditClick,
 }) => {
+  const router = useRouter();
   const [isInvoicesOpen, setIsInvoicesOpen] = useState(false); // State for invoices section visibility
   const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false); // State for portfolios section visibility
   const [portfolioCostOpen, setPortfolioCostOpen] = useState<{
@@ -84,8 +87,9 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
    * Handles dashboard button click
    */
   const onDashboardClick = () => {
-    console.log("Dashboard clicked");
-    // TODO: Add dashboard navigation logic
+    if (details?.id) {
+      router.push(`/account?id=${details.id}`); // Route to /account/{id}
+    }
   };
 
   /**

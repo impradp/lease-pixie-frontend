@@ -1,39 +1,48 @@
-import React, { useState, useEffect } from "react";
+"use client";
 
-import toastr from "@/lib/func/toastr";
+import React, { useState, useEffect } from "react";
 import { DropdownOption } from "@/types/user";
+import handleInfo from "@/lib/utils/errorHandler";
 import { NewVendorFormData } from "@/types/vendor";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { NewVendor } from "@/components/portfolio/vendor/NewVendor";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
 
+/**
+ * Props for the PortfolioVendors component
+ */
 interface PortfolioVendorsProps {
-  label?: string;
-  selectedVendor?: DropdownOption;
-  selectedSecondaryVendor?: DropdownOption;
-  selectedTertiaryVendor?: DropdownOption;
-  onVendorChange?: (vendor: DropdownOption) => void;
-  onSecondaryVendorChange?: (vendor: DropdownOption) => void;
-  onTertiaryVendorChange?: (vendor: DropdownOption) => void;
-  vendors: DropdownOption[];
-  secondaryVendors: DropdownOption[];
-  tertiaryVendors: DropdownOption[];
-  onAddVendor?: (vendorData: NewVendorFormData) => void;
-  showInfo?: boolean;
-  infoContents?: string[];
-  vendorType?: string;
-  sectionId: string;
-  editingSection: string | null;
-  onSectionEdit: (section: string) => void;
-  onSectionClose: () => void;
-  subLabels: string[];
-  refreshVendors: () => void;
+  label?: string; // Label for the component
+  selectedVendor?: DropdownOption; // Primary selected vendor
+  selectedSecondaryVendor?: DropdownOption; // Secondary selected vendor
+  selectedTertiaryVendor?: DropdownOption; // Tertiary selected vendor
+  onVendorChange?: (vendor: DropdownOption) => void; // Callback for primary vendor change
+  onSecondaryVendorChange?: (vendor: DropdownOption) => void; // Callback for secondary vendor change
+  onTertiaryVendorChange?: (vendor: DropdownOption) => void; // Callback for tertiary vendor change
+  vendors: DropdownOption[]; // List of available primary vendors
+  secondaryVendors: DropdownOption[]; // List of available secondary vendors
+  tertiaryVendors: DropdownOption[]; // List of available tertiary vendors
+  onAddVendor?: (vendorData: NewVendorFormData) => void; // Callback for adding a new vendor
+  showInfo?: boolean; // Whether to show info tooltips
+  infoContents?: string[]; // Content for info tooltips
+  vendorType?: string; // Type of vendor (e.g., Vendor)
+  sectionId: string; // Unique identifier for the section
+  editingSection: string | null; // Currently editing section ID
+  onSectionEdit: (section: string) => void; // Callback for entering edit mode
+  onSectionClose: () => void; // Callback for closing edit mode
+  subLabels: string[]; // Labels for dropdowns
+  refreshVendors: () => void; // Callback to refresh vendor list
 }
 
+/**
+ * Renders a component for managing primary, secondary, and tertiary portfolio vendors
+ * @param props - The properties for configuring the component
+ * @returns JSX.Element - The rendered portfolio vendors component
+ */
 export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
   label = "",
   selectedVendor,
@@ -55,26 +64,30 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
   subLabels = ["Selected Vendor 1", "Selected Vendor 2", "Selected Vendor 3"],
   refreshVendors,
 }) => {
-  const [showNewVendorModal, setShowNewVendorModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedVendor, setEditedVendor] = useState(selectedVendor);
+  const [showNewVendorModal, setShowNewVendorModal] = useState(false); // Controls new vendor modal visibility
+  const [isEditMode, setIsEditMode] = useState(false); // Tracks edit mode state
+  const [editedVendor, setEditedVendor] = useState(selectedVendor); // Tracks edited primary vendor
   const [editedSecondaryVendor, setEditedSecondaryVendor] = useState(
     selectedSecondaryVendor
-  );
+  ); // Tracks edited secondary vendor
   const [editedTertiaryVendor, setEditedTertiaryVendor] = useState(
     selectedTertiaryVendor
-  );
-  const [originalVendor, setOriginalVendor] = useState(selectedVendor);
+  ); // Tracks edited tertiary vendor
+  const [originalVendor, setOriginalVendor] = useState(selectedVendor); // Stores original primary vendor
   const [originalSecondaryVendor, setOriginalSecondaryVendor] = useState(
     selectedSecondaryVendor
-  );
+  ); // Stores original secondary vendor
   const [originalTertiaryVendor, setOriginalTertiaryVendor] = useState(
     selectedTertiaryVendor
-  );
+  ); // Stores original tertiary vendor
 
-  const isEditing = isEditMode;
+  const isEditing = isEditMode; // Alias for edit mode state
 
+  /**
+   * Syncs original and edited vendor selections with props
+   */
   useEffect(() => {
+    // Updates state when selected vendors change
     setOriginalVendor(selectedVendor);
     setOriginalSecondaryVendor(selectedSecondaryVendor);
     setOriginalTertiaryVendor(selectedTertiaryVendor);
@@ -83,7 +96,11 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     setEditedTertiaryVendor(selectedTertiaryVendor);
   }, [selectedVendor, selectedSecondaryVendor, selectedTertiaryVendor]);
 
+  /**
+   * Manages body overflow based on modal visibility
+   */
   useEffect(() => {
+    // Locks/unlocks scroll when modal is open
     if (showNewVendorModal) {
       document.body.style.overflow = "hidden";
     } else {
@@ -94,50 +111,57 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     };
   }, [showNewVendorModal]);
 
+  /**
+   * Handles adding a new vendor via API
+   * @param userData - Data for the new vendor
+   * @param setLoading - Function to toggle loading state
+   */
   const handleAddVendor = async (
     userData: NewVendorFormData,
     setLoading: (loading: boolean) => void
   ) => {
+    // Submits new vendor data and refreshes list
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
-
       const response = await portfolioService.addVendor(userData);
       if (response?.status === "SUCCESS") {
         setShowNewVendorModal(false);
-        toastr({
-          message: "New portfolio vendor added successfully.",
-          toastrType: "success",
-        });
+        handleInfo({ code: 100510 });
         refreshVendors();
       } else {
-        toastr({
-          message: "Error adding new portfolio vendor.",
-          toastrType: "error",
-        });
+        handleInfo({ code: 100511 });
       }
-    } catch {
-      //TODO: Handle log
-      toastr({
-        message: "Exception occured adding new portfolio vendor.",
-        toastrType: "error",
-      });
+    } catch (err) {
+      handleInfo({ code: 100512, error: err });
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Closes the new vendor modal
+   */
   const handleCloseVendorModal = () => {
+    // Hides the new vendor modal
     setShowNewVendorModal(false);
   };
 
+  /**
+   * Enters edit mode for the section
+   */
   const handleEdit = () => {
+    // Initiates edit mode if allowed
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
     }
   };
 
+  /**
+   * Cancels edit mode and reverts changes
+   */
   const handleTextClose = () => {
+    // Exits edit mode and reverts vendor selections
     setIsEditMode(false);
     setEditedVendor(originalVendor);
     setEditedSecondaryVendor(originalSecondaryVendor);
@@ -145,7 +169,11 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     onSectionClose();
   };
 
+  /**
+   * Saves changes and exits edit mode
+   */
   const handleUpdate = () => {
+    // Applies vendor changes and exits edit mode
     setIsEditMode(false);
     if (onVendorChange && editedVendor) {
       onVendorChange(editedVendor);
@@ -159,20 +187,35 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     onSectionClose();
   };
 
+  /**
+   * Updates the edited primary vendor
+   * @param vendor - The selected vendor
+   */
   const handleVendorChange = (vendor: DropdownOption) => {
+    // Updates primary vendor selection
     setEditedVendor(vendor);
   };
 
+  /**
+   * Updates the edited secondary vendor
+   * @param vendor - The selected vendor
+   */
   const handleSecondaryVendorChange = (vendor: DropdownOption) => {
+    // Updates secondary vendor selection
     setEditedSecondaryVendor(vendor);
   };
 
+  /**
+   * Updates the edited tertiary vendor
+   * @param vendor - The selected vendor
+   */
   const handleTertiaryVendorChange = (vendor: DropdownOption) => {
+    // Updates tertiary vendor selection
     setEditedTertiaryVendor(vendor);
   };
 
   const isEditDisabled =
-    editingSection !== null && editingSection !== sectionId;
+    editingSection !== null && editingSection !== sectionId; // Determines if edit is disabled
 
   return (
     <>
@@ -189,7 +232,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
           showTextCloseButton={isEditMode}
           editDisabled={isEditDisabled}
         />
-
         <CustomDropdown
           options={vendors}
           value={editedVendor?.value}
@@ -206,7 +248,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
             onClick={() => setShowNewVendorModal(true)}
           />
         )}
-
         <CustomDropdown
           options={secondaryVendors}
           value={editedSecondaryVendor?.value}
@@ -223,7 +264,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
             onClick={() => setShowNewVendorModal(true)}
           />
         )}
-
         <CustomDropdown
           options={tertiaryVendors}
           value={editedTertiaryVendor?.value}
@@ -247,12 +287,11 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <CancelButton onClick={handleTextClose} />
+              <LinkButton onClick={handleTextClose} />
             </div>
           </>
         )}
       </div>
-
       {showNewVendorModal && (
         <div className="fixed inset-0 z-50">
           <div className="relative z-50">

@@ -6,7 +6,7 @@ import SubHeader from "@/components/ui/header/SubHeader";
 import { InvoiceSettingsData } from "@/types/InvoiceSettings";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import CustomInput from "@/components/ui/input/CustomInput";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import CustomTextArea from "@/components/ui/input/CustomTextArea";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
@@ -294,7 +294,7 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
               onClick={handleUpdate}
               className="w-full"
             />
-            <CancelButton onClick={handleTextClose} />
+            <LinkButton onClick={handleTextClose} />
           </div>
         )}
       </form>

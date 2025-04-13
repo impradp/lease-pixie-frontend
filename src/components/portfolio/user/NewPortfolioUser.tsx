@@ -6,7 +6,7 @@ import { getMessages } from "@/locales/locale";
 import { NewUserFormData } from "@/types/user";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 interface NewPortfolioUserProps {
@@ -152,7 +152,7 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
                 disabled={isLoading}
                 isLoading={isLoading}
               />
-              <CancelButton onClick={onClose} />
+              <LinkButton onClick={onClose} />
             </div>
           </form>
         </div>

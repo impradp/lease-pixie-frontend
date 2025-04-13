@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import CancelButton from "@/components/ui/buttons/CancelButton";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 
 describe("CancelButton Component", () => {
   const defaultProps = {
@@ -12,13 +12,13 @@ describe("CancelButton Component", () => {
   });
 
   it('renders with the text "Cancel"', () => {
-    render(<CancelButton {...defaultProps} />);
+    render(<LinkButton {...defaultProps} />);
 
     expect(screen.getByText("Cancel")).toBeInTheDocument();
   });
 
   it("calls onClick handler when clicked", () => {
-    render(<CancelButton {...defaultProps} />);
+    render(<LinkButton {...defaultProps} />);
 
     const button = screen.getByRole("button");
     fireEvent.click(button);
@@ -27,14 +27,14 @@ describe("CancelButton Component", () => {
   });
 
   it('has type="button" attribute', () => {
-    render(<CancelButton {...defaultProps} />);
+    render(<LinkButton {...defaultProps} />);
 
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("type", "button");
   });
 
   it("applies default classes", () => {
-    render(<CancelButton {...defaultProps} />);
+    render(<LinkButton {...defaultProps} />);
 
     const button = screen.getByRole("button");
     expect(button).toHaveClass(
@@ -47,14 +47,14 @@ describe("CancelButton Component", () => {
   });
 
   it("applies additional custom classes when provided", () => {
-    render(<CancelButton {...defaultProps} className="custom-class" />);
+    render(<LinkButton {...defaultProps} className="custom-class" />);
 
     const button = screen.getByRole("button");
     expect(button).toHaveClass("custom-class");
   });
 
   it("renders as a button element", () => {
-    render(<CancelButton {...defaultProps} />);
+    render(<LinkButton {...defaultProps} />);
 
     const button = screen.getByText("Cancel");
     expect(button.tagName).toBe("BUTTON");
@@ -62,7 +62,7 @@ describe("CancelButton Component", () => {
 
   it("applies all classes together in the correct order", () => {
     const customClass = "mt-4 ml-2";
-    render(<CancelButton {...defaultProps} className={customClass} />);
+    render(<LinkButton {...defaultProps} className={customClass} />);
 
     const button = screen.getByRole("button");
     const classNames = button.className.split(" ");
