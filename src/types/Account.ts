@@ -24,7 +24,7 @@ export interface Account {
   portfolios?: Portfolio[];
   services?: string[]; // Updated to string[] for raw backend data
   actions?: string[];
-  isAccessLocked: boolean;
+  isLocked?: boolean;
   invoices?: Invoice[];
 }
 

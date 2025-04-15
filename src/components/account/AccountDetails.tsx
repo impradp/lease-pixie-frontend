@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { Account } from "@/types/Account";
 import handleInfo from "@/lib/utils/errorHandler";
 import { accountService } from "@/lib/services/account";
@@ -14,6 +14,7 @@ import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 interface AccountDetailsProps {
   details: Account;
   isSubmitting: (value: boolean) => void;
+  onAccountUpdated: () => void; // Added callback for refetch
 }
 
 /**
@@ -24,36 +25,15 @@ interface AccountDetailsProps {
 const AccountDetails: React.FC<AccountDetailsProps> = ({
   details,
   isSubmitting,
+  onAccountUpdated,
 }) => {
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [displayEditFeature, setDisplayEditFeature] = useState(true);
-  const [selectedAccount, setSelectedAccount] = useState<Account>(details);
 
   const handleCloseAccountModal = () => {
     setShowAccountForm(false);
     setDisplayEditFeature(false);
   };
-
-  // Fetch accounts for admin
-  const fetchAccounts = useCallback(async () => {
-    isSubmitting(true);
-    try {
-      if (selectedAccount?.id) {
-        const response = await accountService.fetchById(
-          Number(selectedAccount.id)
-        );
-        if (response.status === "SUCCESS") {
-          setSelectedAccount(response?.data);
-        } else {
-          handleInfo({ code: 100103 });
-        }
-      }
-    } catch (err) {
-      handleInfo({ code: 100104, error: err });
-    } finally {
-      isSubmitting(false);
-    }
-  }, [isSubmitting]);
 
   const handleEditAccount = async (userData: Account) => {
     try {
@@ -64,7 +44,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
         const response = await accountService.update(userData.id, userData);
         if (response?.status === "SUCCESS") {
           handleInfo({ code: 100107 });
-          fetchAccounts();
+          onAccountUpdated();
         } else {
           handleInfo({ code: 100108 });
         }
@@ -153,7 +133,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       {showAccountForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <AccountForm
-            data={selectedAccount}
+            data={details}
             isEditForm={displayEditFeature}
             onClose={handleCloseAccountModal}
             onSubmit={handleEditAccount}

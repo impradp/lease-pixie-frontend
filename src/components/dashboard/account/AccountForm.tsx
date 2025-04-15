@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import toastr from "@/lib/func/toastr";
 import { Account } from "@/types/Account";
+import handleInfo from "@/lib/utils/errorHandler";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
@@ -90,10 +90,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
     if (isFormDisabled) return;
 
     if (!validateForm()) {
-      toastr({
-        message: "Required fields (*) are empty.",
-        toastrType: "error",
-      });
+      handleInfo({ code: 100000 });
       return;
     }
 

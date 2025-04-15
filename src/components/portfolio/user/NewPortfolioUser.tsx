@@ -27,7 +27,7 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
     lastName: "",
     email: "",
     phoneNumber: "",
-    mobilePhone: "",
+    mobileNumber: "",
   });
 
   const [locale] = useState<Locale>("en");

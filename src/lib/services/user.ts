@@ -2,6 +2,12 @@
 
 import { apiService } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/constants/endpoints";
+import {
+  ReadOnlyAdminUser,
+  ReadOnlyAdminUserResponse,
+  ReadOnlyAdminUsersResponse,
+} from "@/types/ReadOnlyAdminUser";
+import { interpolate } from "../utils/stringUtils";
 
 interface UserResponse {
   id: number;
@@ -14,6 +20,29 @@ class UserService {
     const endpoint = ENDPOINTS.USER.SELF ?? "/api/user/self";
     const response = await apiService.get<UserResponse>(endpoint);
     return response;
+  }
+
+  async createROAdminUser(
+    userData: ReadOnlyAdminUser
+  ): Promise<ReadOnlyAdminUserResponse> {
+    return await apiService.post<ReadOnlyAdminUserResponse>(
+      ENDPOINTS.USER.ADMIN.DEFAULT,
+      userData
+    );
+  }
+
+  async deleteROAdminUser(
+    id: number | string
+  ): Promise<ReadOnlyAdminUserResponse> {
+    return await apiService.delete<ReadOnlyAdminUserResponse>(
+      interpolate(ENDPOINTS.USER.ADMIN.DELETE, id)
+    );
+  }
+
+  async fetchROAdminUsers(): Promise<ReadOnlyAdminUsersResponse> {
+    return await apiService.get<ReadOnlyAdminUsersResponse>(
+      ENDPOINTS.USER.ADMIN.DEFAULT
+    );
   }
 }
 

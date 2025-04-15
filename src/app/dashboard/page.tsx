@@ -34,11 +34,6 @@ function DashboardContent() {
     // No need to manually filter here as the useEffect will handle it
   };
 
-  // Handle adding a new user (placeholder for future implementation)
-  const handleAddUser = () => {
-    // TODO: Implement add user logic
-  };
-
   // Filter properties and portfolios directly in render
   const filteredProperties = sampleProperties.filter((property) =>
     property.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -83,7 +78,10 @@ function DashboardContent() {
             isSubmitting={(value: boolean) => setLoading(value)}
           />
           <PropertyUsersCard />
-          <ROAdminUsersCard onAddUser={handleAddUser} />
+          <ROAdminUsersCard
+            isEditable={!isLoading}
+            isSubmitting={(value: boolean) => setLoading(value)}
+          />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
           <AccountsCard

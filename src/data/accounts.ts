@@ -43,6 +43,6 @@ export const defaultData: Account = {
   portfolios: [],
   services: [],
   actions: [],
-  isAccessLocked: false,
+  isLocked: false,
   invoices: [],
 };

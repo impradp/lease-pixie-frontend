@@ -36,15 +36,15 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
     [key: string]: boolean;
   }>({}); // State for individual portfolio cost visibility
   const [isAccessLocked, setIsAccessLocked] = useState(
-    details?.isAccessLocked || false
+    details?.isLocked || false
   ); // State for access lock status
 
   /**
    * Syncs local access lock state with prop changes
    */
   useEffect(() => {
-    setIsAccessLocked(details?.isAccessLocked || false);
-  }, [details?.isAccessLocked]);
+    setIsAccessLocked(details?.isLocked || false);
+  }, [details?.isLocked]);
 
   /**
    * Toggles the visibility of the invoices section

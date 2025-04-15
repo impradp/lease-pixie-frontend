@@ -8,6 +8,10 @@ export const ENDPOINTS = {
   },
   USER: {
     SELF: "/api/index",
+    ADMIN: {
+      DEFAULT: "/api/v1/admin",
+      DELETE: "/api/v1/admin/%s",
+    },
   },
   ACCOUNT: {
     DEFAULT: "/api/v1/account",

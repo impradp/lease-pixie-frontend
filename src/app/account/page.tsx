@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, Suspense, useState, useContext } from "react";
-import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Account } from "@/types/Account";
 import handleToast from "@/lib/utils/toastr";
 import { getDefaultPage } from "@/config/roleAccess";
 import { accountService } from "@/lib/services/account";
+import PaymentMethod from "@/components/account/PaymentMethod";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
@@ -15,22 +16,17 @@ import { LoadingContext } from "@/components/ClientLoadingWrapper";
 import AccountDetailsCard from "@/components/account/AccountDetails";
 import DepositAccountsCard from "@/components/account/DepositAccountCard";
 import PropertyApprovalCard from "@/components/dashboard/property/PropertyApprovalCard";
-import PaymentMethod from "@/components/account/PaymentMethod";
 
 function AccountContent() {
   const router = useRouter();
-  const { id } = useParams();
   const searchParams = useSearchParams();
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [selectedAccount, setSelectedAccount] = useState<Account>();
 
-  useEffect(() => {
-    handleToast(searchParams);
-    router.push("/account");
-  }, [searchParams, router]);
-
-  useEffect(() => {
-    const fetchAccountDetails = async () => {
+  // Function to fetch account details, reusable for refetching
+  const fetchAccountDetails = async (id?: string) => {
+    setLoading(true);
+    try {
       if (id) {
         const accountDetails = await accountService.fetchById(Number(id));
         if (accountDetails?.status === "SUCCESS") {
@@ -46,9 +42,21 @@ function AccountContent() {
           router.push(getDefaultPage() + "?msg=100101");
         }
       }
-    };
-    fetchAccountDetails();
-  }, [id]);
+    } catch {
+      router.push(getDefaultPage() + "?msg=100101");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleToast(searchParams);
+    const id = searchParams.get("id") ?? undefined;
+    fetchAccountDetails(id);
+    // router.push("/account");
+  }, [searchParams, router]);
+
+  // useEffect(() => {}, [id]);
 
   const breadcrumbItems = [
     { href: "#", label: "Account Dashboard", isActive: true },
@@ -64,6 +72,9 @@ function AccountContent() {
             <AccountDetailsCard
               isSubmitting={(value: boolean) => setLoading(value)}
               details={selectedAccount}
+              onAccountUpdated={() =>
+                fetchAccountDetails(selectedAccount?.id?.toString())
+              }
             />
           )}
           <PaymentMethod />

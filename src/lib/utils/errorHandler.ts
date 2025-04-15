@@ -13,10 +13,13 @@ interface HandleErrorOptions {
 const handleInfo = ({ code, error }: HandleErrorOptions): void => {
   // Log the error to console (you could replace this with a more sophisticated logging service)
   const info = decodeMsg(code);
-  if (error) {
-    console.error(`Exception: ${info.message}`, error);
-  } else {
-    console.error(`Error: ${info.message}`);
+
+  if (info.type != "success" && info.type != "info") {
+    if (error) {
+      console.error(`Exception: ${info.message}`, error);
+    } else {
+      console.error(`Error: ${info.message}`);
+    }
   }
 
   // Display toast notification

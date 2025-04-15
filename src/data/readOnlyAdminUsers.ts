@@ -3,15 +3,19 @@ import { ReadOnlyAdminUser } from "@/types/ReadOnlyAdminUser";
 const sampleReadOnlyAdminUsers: ReadOnlyAdminUser[] = [
   {
     id: "admin1",
-    name: "Jane Doe",
+    firstName: "Jane",
+    lastName: "Doe",
     email: "anedoe@gmail.com",
-    phone: "908.123.1234 (SMS On)",
+    mobileNumber: "908.123.1234 (SMS On)",
+    smsActive: true,
   },
   {
     id: "admin2",
-    name: "John Smith",
+    firstName: "John",
+    lastName: "Smith",
     email: "johnsmith@email.com",
-    phone: "555.987.6543 (SMS Off)",
+    mobileNumber: "555.987.6543 (SMS Off)",
+    smsActive: false,
   },
 ];
 

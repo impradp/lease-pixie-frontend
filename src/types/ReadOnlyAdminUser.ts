@@ -1,6 +1,20 @@
 export interface ReadOnlyAdminUser {
-  id: string;
-  name: string;
+  id?: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
+  mobileNumber: string;
+  smsActive: boolean;
+}
+
+export interface ReadOnlyAdminUserResponse {
+  status: string;
+  data: ReadOnlyAdminUser;
+  message?: string;
+}
+
+export interface ReadOnlyAdminUsersResponse {
+  status: string;
+  data: ReadOnlyAdminUser[];
+  message?: string;
 }

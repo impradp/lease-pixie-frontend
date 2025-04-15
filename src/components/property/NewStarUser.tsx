@@ -23,7 +23,7 @@ const NewStarUser: React.FC<NewStarUserProps> = ({ onClose, onSubmit }) => {
     firstName: "",
     lastName: "",
     email: "",
-    mobilePhone: "",
+    mobileNumber: "",
     phoneNumber: "",
   });
 
@@ -71,7 +71,7 @@ const NewStarUser: React.FC<NewStarUserProps> = ({ onClose, onSubmit }) => {
       formData.email.trim() &&
       formData.firstName.trim() &&
       formData.lastName.trim() &&
-      formData.mobilePhone.trim();
+      formData.mobileNumber.trim();
 
     return !!isValid;
   };
@@ -130,8 +130,8 @@ const NewStarUser: React.FC<NewStarUserProps> = ({ onClose, onSubmit }) => {
 
             <CustomInput
               label="Mobile phone"
-              value={formData.mobilePhone}
-              onChange={(value) => handleInputChange("mobilePhone", value)}
+              value={formData.mobileNumber}
+              onChange={(value) => handleInputChange("mobileNumber", value)}
               isEditing={true}
               placeholder="800-555-1234"
               type="mobile"

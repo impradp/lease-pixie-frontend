@@ -75,6 +75,38 @@ const target = {
     type: "success",
     message: "Logged out successfully.",
   } as LeasePixieToastMsg,
+  100203: {
+    type: "success",
+    message: "Read-Only Admin user created successfully.",
+  } as LeasePixieToastMsg,
+  100204: {
+    type: "error",
+    message: "Failed to create Read-Only Admin user.",
+  } as LeasePixieToastMsg,
+  100205: {
+    type: "error",
+    message: "Exception occured creating Read-Only Admin user.",
+  } as LeasePixieToastMsg,
+  100206: {
+    type: "error",
+    message: "Failed to fetch Read-Only Admin user.",
+  } as LeasePixieToastMsg,
+  100207: {
+    type: "error",
+    message: "Exception occured fetching Read-Only Admin user.",
+  } as LeasePixieToastMsg,
+  100208: {
+    type: "info",
+    message: "Read-only admin user deleted successfully.",
+  } as LeasePixieToastMsg,
+  100209: {
+    type: "error",
+    message: "Error deleting read-only admin user.",
+  } as LeasePixieToastMsg,
+  100210: {
+    type: "error",
+    message: "Exception occured deleting read-only admin user.",
+  } as LeasePixieToastMsg,
 
   //100300 series for login handle message
   100300: {
