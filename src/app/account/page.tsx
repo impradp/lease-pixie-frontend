@@ -95,7 +95,10 @@ function AccountContent() {
           />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
-          <DepositAccountsCard isEditable={!isLoading} />
+          <DepositAccountsCard
+            isEditable={!isLoading}
+            isSubmitting={(value: boolean) => setLoading(value)}
+          />
         </div>
       </div>
     </>

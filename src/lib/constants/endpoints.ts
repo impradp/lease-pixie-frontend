@@ -24,6 +24,9 @@ export const ENDPOINTS = {
       BY_ID: "/api/v1/account/%s",
     },
   },
+  DEPOSIT_ACCOUNT: {
+    DEFAULT: "/api/v1/deposit-account",
+  },
   PORTFOLIO: {
     ADD: {
       DEFAULT: "/api/v1/portfolio",

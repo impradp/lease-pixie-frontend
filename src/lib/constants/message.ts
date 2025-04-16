@@ -230,6 +230,28 @@ const target = {
     type: "error",
     message: "Exception occured fetching properties.",
   } as LeasePixieToastMsg,
+
+  //100700 series for deposit account handle message
+  100700: {
+    type: "success",
+    message: "Deposit account added successfully.",
+  } as LeasePixieToastMsg,
+  100701: {
+    type: "error",
+    message: "Failed to fetch deposit account.",
+  } as LeasePixieToastMsg,
+  100702: {
+    type: "error",
+    message: "Exception occured while fetching deposit accounts.",
+  } as LeasePixieToastMsg,
+  100703: {
+    type: "error",
+    message: "Failed to create deposit accounts.",
+  } as LeasePixieToastMsg,
+  100704: {
+    type: "error",
+    message: "Exception occured while creating deposit accounts.",
+  } as LeasePixieToastMsg,
 } as const;
 
 export type MessageCode = keyof typeof target;
