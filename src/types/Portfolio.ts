@@ -75,4 +75,11 @@ export interface PortfolioVendorListResponse {
 export interface PortfolioResponse {
   status: string;
   data: Portfolio;
+  message?: string;
+}
+
+export interface PortfolioListResponse {
+  status: string;
+  data: Portfolio[];
+  message?: string;
 }

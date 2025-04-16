@@ -7,6 +7,7 @@ import handleInfo from "@/lib/utils/errorHandler";
 import { ReadOnlyAdminUser } from "@/types/ReadOnlyAdminUser";
 import { defaultReadOnlyAdminUser } from "@/data/readOnlyAdminUser";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
+import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import ReadOnlyAdminUserForm from "@/components/dashboard/ReadOnlyAdminUserForm";
 import ROAdminUsersCardContent from "@/components/dashboard/ROAdminUsersCardContent";
 
@@ -32,10 +33,34 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
   const [readOnlyAdminUsers, setReadOnlyAdminUsers] = useState<
     ReadOnlyAdminUser[]
   >([]);
+  const [filteredReadOnlyAdminUsers, setfilteredReadOnlyAdminUsers] = useState<
+    ReadOnlyAdminUser[]
+  >([]);
   const [displayEditFeature, setDisplayEditFeature] = useState(false);
   const [selectedReadOnlyAdminUser, setSelectedReadOnlyAdminUser] =
     useState<ReadOnlyAdminUser>(defaultReadOnlyAdminUser);
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
+  const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
+    useState(false);
+
+  // Filter read only admin based on search term
+  const filterReadOnlyAdmins = useCallback(
+    (adminsToFilter: ReadOnlyAdminUser[], term: string) => {
+      return adminsToFilter.filter((admin) =>
+        [admin.firstName, admin.lastName, admin.email].some((field) =>
+          field?.toLowerCase().includes(term.toLowerCase())
+        )
+      );
+    },
+    []
+  );
+
+  // Update filtered admin users whenever accounts or searchTerm changes
+  useEffect(() => {
+    setfilteredReadOnlyAdminUsers(
+      filterReadOnlyAdmins(readOnlyAdminUsers, searchTerm)
+    );
+  }, [readOnlyAdminUsers, searchTerm, filterReadOnlyAdmins]);
 
   // Handle refresh button click
   const onRefreshClick = () => {
@@ -55,13 +80,23 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
     setShowNewUserModal(true);
   };
 
+  const onClickDelete = async (user: ReadOnlyAdminUser) => {
+    setShowPreConfirmationDialog(true);
+    setSelectedReadOnlyAdminUser(user);
+  };
+
   // Handle delete action (placeholder for API call)
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
       isSubmitting(true);
-      setShowNewUserModal(false);
+      setShowPreConfirmationDialog(false);
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const response = await userService.deleteROAdminUser(id);
+      if (!selectedReadOnlyAdminUser?.id) {
+        throw new Error("Invalid user id.");
+      }
+      const response = await userService.deleteROAdminUser(
+        selectedReadOnlyAdminUser.id
+      );
 
       if (response?.status === "SUCCESS") {
         handleInfo({ code: 100208 });
@@ -75,11 +110,6 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
       isSubmitting(false);
     }
   };
-
-  // Filter users based on search term
-  const filteredAdminUsers = readOnlyAdminUsers.filter((user) =>
-    user.firstName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   // Manage body overflow when modals are open
   useEffect(() => {
@@ -103,6 +133,11 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
       handleInfo({ code: 100207, error: err });
     }
   }, [isSubmitting]);
+
+  // Initial data fetch on component mount
+  useEffect(() => {
+    fetchROAdminUsers();
+  }, [fetchROAdminUsers]);
 
   //Handles the read-only admin user form submission
   const handleAddUser = async (userData: ReadOnlyAdminUser) => {
@@ -132,6 +167,11 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
     setSelectedReadOnlyAdminUser(defaultReadOnlyAdminUser);
   };
 
+  const handlePreConfirmationClose = () => {
+    setShowPreConfirmationDialog(false);
+    setSelectedReadOnlyAdminUser(defaultReadOnlyAdminUser);
+  };
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -148,11 +188,11 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
           isRefreshClicked={isRefreshClicked}
         />
         <div className="flex flex-col gap-3">
-          {filteredAdminUsers.map((user) => (
+          {filteredReadOnlyAdminUsers.map((user) => (
             <ROAdminUsersCardContent
               key={user.id}
               user={user}
-              onDelete={handleDelete}
+              onDelete={onClickDelete}
             />
           ))}
         </div>
@@ -168,6 +208,15 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
           />
         </div>
       )}
+
+      <PreConfirmationDialog
+        isOpen={showPreConfirmationDialog}
+        onClose={handlePreConfirmationClose}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message="Delete read-only admin user. This action will archive the read-only admin user and cannot be undone."
+        confirmButtonLabel="Delete Read-Only Admin"
+      />
     </>
   );
 };

@@ -25,10 +25,22 @@ export const ENDPOINTS = {
     },
   },
   PORTFOLIO: {
-    ADD_USER: "/api/v1/portfolio/user",
-    GET_USERS: "/api/v1/portfolio/users?attachPortfolio=%s",
-    ADD_VENDOR: "/api/v1/portfolio/vendor",
-    GET_VENDORS: "/api/v1/portfolio/vendors",
-    ADD: "/api/v1/portfolio",
+    ADD: {
+      DEFAULT: "/api/v1/portfolio",
+      VENDOR: "/api/v1/portfolio/vendor",
+      USER: "/api/v1/portfolio/user",
+    },
+    FETCH: {
+      DEFAULT: "/api/v1/portfolio",
+      BY_ID: "/api/v1/portfolio/%s",
+      VENDORS: "/api/v1/portfolio/vendors",
+      USERS: "/api/v1/portfolio/users?attachPortfolio=%s",
+    },
+  },
+
+  PROPERTY: {
+    FETCH: {
+      DEFAULT: "/api/v1/properties",
+    },
   },
 } as const;

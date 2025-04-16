@@ -8,3 +8,9 @@ export interface BankSettingsData {
   selectedBankAccount: string;
   pendingAccountApprovalFlag: boolean;
 }
+
+export interface PropertyListResponse {
+  status: string; // Status of the response (e.g., "SUCCESS", "ERROR")
+  data: Property[]; // Array of properties
+  message?: string; // Message associated with the response
+}

@@ -17,47 +17,54 @@ import AccountDetailsCard from "@/components/account/AccountDetails";
 import DepositAccountsCard from "@/components/account/DepositAccountCard";
 import PropertyApprovalCard from "@/components/dashboard/property/PropertyApprovalCard";
 
+/**
+ * AccountContent component renders the main content of the account page, including account details,
+ * payment methods, property approval, and deposit accounts.
+ */
 function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [selectedAccount, setSelectedAccount] = useState<Account>();
 
-  // Function to fetch account details, reusable for refetching
+  /**
+   * Fetches account details based on provided ID or retrieves the default account.
+   * Handles loading state and error redirection.
+   * @param id - Optional account ID to fetch specific account details
+   */
   const fetchAccountDetails = async (id?: string) => {
-    setLoading(true);
+    setLoading(true); // Set loading state to true
     try {
       if (id) {
         const accountDetails = await accountService.fetchById(Number(id));
         if (accountDetails?.status === "SUCCESS") {
-          setSelectedAccount(accountDetails?.data);
+          setSelectedAccount(accountDetails?.data); // Update state with fetched account
         } else {
-          router.push(getDefaultPage() + "?msg=100101");
+          router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
         }
       } else {
         const accountDetails = await accountService.fetch();
         if (accountDetails?.status === "SUCCESS") {
-          setSelectedAccount(accountDetails?.data[0]);
+          setSelectedAccount(accountDetails?.data[0]); // Set first account as default
         } else {
-          router.push(getDefaultPage() + "?msg=100101");
+          router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
         }
       }
     } catch {
-      router.push(getDefaultPage() + "?msg=100101");
+      router.push(getDefaultPage() + "?msg=100101"); // Redirect on error
     } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading state
     }
   };
 
+  // Effect to handle toast notifications and fetch account details on mount or search param change
   useEffect(() => {
-    handleToast(searchParams);
+    handleToast(searchParams); // Display toast based on search params
     const id = searchParams.get("id") ?? undefined;
-    fetchAccountDetails(id);
-    // router.push("/account");
+    fetchAccountDetails(id); // Fetch account details
   }, [searchParams, router]);
 
-  // useEffect(() => {}, [id]);
-
+  // Breadcrumb navigation items
   const breadcrumbItems = [
     { href: "#", label: "Account Dashboard", isActive: true },
   ];
@@ -70,10 +77,10 @@ function AccountContent() {
           <WorkflowCard />
           {selectedAccount && (
             <AccountDetailsCard
-              isSubmitting={(value: boolean) => setLoading(value)}
+              isSubmitting={(value: boolean) => setLoading(value)} // Update loading state on submission
               details={selectedAccount}
-              onAccountUpdated={() =>
-                fetchAccountDetails(selectedAccount?.id?.toString())
+              onAccountUpdated={
+                () => fetchAccountDetails(selectedAccount?.id?.toString()) // Refetch account on update
               }
             />
           )}
@@ -95,6 +102,10 @@ function AccountContent() {
   );
 }
 
+/**
+ * AccountPage is the main page component that wraps AccountContent with Suspense for lazy loading.
+ * @returns JSX.Element
+ */
 const AccountPage: React.FC = () => {
   return (
     <Suspense fallback={<LoadingOverlay />}>

@@ -23,7 +23,7 @@ const PortfolioTabContent: React.FC<PortfolioTabContentProps> = ({
     <div className="flex flex-col justify-start items-center gap-3">
       {portfolios.map((portfolio, index) => (
         <div
-          key={portfolio.id || index} // Prefer unique ID over index if available
+          key={portfolio.id ?? index} // Prefer unique ID over index if available
           className="self-stretch shadow-[0px_1px_4px_0px_rgba(12,12,13,0.05)] flex flex-col justify-start items-start gap-4 group"
         >
           <div className="self-stretch p-3 bg-tertiary-whisperGray rounded-xl outline outline-1 outline-tertiary-blueTint flex flex-col justify-start items-start gap-2 transition-all duration-300 ease-in-out group-hover:pb-6">
@@ -34,7 +34,7 @@ const PortfolioTabContent: React.FC<PortfolioTabContentProps> = ({
               <div className="self-stretch flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                    {portfolio?.totalProperties}{" "}
+                    {portfolio?.totalProperties ?? "N/A"}{" "}
                     <span className="text-tertiary-light font-normal">
                       properties
                     </span>

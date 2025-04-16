@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useContext, Suspense } from "react";
+import React, { useEffect, useContext, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import handleToast from "@/lib/utils/toastr";
-import { samplePortfolios } from "@/data/portfolio";
-import { sampleProperties } from "@/data/Properties";
 import BlankCard from "@/components/dashboard/BlankCard";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
@@ -25,23 +23,7 @@ import PropertyAndPortfolioCard from "@/components/dashboard/property/PropertyAn
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState("");
   const { isLoading, setLoading } = useContext(LoadingContext);
-
-  // Handle search input changes
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    // No need to manually filter here as the useEffect will handle it
-  };
-
-  // Filter properties and portfolios directly in render
-  const filteredProperties = sampleProperties.filter((property) =>
-    property.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredPortfolios = samplePortfolios.filter((portfolio) =>
-    portfolio.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   // Show success toast and redirect on initial load if login succeeded
   useEffect(() => {
@@ -68,10 +50,8 @@ function DashboardContent() {
             showAdminFunc={true}
           />
           <PropertyAndPortfolioCard
-            isEditable={true}
-            onSearchChange={handleSearchChange}
-            portfolios={filteredPortfolios}
-            properties={filteredProperties}
+            isEditable={!isLoading}
+            isSubmitting={(value: boolean) => setLoading(value)}
           />
           <PortfolioUsersCard
             isEditable={!isLoading}

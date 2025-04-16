@@ -6,9 +6,16 @@ import LinkButton from "../ui/buttons/LinkButton";
 
 interface ROAdminUsersCardContentProps {
   user: ReadOnlyAdminUser;
-  onDelete?: (userId: string) => void;
+  onDelete?: (user: ReadOnlyAdminUser) => void;
 }
 
+/**
+ * ROAdminUsersCardContent displays a card with read-only admin user details and a delete option.
+ * @param {ROAdminUsersCardContentProps} props - The component props
+ * @param {ReadOnlyAdminUser} props.user - The user data to display
+ * @param {(user: ReadOnlyAdminUser) => void} [props.onDelete] - Optional callback to handle user deletion
+ * @returns {JSX.Element} The rendered user card component
+ */
 export const ROAdminUsersCardContent: React.FC<
   ROAdminUsersCardContentProps
 > = ({ user, onDelete }) => {
@@ -19,21 +26,21 @@ export const ROAdminUsersCardContent: React.FC<
           <div className="self-stretch flex flex-col justify-center items-start gap-1">
             <div className="self-stretch inline-flex justify-between items-center">
               <div className="justify-start text-secondary-light text-sm font-bold font-['Inter'] leading-[18px]">
-                {user.firstName + " " + user.lastName}
+                {user.firstName + " " + user.lastName} {/* Display full name */}
               </div>
               <LinkButton
                 label="Delete"
-                onClick={() => user.id && onDelete && onDelete(user.id)}
+                onClick={() => user.id && onDelete && onDelete(user)} // Trigger onDelete callback if provided
               />
             </div>
             <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-              {user.email}
+              {user.email} {/* Display user email */}
             </div>
             <div className="justify-start text-tertiary-midnightBlue text-xs font-normal font-['Inter'] leading-tight">
-              {user.mobileNumber}
+              {user.mobileNumber} {/* Display user mobile number */}
             </div>
           </div>
-          <div className="self-stretch h-px" />
+          <div className="self-stretch h-px" /> {/* Divider line */}
         </div>
       </div>
     </div>

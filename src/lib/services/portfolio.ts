@@ -7,6 +7,7 @@ import { ENDPOINTS } from "@/lib/constants/endpoints";
 import { interpolate } from "@/lib/utils/stringUtils";
 import {
   Portfolio,
+  PortfolioListResponse,
   PortfolioResponse,
   PortfolioUserListResponse,
   PortfolioUserResponse,
@@ -17,7 +18,7 @@ import {
 class PortfolioService {
   async addUser(payload: NewUserFormData): Promise<PortfolioUserResponse> {
     return await apiService.post<PortfolioUserResponse>(
-      ENDPOINTS.PORTFOLIO.ADD_USER,
+      ENDPOINTS.PORTFOLIO.ADD.USER,
       payload
     );
   }
@@ -27,7 +28,7 @@ class PortfolioService {
   ): Promise<PortfolioUserListResponse> {
     const { attachPortfolio } = options;
     return await apiService.get<PortfolioUserListResponse>(
-      interpolate(ENDPOINTS.PORTFOLIO.GET_USERS, attachPortfolio ?? false)
+      interpolate(ENDPOINTS.PORTFOLIO.FETCH.USERS, attachPortfolio ?? false)
     );
   }
 
@@ -35,21 +36,27 @@ class PortfolioService {
     vendorData: NewVendorFormData
   ): Promise<PortfolioVendorResponse> {
     return await apiService.post<PortfolioVendorResponse>(
-      ENDPOINTS.PORTFOLIO.ADD_VENDOR,
+      ENDPOINTS.PORTFOLIO.ADD.VENDOR,
       vendorData
     );
   }
 
   async getVendors(): Promise<PortfolioVendorListResponse> {
     return await apiService.get<PortfolioVendorListResponse>(
-      ENDPOINTS.PORTFOLIO.GET_VENDORS
+      ENDPOINTS.PORTFOLIO.FETCH.VENDORS
     );
   }
 
   async create(portfolioData: Portfolio): Promise<PortfolioResponse> {
     return await apiService.post<PortfolioResponse>(
-      ENDPOINTS.PORTFOLIO.ADD,
+      ENDPOINTS.PORTFOLIO.ADD.DEFAULT,
       portfolioData
+    );
+  }
+
+  async fetchAll(): Promise<PortfolioListResponse> {
+    return await apiService.get<PortfolioListResponse>(
+      ENDPOINTS.PORTFOLIO.FETCH.DEFAULT
     );
   }
 }

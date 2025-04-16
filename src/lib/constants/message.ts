@@ -200,6 +200,14 @@ const target = {
     type: "error",
     message: "Exception occured adding new portfolio vendor.",
   } as LeasePixieToastMsg,
+  100513: {
+    type: "error",
+    message: "Failed to fetch portfolios.",
+  } as LeasePixieToastMsg,
+  100514: {
+    type: "error",
+    message: "Exception occured while fetching portfolios.",
+  } as LeasePixieToastMsg,
 
   //100600 series for property handle message
   100600: {
@@ -213,6 +221,14 @@ const target = {
   100602: {
     type: "error",
     message: "Exception occurred adding new property user.",
+  } as LeasePixieToastMsg,
+  100603: {
+    type: "error",
+    message: "Error fetching properties.",
+  } as LeasePixieToastMsg,
+  100604: {
+    type: "error",
+    message: "Exception occured fetching properties.",
   } as LeasePixieToastMsg,
 } as const;
 
