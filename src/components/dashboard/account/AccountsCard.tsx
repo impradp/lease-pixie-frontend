@@ -220,6 +220,8 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           {filteredAccounts.length > 0 ? (
             filteredAccounts.map((company, index) => (
               <CompanyInfo
+                isSubmitting={(value: boolean) => isSubmitting(value)}
+                isEditable={isEditable}
                 key={index}
                 details={company}
                 onToggleAccess={handleToggleAccess}

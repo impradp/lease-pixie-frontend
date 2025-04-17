@@ -62,7 +62,7 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
           </div>
           <div className="flex-none text-tertiary-offBlack text-xs font-normal font-['Inter']">
             {account.issMaxSingleACHTxnLimit +
-              "limit / " +
+              " limit / " +
               account.reqMaxSingleACHTxnLimit +
               " req."}{" "}
             {/* Display transaction limits */}

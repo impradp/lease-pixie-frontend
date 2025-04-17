@@ -31,10 +31,10 @@ function LoginContent() {
     useState<boolean>(false);
   const [formData, setFormData] = useState<{
     email: string;
-    phoneNumber: string;
+    mobileNumber: string;
   }>({
     email: "",
-    phoneNumber: "",
+    mobileNumber: "",
   });
 
   useEffect(() => {
@@ -120,7 +120,7 @@ function LoginContent() {
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       const response = await authService.resetVerify({
-        phoneNumber: formData.phoneNumber,
+        mobileNumber: formData.mobileNumber,
         resetCode: otp,
         email: formData.email,
       });
@@ -157,7 +157,7 @@ function LoginContent() {
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       const response = await authService.resolveConsent({
-        phoneNumber: formData.phoneNumber,
+        mobileNumber: formData.mobileNumber,
         email: formData.email,
         smsConsentAccepted: data.smsConsent,
         serviceTermConsentAccepted: data.serviceConsent,
@@ -194,7 +194,7 @@ function LoginContent() {
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       const resetResponse = await emailService.resetLogin({
-        phoneNumber: formData.mobileNumber.replaceAll("-", ""),
+        mobileNumber: formData.mobileNumber.replaceAll("-", ""),
         email: formData.email,
       });
 
@@ -202,7 +202,7 @@ function LoginContent() {
         setEmailSent(true);
         setFormData({
           email: formData.email,
-          phoneNumber: formData.mobileNumber.replaceAll("-", ""),
+          mobileNumber: formData.mobileNumber.replaceAll("-", ""),
         });
         handleInfo({ code: 100404 });
       } else {
@@ -217,7 +217,7 @@ function LoginContent() {
   const resetState = () => {
     setEmailSent(false);
     setIsEmailCodeVerified(false);
-    setFormData({ email: "", phoneNumber: "" });
+    setFormData({ email: "", mobileNumber: "" });
     setError("");
     setAttempts(0);
     cookieHandler.clearLoginAttempts();

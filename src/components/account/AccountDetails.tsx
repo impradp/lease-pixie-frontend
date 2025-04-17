@@ -12,6 +12,7 @@ import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
  * Props for the PropertyApprovalCard component
  */
 interface AccountDetailsProps {
+  isEditable?: boolean; // Whether the card is editable (default: false)
   details: Account;
   isSubmitting: (value: boolean) => void;
   onAccountUpdated: () => void; // Added callback for refetch
@@ -26,6 +27,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   details,
   isSubmitting,
   onAccountUpdated,
+  isEditable = false,
 }) => {
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [displayEditFeature, setDisplayEditFeature] = useState(true);
@@ -63,7 +65,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
 
   return (
     <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
-      <PixieCardHeader label="Account Details" />
+      <PixieCardHeader label="Account Details" isEditable={isEditable} />
       <div className="self-stretch p-3 bg-[#ececec] rounded-xl inline-flex flex-col justify-start items-start gap-1">
         <div className="self-stretch inline-flex justify-start items-start gap-2">
           <div className="flex-1 inline-flex flex-col justify-start items-start gap-2">
@@ -72,7 +74,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                 Company
               </div>
 
-              <LinkButton label="Edit" onClick={onClickEdit} />
+              <LinkButton
+                label="Edit"
+                onClick={onClickEdit}
+                disabled={!isEditable}
+              />
             </div>
             <div className="self-stretch inline-flex justify-start items-start gap-1">
               <div className="flex-1 justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">

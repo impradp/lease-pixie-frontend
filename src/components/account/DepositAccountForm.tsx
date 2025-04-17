@@ -6,6 +6,8 @@ import { DepositAccount } from "@/types/DepositAccount";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
+import { samplePaymentProcessor } from "@/data/paymentProcessor";
+import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 /**
@@ -120,9 +122,9 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-lg mx-4">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-xl w-full max-w-[800px] mx-4 max-h-[100vh] overflow-y-auto flex flex-col">
+        <div className="p-6 flex-shrink-0">
+          <div className="flex justify-between items-center">
             <SectionHeader
               title={
                 isEditForm
@@ -133,6 +135,9 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
               onClose={handleClose}
             />
           </div>
+        </div>
+
+        <div className="overflow-y-auto flex-1 px-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <CustomInput
               label="Account holder entity or name"
@@ -153,7 +158,8 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
               disabled={isFormDisabled || isReadonly}
               isRequired={true}
             />
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <CustomInput
                 label="Expected monthly total invoices"
                 value={formData.expMonthlyTotalInvoice ?? ""}
@@ -163,6 +169,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 isEditing={true}
                 disabled={isFormDisabled}
                 isRequired={true}
+                type="money"
               />
               <CustomInput
                 label="Requested maximum single ACH transaction limit"
@@ -173,8 +180,10 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 isEditing={true}
                 disabled={isFormDisabled}
                 isRequired={true}
+                type="money"
               />
             </div>
+
             <CustomInput
               label="Last 4 digits of deposit account"
               value={formData.lastFourDigits ?? ""}
@@ -182,16 +191,29 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
               isEditing={true}
               disabled={isFormDisabled}
               isRequired={true}
+              type="number"
             />
-            <div className="grid grid-cols-2 gap-4">
-              <CustomInput
-                label="Issued processor"
-                value={formData.issProcessor ?? ""}
-                onChange={(value) => handleInputChange("issProcessor", value)}
-                isEditing={true}
-                disabled={isFormDisabled}
-                isRequired={true}
-              />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="self-stretch flex flex-col justify-center items-start gap-1">
+                <div className="justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]">
+                  Issued Processor{" "}
+                  <span className="text-[#878aa4] text-sm"> *</span>
+                </div>
+                <PixieDropdown
+                  options={samplePaymentProcessor}
+                  value={formData.issProcessor}
+                  onChange={(option) =>
+                    handleInputChange("issProcessor", option)
+                  }
+                  isEditing={true}
+                  placeholder="Select processor"
+                  className="w-full"
+                  containerClassName="w-full"
+                  type="large"
+                  labelClassName="hidden"
+                />
+              </div>
               <CustomInput
                 label="Issued processor UUID"
                 value={formData.issProcessorId ?? ""}
@@ -199,9 +221,11 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 isEditing={true}
                 disabled={isFormDisabled}
                 isRequired={true}
+                type="number"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <CustomInput
                 label="Issued maximum single ACH transaction limit"
                 value={formData.issMaxSingleACHTxnLimit ?? ""}
@@ -211,6 +235,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 isEditing={true}
                 disabled={isFormDisabled}
                 isRequired={true}
+                type="money"
               />
               <CustomInput
                 label="Issued merchant account number"
@@ -221,9 +246,11 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 isEditing={true}
                 disabled={isFormDisabled}
                 isRequired={true}
+                type="number"
               />
             </div>
-            <div className="flex flex-col gap-3">
+
+            <div className="flex flex-col gap-3 pb-6">
               <PixieButton
                 label={isEditForm ? "Update" : "Add Deposit Account"}
                 disabled={isFormDisabled}

@@ -5,8 +5,8 @@ import toastr from "@/lib/func/toastr";
 import { getMessages } from "@/locales/locale";
 import { NewUserFormData } from "@/types/user";
 import CustomInput from "@/components/ui/input/CustomInput";
-import PixieButton from "@/components/ui/buttons/PixieButton";
 import LinkButton from "@/components/ui/buttons/LinkButton";
+import PixieButton from "@/components/ui/buttons/PixieButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 interface NewPortfolioUserProps {
@@ -26,7 +26,6 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: "",
     mobileNumber: "",
   });
 
@@ -63,7 +62,10 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
       setIsLoading(true);
       await new Promise((resolve) => requestAnimationFrame(resolve));
       onSubmit(
-        { ...formData, phoneNumber: formData?.phoneNumber.replaceAll("-", "") },
+        {
+          ...formData,
+          mobileNumber: formData?.mobileNumber?.replaceAll("-", ""),
+        },
         setIsLoading
       );
     } catch {
@@ -77,7 +79,7 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
       formData.email.trim() &&
       formData.firstName.trim() &&
       formData.lastName.trim() &&
-      formData.phoneNumber.trim();
+      formData.mobileNumber.trim();
 
     return !!isValid;
   };
@@ -136,8 +138,8 @@ const NewPortfolioUser: React.FC<NewPortfolioUserProps> = ({
 
             <CustomInput
               label="Mobile phone"
-              value={formData.phoneNumber}
-              onChange={(value) => handleInputChange("phoneNumber", value)}
+              value={formData.mobileNumber}
+              onChange={(value) => handleInputChange("mobileNumber", value)}
               isEditing={true}
               placeholder="800-555-1234"
               type="mobile"

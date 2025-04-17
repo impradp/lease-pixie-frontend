@@ -7,6 +7,7 @@ import LinkButton from "../ui/buttons/LinkButton";
 interface ROAdminUsersCardContentProps {
   user: ReadOnlyAdminUser;
   onDelete?: (user: ReadOnlyAdminUser) => void;
+  isEditable?: boolean;
 }
 
 /**
@@ -18,7 +19,7 @@ interface ROAdminUsersCardContentProps {
  */
 export const ROAdminUsersCardContent: React.FC<
   ROAdminUsersCardContentProps
-> = ({ user, onDelete }) => {
+> = ({ user, onDelete, isEditable = false }) => {
   return (
     <div className="w-full p-3 bg-secondary-fill rounded-xl inline-flex flex-col justify-start items-start gap-1">
       <div className="self-stretch h-[66px] flex flex-col justify-start items-start gap-[15px]">
@@ -29,6 +30,7 @@ export const ROAdminUsersCardContent: React.FC<
                 {user.firstName + " " + user.lastName} {/* Display full name */}
               </div>
               <LinkButton
+                disabled={!isEditable}
                 label="Delete"
                 onClick={() => user.id && onDelete && onDelete(user)} // Trigger onDelete callback if provided
               />

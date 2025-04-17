@@ -5,17 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { Account } from "@/types/Account";
 import handleToast from "@/lib/utils/toastr";
+import { hasRole } from "@/lib/utils/authUtils";
 import { getDefaultPage } from "@/config/roleAccess";
 import { accountService } from "@/lib/services/account";
-import PaymentMethod from "@/components/account/PaymentMethod";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
+import PaymentMethod from "@/components/account/PaymentMethod";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
 import AccountDetailsCard from "@/components/account/AccountDetails";
 import DepositAccountsCard from "@/components/account/DepositAccountCard";
+import PortfolioUsersCard from "@/components/dashboard/portfolio/PortfolioUsersCard";
 import PropertyApprovalCard from "@/components/dashboard/property/PropertyApprovalCard";
+import PropertyAndPortfolioCard from "@/components/dashboard/property/PropertyAndPortfolioCard";
 
 /**
  * AccountContent component renders the main content of the account page, including account details,
@@ -26,6 +29,7 @@ function AccountContent() {
   const searchParams = useSearchParams();
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [selectedAccount, setSelectedAccount] = useState<Account>();
+  const [isReadonly, setIsReadonly] = useState(false);
 
   /**
    * Fetches account details based on provided ID or retrieves the default account.
@@ -59,6 +63,11 @@ function AccountContent() {
 
   // Effect to handle toast notifications and fetch account details on mount or search param change
   useEffect(() => {
+    if (hasRole("READONLYADMINUSER")) {
+      setIsReadonly(true);
+    } else {
+      setIsReadonly(false);
+    }
     handleToast(searchParams); // Display toast based on search params
     const id = searchParams.get("id") ?? undefined;
     fetchAccountDetails(id); // Fetch account details
@@ -77,6 +86,7 @@ function AccountContent() {
           <WorkflowCard />
           {selectedAccount && (
             <AccountDetailsCard
+              isEditable={!isLoading && !isReadonly}
               isSubmitting={(value: boolean) => setLoading(value)} // Update loading state on submission
               details={selectedAccount}
               onAccountUpdated={
@@ -88,15 +98,23 @@ function AccountContent() {
         </div>
         <div className="w-[408px] flex flex-col max-w-full flex justify-center mb-4 custom:mb-0 gap-4">
           <PropertyApprovalCard
-            isEditable={true}
+            isEditable={!isLoading && !isReadonly}
             existingApprovalData={propertyApprovalData}
             showAdminFunc={false}
             btnLabel="Approve Monthly Billing"
           />
+          <PropertyAndPortfolioCard
+            isEditable={!isLoading && !isReadonly}
+            isSubmitting={(value: boolean) => setLoading(value)}
+          />
         </div>
-        <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
+        <div className="w-[408px] flex flex-col max-w-full flex justify-center mb-4 custom:mb-0 gap-4">
           <DepositAccountsCard
-            isEditable={!isLoading}
+            isEditable={!isLoading && !isReadonly}
+            isSubmitting={(value: boolean) => setLoading(value)}
+          />
+          <PortfolioUsersCard
+            isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
           />
         </div>

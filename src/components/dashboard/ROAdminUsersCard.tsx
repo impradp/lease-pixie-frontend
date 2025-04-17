@@ -190,6 +190,7 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
         <div className="flex flex-col gap-3">
           {filteredReadOnlyAdminUsers.map((user) => (
             <ROAdminUsersCardContent
+              isEditable={isEditable}
               key={user.id}
               user={user}
               onDelete={onClickDelete}

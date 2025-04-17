@@ -4,6 +4,13 @@
 export const roleAccessMap: Record<string, string[]> = {
   // Defines routes accessible by each role
   ADMINUSER: ["/admin", "/dashboard", "/workflows", "/portfolio", "/account"],
+  READONLYADMINUSER: [
+    "/admin",
+    "/dashboard",
+    "/workflows",
+    "/portfolio",
+    "/account",
+  ],
   ACCOUNTUSER: [
     "/account",
     "/account/profile",
@@ -25,6 +32,7 @@ export const roleAccessMap: Record<string, string[]> = {
  */
 export const defaultPages: Record<string, string> = {
   // Specifies default page for each role
+  READONLYADMINUSER: "/dashboard",
   ADMINUSER: "/dashboard",
   ACCOUNTUSER: "/account",
   PORTFOLIO: "/portfolio",

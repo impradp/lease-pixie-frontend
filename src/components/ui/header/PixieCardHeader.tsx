@@ -54,11 +54,9 @@ function PixieCardHeader({
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isEditable) {
-      const value = e.target.value;
-      setSearchValue(value);
-      onSearchChange?.(value);
-    }
+    const value = e.target.value;
+    setSearchValue(value);
+    onSearchChange?.(value);
   };
 
   return (
@@ -84,11 +82,9 @@ function PixieCardHeader({
             <button
               onClick={isEditable ? handleRefreshClicked : undefined}
               className={`w-[40px] h-[35px] flex justify-center items-center rounded-[4px] ${
-                isEditable
-                  ? isRefreshClicked
-                    ? "bg-tertiary-darkNavy"
-                    : "bg-transparent hover:bg-tertiary-blueTint"
-                  : "cursor-not-allowed bg-transparent"
+                isRefreshClicked
+                  ? "bg-tertiary-darkNavy"
+                  : "bg-transparent hover:bg-tertiary-blueTint"
               }`}
               disabled={!isEditable}
               aria-label="Refresh"
@@ -120,12 +116,9 @@ function PixieCardHeader({
             <input
               type="text"
               value={searchValue}
-              onChange={isEditable ? handleSearchChange : undefined}
+              onChange={handleSearchChange}
               placeholder="Search"
-              className={`w-full px-4 py-2.5 bg-white rounded-lg border border-tertiary-blueTint text-tertiary-light text-[16px] font-normal font-['Inter'] leading-normal outline-none ${
-                !isEditable ? "cursor-not-allowed" : ""
-              }`}
-              disabled={!isEditable}
+              className={`w-full px-4 py-2.5 bg-white rounded-lg border border-tertiary-blueTint text-tertiary-light text-[16px] font-normal font-['Inter'] leading-normal outline-none`}
               aria-label="Search"
             />
             {showSearchIcon && (

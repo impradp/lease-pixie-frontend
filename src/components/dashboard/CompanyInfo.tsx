@@ -14,9 +14,11 @@ import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
  * Props for the CompanyInfo component
  */
 interface CompanyInfoProps {
+  isEditable?: boolean; // Whether the component is editable (default: false)
   details?: Account; // Account details to display
   onToggleAccess?: (accountId: string, isLocked: boolean) => Promise<boolean>; // Callback for toggling access
   onEditClick?: (id: string) => void; // Callback for edit button click
+  isSubmitting: (value: boolean) => void;
 }
 
 /**
@@ -25,9 +27,11 @@ interface CompanyInfoProps {
  * @returns JSX.Element - The rendered company info component
  */
 export const CompanyInfo: React.FC<CompanyInfoProps> = ({
+  isEditable = false,
   details,
   onToggleAccess,
   onEditClick,
+  isSubmitting,
 }) => {
   const router = useRouter();
   const [isInvoicesOpen, setIsInvoicesOpen] = useState(false); // State for invoices section visibility
@@ -87,6 +91,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
    * Handles dashboard button click
    */
   const onDashboardClick = () => {
+    isSubmitting(true);
     if (details?.id) {
       router.push(`/account?id=${details.id}`); // Route to /account/{id}
     }
@@ -178,10 +183,15 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   </div>
                 </button>
                 <button
+                  disabled={!isEditable}
                   onClick={() =>
                     details?.id && onEditAccountClick({ accountId: details.id })
                   }
-                  className="px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1 cursor-pointer hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                  className={`px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1 ${
+                    isEditable
+                      ? "cursor-pointer hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                      : "cursor-not-allowed opacity-50"
+                  }`}
                 >
                   <div className="justify-start text-primary-button text-xs font-medium font-['Inter'] leading-[18px]">
                     Edit Account
@@ -203,7 +213,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   <ToggleSwitch
                     isOn={isAccessLocked}
                     onToggle={handleToggleAccess}
-                    isDisabled={false}
+                    isDisabled={!isEditable}
                   />
                   <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
                     Locked

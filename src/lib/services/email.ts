@@ -16,7 +16,7 @@ interface LoginResetEmailResponse {
 }
 
 interface LoginResetEmailRequest {
-  phoneNumber: string;
+  mobileNumber: string;
   email: string;
 }
 

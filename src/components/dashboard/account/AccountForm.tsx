@@ -100,8 +100,8 @@ const AccountForm: React.FC<AccountFormProps> = ({
       await onSubmit(
         {
           ...formData,
-          mobileNumber: formData?.mobileNumber.replaceAll("-", ""),
-          officePhoneNumber: formData?.officePhoneNumber.replaceAll("-", ""),
+          mobileNumber: formData?.mobileNumber?.replaceAll("-", ""),
+          officePhoneNumber: formData?.officePhoneNumber?.replaceAll("-", ""),
         },
         setIsLoading
       );

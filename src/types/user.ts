@@ -9,7 +9,7 @@ export interface NewUserFormData {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber?: string;
   mobileNumber: string;
   smsActive?: boolean;
 }

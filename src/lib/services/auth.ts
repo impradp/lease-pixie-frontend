@@ -14,18 +14,18 @@ interface ResetResponse {
 }
 
 interface ResetRequest {
-  phoneNumber: string;
+  mobileNumber: string;
   email: string;
 }
 
 interface ResetVerifyRequest {
-  phoneNumber: string;
+  mobileNumber: string;
   resetCode: string;
   email: string;
 }
 
 interface ResolveConsentRequest {
-  phoneNumber: string;
+  mobileNumber: string;
   email: string;
   smsConsentAccepted: boolean;
   serviceTermConsentAccepted: boolean;

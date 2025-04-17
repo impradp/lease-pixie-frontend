@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from "react";
 
 import handleInfo from "@/lib/utils/errorHandler";
-import { defaultData } from "@/data/depositAccount";
+import { defaultData, sampleData } from "@/data/depositAccount";
 import { DepositAccount } from "@/types/DepositAccount";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { depositAccountService } from "@/lib/services/depositAccount";
@@ -30,7 +30,8 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
   const [selectedDepositAccount, setSelectedDepositAccount] =
     useState<DepositAccount>(defaultData);
   const [showDepositAccountForm, setShowDepositAccountForm] = useState(false);
-  const [depositAccounts, setDepositAccounts] = useState<DepositAccount[]>([]);
+  const [depositAccounts, setDepositAccounts] =
+    useState<DepositAccount[]>(sampleData);
 
   /**
    * Fetches deposit accounts from the service and updates state.

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useContext, Suspense } from "react";
+import React, { useEffect, useContext, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import handleToast from "@/lib/utils/toastr";
+import { hasRole } from "@/lib/utils/authUtils";
 import BlankCard from "@/components/dashboard/BlankCard";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
@@ -24,9 +25,17 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoading, setLoading } = useContext(LoadingContext);
+  const [isReadonly, setIsReadonly] = useState(false);
+
+  // Set loading state to false
 
   // Show success toast and redirect on initial load if login succeeded
   useEffect(() => {
+    if (hasRole("READONLYADMINUSER")) {
+      setIsReadonly(true);
+    } else {
+      setIsReadonly(false);
+    }
     handleToast(searchParams);
     router.replace("/dashboard");
   }, [searchParams, router]);
@@ -45,27 +54,27 @@ function DashboardContent() {
         </div>
         <div className="w-[408px] flex flex-col max-w-full justify-center mb-4 custom:mb-0 gap-4">
           <PropertyApprovalCard
-            isEditable={true}
+            isEditable={!isLoading && !isReadonly}
             existingApprovalData={propertyApprovalData}
             showAdminFunc={true}
           />
           <PropertyAndPortfolioCard
-            isEditable={!isLoading}
+            isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
           />
           <PortfolioUsersCard
-            isEditable={!isLoading}
+            isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
           />
           <PropertyUsersCard />
           <ROAdminUsersCard
-            isEditable={!isLoading}
+            isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
           />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
           <AccountsCard
-            isEditable={!isLoading}
+            isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
           />
         </div>

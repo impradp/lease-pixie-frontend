@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 /**
  * Props for the CustomInput component
@@ -13,14 +13,14 @@ interface CustomInputProps {
   containerClassName?: string; // Custom class for the container
   className?: string; // Custom class for the input
   labelClassName?: string; // Custom class for the label
-  type?: "text" | "email" | "mobile"; // Input type
+  type?: "text" | "email" | "mobile" | "money" | "number"; // Input type
   error?: string; // External error message
   disabled?: boolean; // Whether the input is disabled
   isRequired?: boolean; // Whether the input is required
 }
 
 /**
- * Renders a customizable input field with validation for email and mobile types
+ * Renders a customizable input field with validation for email, mobile, money, and number types
  * @param props - The properties for configuring the input
  * @returns JSX.Element - The rendered custom input
  */
@@ -40,6 +40,35 @@ const CustomInput: React.FC<CustomInputProps> = ({
   isRequired = false,
 }) => {
   const [internalError, setInternalError] = useState<string | null>(null); // State for internal validation errors
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Format initial value for mobile type
+  useEffect(() => {
+    if (type === "mobile" && value && !value.includes("-")) {
+      // Format the initial value with hyphens if it doesn't have them
+      const formattedValue = formatMobile(value);
+      if (formattedValue !== value) {
+        onChange?.(formattedValue);
+      }
+    }
+  }, []);
+
+  // Convert value to display format for money type
+  const getDisplayValue = () => {
+    if (type === "money") {
+      return value ? `$${value}` : "$";
+    }
+    return value;
+  };
+
+  // Handle focus for money type
+  const handleFocus = () => {
+    if (type === "money" && inputRef.current) {
+      // Place cursor at the end of input
+      const valueLength = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(valueLength, valueLength);
+    }
+  };
 
   /**
    * Validates an email address
@@ -79,23 +108,45 @@ const CustomInput: React.FC<CustomInputProps> = ({
   };
 
   /**
-   * Handles input value changes with mobile formatting
+   * Handles input value changes with formatting for various types
    * @param e - The input change event
    */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isEditing || readOnly || disabled) return;
 
     let newValue = e.target.value;
+
     if (type === "mobile") {
       const numbersOnly = newValue.replace(/[^0-9]/g, "");
       if (numbersOnly.length > 10) return;
       newValue = formatMobile(newValue);
+      onChange?.(newValue);
+    } else if (type === "money") {
+      // Remove the dollar sign for processing
+      if (newValue.startsWith("$")) {
+        newValue = newValue.substring(1);
+      } else {
+        // If user somehow deleted the dollar sign, ignore this change
+        return;
+      }
+
+      // Only allow numbers and decimal point
+      if (!/^[0-9]*\.?[0-9]*$/.test(newValue)) return;
+
+      // Pass the value without $ to parent
+      onChange?.(newValue);
+    } else if (type === "number") {
+      // Only allow numbers and decimal point for number type
+      if (!/^[0-9]*\.?[0-9]*$/.test(newValue)) return;
+
+      onChange?.(newValue);
+    } else {
+      onChange?.(newValue);
     }
-    onChange?.(newValue);
   };
 
   /**
-   * Restricts key presses for mobile input to numbers and navigation keys
+   * Restricts key presses for various input types
    * @param e - The keydown event
    */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -113,23 +164,125 @@ const CustomInput: React.FC<CustomInputProps> = ({
       ) {
         e.preventDefault();
       }
+    } else if (type === "money") {
+      const char = e.key;
+
+      // Allow only numbers, decimal point, and navigation keys
+      if (
+        !/[0-9.]/.test(char) &&
+        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
+          char
+        ) &&
+        !(e.ctrlKey && char === "v") &&
+        !(e.metaKey && char === "v")
+      ) {
+        e.preventDefault();
+      }
+
+      // Prevent deleting the dollar sign
+      if (
+        (char === "Backspace" || char === "Delete") &&
+        inputRef.current?.selectionStart === 1 &&
+        inputRef.current?.selectionEnd === 1
+      ) {
+        e.preventDefault();
+      }
+
+      // Prevent multiple decimal points
+      if (char === "." && value.includes(".")) {
+        e.preventDefault();
+      }
+    } else if (type === "number") {
+      const char = e.key;
+
+      // Allow only numbers, decimal point, and navigation keys
+      if (
+        !/[0-9.]/.test(char) &&
+        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
+          char
+        ) &&
+        !(e.ctrlKey && char === "v") &&
+        !(e.metaKey && char === "v")
+      ) {
+        e.preventDefault();
+      }
+
+      // Prevent multiple decimal points
+      if (char === "." && value.includes(".")) {
+        e.preventDefault();
+      }
     }
   };
 
   /**
-   * Handles pasted text for mobile input
+   * Handles click for money type to prevent selecting the dollar sign
+   */
+  const handleClick = () => {
+    if (type === "money" && inputRef.current) {
+      if (inputRef.current.selectionStart === 0) {
+        // If cursor is before the $ sign, move it after
+        inputRef.current.setSelectionRange(1, 1);
+      }
+    }
+  };
+
+  /**
+   * Handles selection for money type to prevent selecting the dollar sign
+   */
+  const handleSelect = () => {
+    if (type === "money" && inputRef.current) {
+      const { selectionStart } = inputRef.current;
+      if (selectionStart === 0) {
+        // If selection includes $ sign, adjust it
+        inputRef.current.setSelectionRange(
+          1,
+          inputRef.current.selectionEnd || 1
+        );
+      }
+    }
+  };
+
+  /**
+   * Handles pasted text for various input types
    * @param e - The paste event
    */
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     if (!isEditing || readOnly || disabled) return;
 
+    const pastedText = e.clipboardData.getData("text");
+
     if (type === "mobile") {
-      const pastedText = e.clipboardData.getData("text");
       const numbersOnly = pastedText.replace(/[^0-9]/g, "");
       if (numbersOnly.length > 10) return;
       const formattedValue = formatMobile(numbersOnly);
       onChange?.(formattedValue);
       validateInput(formattedValue);
+      e.preventDefault();
+    } else if (type === "money") {
+      // Remove any $ signs from pasted value
+      const cleanValue = pastedText.replace(/[$,]/g, "");
+
+      // Only allow numbers and at most one decimal point
+      if (!/^[0-9]*\.?[0-9]*$/.test(cleanValue)) {
+        e.preventDefault();
+        return;
+      }
+
+      onChange?.(cleanValue);
+      e.preventDefault();
+    } else if (type === "number") {
+      // Only allow numbers and decimal point for number type
+      const cleanValue = pastedText.replace(/[^0-9.]/g, "");
+
+      // Ensure only one decimal point
+      const parts = cleanValue.split(".");
+      let validValue = parts[0];
+      if (parts.length > 1) {
+        validValue += "." + parts[1];
+      }
+
+      onChange?.(validValue);
+      e.preventDefault();
     }
   };
 
@@ -153,7 +306,29 @@ const CustomInput: React.FC<CustomInputProps> = ({
     }
   };
 
+  // Ensure cursor position is maintained after $ sign for money type
+  useEffect(() => {
+    if (
+      type === "money" &&
+      inputRef.current &&
+      document.activeElement === inputRef.current
+    ) {
+      // When value changes, ensure cursor position is after the $ sign
+      const cursorPos = inputRef.current.selectionStart || 0;
+      if (cursorPos === 0) {
+        inputRef.current.setSelectionRange(1, 1);
+      }
+    }
+  }, [value, type]);
+
   const displayError = externalError ?? internalError;
+
+  // Determine the appropriate input type attribute
+  const getInputTypeAttribute = () => {
+    if (type === "mobile") return "tel";
+    if (type === "money" || type === "number") return "text"; // Using text for better control
+    return type;
+  };
 
   return (
     <div className={`flex flex-col gap-1.5 ${containerClassName}`}>
@@ -171,12 +346,24 @@ const CustomInput: React.FC<CustomInputProps> = ({
         }`}
       >
         <input
-          placeholder={type === "mobile" ? "800-555-1234" : placeholder}
-          type={type === "mobile" ? "tel" : type}
-          value={value}
+          ref={inputRef}
+          placeholder={
+            type === "mobile"
+              ? "800-555-1234"
+              : type === "money"
+              ? "$"
+              : type === "number"
+              ? ""
+              : placeholder
+          }
+          type={getInputTypeAttribute()}
+          value={getDisplayValue()}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
+          onFocus={handleFocus}
+          onClick={handleClick}
+          onSelect={handleSelect}
           readOnly={!isEditing || readOnly}
           disabled={disabled}
           className={`w-full ${className} font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist ${
