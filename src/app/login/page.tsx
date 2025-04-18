@@ -223,12 +223,21 @@ function LoginContent() {
     cookieHandler.clearLoginAttempts();
   };
 
-  const handleLoginResetSwitch = (isVisible: boolean) => {
+  // Modified to accept and store email
+  const handleLoginResetSwitch = (isVisible: boolean, email?: string) => {
     setShowLogin(isVisible);
+    if (email !== undefined) {
+      setFormData((prev) => ({ ...prev, email }));
+    }
   };
 
   const handleSetShowAuthForm = (isVisible: boolean) => {
     setShowAuthForm(isVisible);
+  };
+
+  // New handler to update email in the formData state
+  const handleEmailChange = (email: string) => {
+    setFormData((prev) => ({ ...prev, email }));
   };
 
   return (
@@ -246,6 +255,8 @@ function LoginContent() {
             setShowLogin={handleLoginResetSwitch}
             isAuthFormVisible={showAuthForm}
             setShowAuthForm={handleSetShowAuthForm}
+            email={formData.email}
+            onEmailChange={handleEmailChange}
           />
         )}
 
@@ -259,8 +270,10 @@ function LoginContent() {
             isEmailCodeVerified={isEmailCodeVerified}
             onResetCodeVerify={handleEmailCodeVerify}
             onConsentSubmit={handleConsentAgreement}
-            onCancel={resetState} // Pass reset function to ResetCard
+            onCancel={resetState}
             setShowLogin={handleLoginResetSwitch}
+            defaultData={formData}
+            onEmailChange={handleEmailChange}
           />
         )}
       </div>

@@ -66,7 +66,7 @@ export function checkAccess(path: string, token?: string): boolean {
  * @returns Boolean indicating if user has the specified role
  */
 export function hasRole(role: string, token?: string): boolean {
-  const userRole = getUserRole(token || cookieHandler.getAuthToken());
+  const userRole = getUserRole(token ?? cookieHandler.getAuthToken());
   return userRole === role.toUpperCase();
 }
 

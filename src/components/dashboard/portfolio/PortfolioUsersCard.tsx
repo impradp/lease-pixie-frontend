@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { NewUserFormData } from "@/types/user";
+import { hasRole } from "@/lib/utils/authUtils";
 import { PortfolioUser } from "@/types/Portfolio";
 import handleInfo from "@/lib/utils/errorHandler";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
-import NewPortfolioUser from "@/components/portfolio/user/NewPortfolioUser";
+import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import PortfolioUserCardContent from "@/components/dashboard/portfolio/PortfolioUserCardContent";
 
 /**
@@ -16,6 +16,7 @@ import PortfolioUserCardContent from "@/components/dashboard/portfolio/Portfolio
 interface PortfolioUsersCardProps {
   isEditable: boolean; // Whether the card is editable (default: false)
   isSubmitting: (value: boolean) => void;
+  defaultSearchTerm?: string; // Default search term for the card
 }
 
 /**
@@ -25,14 +26,25 @@ interface PortfolioUsersCardProps {
 const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
   isEditable = false,
   isSubmitting,
+  defaultSearchTerm = "", // Default search term for the card
 }) => {
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolioUsers, setPortfolioUsers] = useState<PortfolioUser[]>([]);
   const [filteredPortfolioUsers, setFilteredPortfolioUsers] = useState<
     PortfolioUser[]
   >([]);
-  const [showNewUserModal, setShowNewUserModal] = useState(false); // Controls new user modal
+  const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
+    useState(false);
+  const [selectedPortfolioUser, setSelectedPortfolioUser] =
+    useState<PortfolioUser>();
+
+  const hasAccountPermission = hasRole("ACCOUNTUSER") ?? false;
+
+  // Update searchTerm when defaultSearchTerm prop changes
+  useEffect(() => {
+    setSearchTerm(defaultSearchTerm);
+  }, [defaultSearchTerm]);
 
   // Handle search input changes
   const onSearchChange = (value: string) => {
@@ -41,11 +53,32 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
 
   const filterPortfolioUsers = useCallback(
     (usersToFilter: PortfolioUser[], term: string) => {
-      return usersToFilter.filter((user) =>
-        [user.firstName, user.lastName, user.mobileNumber].some((field) =>
-          field?.toLowerCase().includes(term.toLowerCase())
-        )
-      );
+      if (!term) return usersToFilter;
+
+      const lowerCaseTerm = term.toLowerCase();
+
+      return usersToFilter.filter((user) => {
+        // Check basic user fields
+        const basicFieldsMatch = [
+          user.firstName,
+          user.lastName,
+          user.mobileNumber,
+        ].some((field) => field?.toLowerCase().includes(lowerCaseTerm));
+
+        if (basicFieldsMatch) return true;
+
+        // Check portfolio list (if it exists)
+        if (user.portfolioList && Array.isArray(user.portfolioList)) {
+          // Check if any portfolio id or name contains the search term
+          return user.portfolioList.some(
+            (portfolio) =>
+              portfolio.id?.toLowerCase().includes(lowerCaseTerm) ||
+              portfolio.name?.toLowerCase().includes(lowerCaseTerm)
+          );
+        }
+
+        return false;
+      });
     },
     []
   );
@@ -56,7 +89,6 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
 
   const fetchPortfolioUsers = async () => {
     isSubmitting(true);
-    setSearchTerm(""); // Reset search term on fetch
     try {
       const response = await portfolioService.getUsers({
         attachPortfolio: true,
@@ -78,45 +110,49 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
   }, []);
 
   // Handle refresh button click
-  const onRefreshClick = () => {
+  const onRefreshClick = async () => {
     setIsRefreshClicked(true);
-    setSearchTerm("");
+    setSearchTerm(""); // Clear search on refresh
+
+    // Re-fetch data
+    await fetchPortfolioUsers();
+
     setTimeout(() => setIsRefreshClicked(false), 500); // Reset after 500ms
   };
 
-  /**
-   * Closes the new user modal
-   */
-  const handleCloseUserModal = () => {
-    // Hides the new user modal
-    setShowNewUserModal(false);
+  const onClickDelete = async (user: PortfolioUser) => {
+    setShowPreConfirmationDialog(true);
+    setSelectedPortfolioUser(user);
   };
 
-  /**
-   * Handles adding a new user via API
-   * @param userData - Data for the new user
-   * @param setLoading - Function to toggle loading state
-   */
-  const handleAddUser = async (
-    userData: NewUserFormData,
-    setLoading: (loading: boolean) => void
-  ) => {
-    // Submits new user data and refreshes list
+  const handlePreConfirmationClose = () => {
+    setShowPreConfirmationDialog(false);
+    setSelectedPortfolioUser(undefined);
+  };
+
+  // Handle delete action (placeholder for API call)
+  const handleDelete = async () => {
     try {
-      setShowNewUserModal(false);
+      isSubmitting(true);
+      setShowPreConfirmationDialog(false);
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const response = await portfolioService.addUser(userData);
+      if (!selectedPortfolioUser?.id) {
+        throw new Error("Invalid user id.");
+      }
+      const response = await portfolioService.deleteUser(
+        selectedPortfolioUser.id
+      );
+
       if (response?.status === "SUCCESS") {
-        setShowNewUserModal(false);
-        handleInfo({ code: 100507 });
+        handleInfo({ code: 100515 });
         fetchPortfolioUsers();
       } else {
-        handleInfo({ code: 100508 });
+        handleInfo({ code: 100516 });
       }
     } catch (err) {
-      handleInfo({ code: 100509, error: err });
+      handleInfo({ code: 100517, error: err });
     } finally {
-      setLoading(false);
+      isSubmitting(false);
     }
   };
 
@@ -127,26 +163,32 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
           label="Portfolio Users"
           isEditable={isEditable}
           onSearchChange={onSearchChange}
+          globalSearchValue={searchTerm} // Pass current search term to header
           showSearchFeat={true}
           showRefreshIcon={true}
           onRefreshClick={onRefreshClick}
           isRefreshClicked={isRefreshClicked}
           showSearchIcon={true}
-          showAddIcon={true}
-          onAddClick={() => setShowNewUserModal(true)}
         />
         <div className="flex flex-col gap-2">
           {filteredPortfolioUsers.map((user: PortfolioUser) => (
-            <PortfolioUserCardContent key={user.id} user={user} />
+            <PortfolioUserCardContent
+              key={user.id}
+              user={user}
+              isEditable={hasAccountPermission}
+              onDelete={onClickDelete}
+            />
           ))}
         </div>
       </div>
-      {showNewUserModal && (
-        <NewPortfolioUser
-          onClose={handleCloseUserModal}
-          onSubmit={handleAddUser}
-        />
-      )}
+      <PreConfirmationDialog
+        isOpen={showPreConfirmationDialog}
+        onClose={handlePreConfirmationClose}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message="Delete portfolio user. This action will archive the portfolio user and cannot be undone."
+        confirmButtonLabel="Delete"
+      />
     </>
   );
 };

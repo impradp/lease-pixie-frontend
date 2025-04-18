@@ -192,8 +192,9 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
             </div>
             {isEditing && !readOnly && !isLocked && (
               <ChevronDown
-                className="w-5 h-5 stroke-secondary-icon"
-                aria-hidden="true"
+                className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                  isOpen && !isLocked ? "-rotate-90" : ""
+                }`}
               />
             )}
           </div>

@@ -23,6 +23,9 @@ export const ENDPOINTS = {
       DEFAULT: "/api/v1/account",
       BY_ID: "/api/v1/account/%s",
     },
+    DELETE: {
+      DEFAULT: "/api/v1/account/%s",
+    },
   },
   DEPOSIT_ACCOUNT: {
     DEFAULT: "/api/v1/deposit-account",
@@ -38,6 +41,9 @@ export const ENDPOINTS = {
       BY_ID: "/api/v1/portfolio/%s",
       VENDORS: "/api/v1/portfolio/vendors",
       USERS: "/api/v1/portfolio/users?attachPortfolio=%s",
+    },
+    DELETE: {
+      USER: "/api/v1/portfolio/users/%s",
     },
   },
 

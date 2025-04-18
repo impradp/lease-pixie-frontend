@@ -5,15 +5,32 @@ import { X } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
 
+/**
+ * Props for the ConsentForm component.
+ *
+ * @interface ConsentFormProps
+ * @property {string} label - Main title of the form displayed at the top.
+ * @property {string} consentLabel - Text displayed next to the consent checkbox.
+ * @property {(agreed: boolean) => void} onSubmit - Callback function triggered when the form is submitted with agreement.
+ * @property {() => void} [onClose] - Optional callback function triggered when the close button is clicked.
+ * @property {string} [className] - Optional additional CSS classes for styling the form container.
+ * @property {React.CSSProperties} [style] - Optional inline CSS styles for the form container.
+ */
 interface ConsentFormProps {
-  label: string; // Main title of the form
-  consentLabel: string; // Text for the consent checkbox
-  onSubmit: (agreed: boolean) => void; // Callback when "I Agree" is clicked
-  onClose?: () => void; // Optional close callback
+  label: string;
+  consentLabel: string;
+  onSubmit: (agreed: boolean) => void;
+  onClose?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
+/**
+ * ConsentForm component.
+ *
+ * @param {ConsentFormProps} props - The props for the ConsentForm component.
+ * @returns {JSX.Element} The rendered consent form component.
+ */
 function ConsentForm({
   label,
   consentLabel,
@@ -24,12 +41,20 @@ function ConsentForm({
 }: ConsentFormProps) {
   const [agreed, setAgreed] = useState(false);
 
+  /**
+   * Handles form submission, preventing submission if the user has not agreed.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!agreed) return; // Prevent submission if not agreed
+    if (!agreed) return;
     onSubmit(agreed);
   };
 
+  /**
+   * Handles the close button click, resetting the agreement state and calling the onClose callback if provided.
+   */
   const handleClose = () => {
     setAgreed(false);
     if (onClose) onClose();

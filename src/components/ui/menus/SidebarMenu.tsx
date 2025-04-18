@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState, useContext } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
 
+import { ChevronDown } from "lucide-react";
 import { MenuItem } from "@/types/menuItem";
 import handleInfo from "@/lib/utils/errorHandler";
 import { loginService } from "@/lib/services/login";
@@ -94,19 +94,11 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
                 <span className="text-black text-base truncate">
                   {item.title}
                 </span>
-                {item.isExpanded ? (
-                  <ChevronDown
-                    size={24}
-                    className={`ml-2 transition-transform font-bold stroke-[2]`}
-                    stroke="black"
-                  />
-                ) : (
-                  <ChevronRight
-                    size={24}
-                    className={`ml-2 transition-transform stroke-[1.5]`}
-                    stroke="black"
-                  />
-                )}
+                <ChevronDown
+                  className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                    item.isExpanded ? "-rotate-90" : ""
+                  }`}
+                />
               </dt>
               {item.isExpanded && item.subItems && (
                 <div className="flex flex-col mt-1">

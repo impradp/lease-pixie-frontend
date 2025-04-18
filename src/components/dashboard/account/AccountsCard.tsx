@@ -10,6 +10,7 @@ import CompanyInfo from "@/components/dashboard/CompanyInfo";
 import AccountForm from "@/components/dashboard/account/AccountForm";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
+import { hasRole } from "@/lib/utils/authUtils";
 
 /**
  * Props for the AccountsCard component
@@ -17,6 +18,7 @@ import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog"
 interface AccountsCardProps {
   isEditable?: boolean; // Whether the card is editable (default: false)
   isSubmitting: (value: boolean) => void;
+  globalPortfolioSearch: (value: string) => void; // Function to handle global portfolio search
 }
 
 /**
@@ -27,6 +29,7 @@ interface AccountsCardProps {
 const AccountsCard: React.FC<AccountsCardProps> = ({
   isEditable = false,
   isSubmitting,
+  globalPortfolioSearch,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAccountForm, setShowAccountForm] = useState(false);
@@ -36,6 +39,10 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
   const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
   const [displayEditFeature, setDisplayEditFeature] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account>(defaultData);
+  const [showPreConfirmationDeleteDialog, setShowPreConfirmationDeleteDialog] =
+    useState(false);
+
+  const showAddFeature = hasRole("ADMINUSER");
 
   // Filter accounts based on search term
   const filterAccounts = useCallback(
@@ -202,6 +209,40 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
     }
   };
 
+  const onClickDelete = async (account: Account) => {
+    setShowPreConfirmationDeleteDialog(true);
+    setSelectedAccount(account);
+  };
+
+  const handlePreConfirmationDeleteClose = () => {
+    setShowPreConfirmationDeleteDialog(false);
+    setSelectedAccount(defaultData);
+  };
+
+  // Handle delete action (placeholder for API call)
+  const handleDelete = async () => {
+    try {
+      isSubmitting(true);
+      setShowPreConfirmationDeleteDialog(false);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      if (!selectedAccount?.id) {
+        throw new Error("Invalid user id.");
+      }
+      const response = await accountService.delete(selectedAccount.id);
+
+      if (response?.status === "SUCCESS") {
+        handleInfo({ code: 100114 });
+        fetchAccounts();
+      } else {
+        handleInfo({ code: 100115 });
+      }
+    } catch (err) {
+      handleInfo({ code: 100116, error: err });
+    } finally {
+      isSubmitting(false);
+    }
+  };
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -211,7 +252,7 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
           onSearchChange={handleSearchChange}
           showSearchFeat={true}
           showSearchIcon={true}
-          showAddIcon={true}
+          showAddIcon={showAddFeature}
           onAddClick={handleAccountAdd}
           showRefreshIcon={true}
           onRefreshClick={fetchAccounts}
@@ -226,6 +267,8 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
                 details={company}
                 onToggleAccess={handleToggleAccess}
                 onEditClick={onEditAccountClick}
+                onDelete={onClickDelete}
+                globalPortfolioSearch={globalPortfolioSearch}
               />
             ))
           ) : (
@@ -254,6 +297,15 @@ const AccountsCard: React.FC<AccountsCardProps> = ({
         title="Create Account"
         message="Create a billing account. This action will add an Account user to the platform."
         confirmButtonLabel="Create Billing Account"
+      />
+
+      <PreConfirmationDialog
+        isOpen={showPreConfirmationDeleteDialog}
+        onClose={handlePreConfirmationDeleteClose}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message="Delete account user. This action will archive the account user and cannot be undone."
+        confirmButtonLabel="Delete"
       />
     </>
   );

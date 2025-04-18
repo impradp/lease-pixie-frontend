@@ -10,6 +10,7 @@ import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import ReadOnlyAdminUserForm from "@/components/dashboard/ReadOnlyAdminUserForm";
 import ROAdminUsersCardContent from "@/components/dashboard/ROAdminUsersCardContent";
+import { hasRole } from "@/lib/utils/authUtils";
 
 /**
  * Props for the ROAdminUsersCard component
@@ -42,6 +43,8 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
+
+  const showAddFeature = hasRole("ADMINUSER");
 
   // Filter read only admin based on search term
   const filterReadOnlyAdmins = useCallback(
@@ -180,7 +183,7 @@ const ROAdminUsersCard: React.FC<ROAdminUsersCardProps> = ({
           isEditable={isEditable}
           onSearchChange={onSearchChange}
           showSearchFeat={true}
-          showAddIcon={true}
+          showAddIcon={showAddFeature}
           showSearchIcon={true}
           showRefreshIcon={true}
           onAddClick={onAddClick}

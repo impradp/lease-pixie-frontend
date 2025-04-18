@@ -61,6 +61,18 @@ const target = {
     type: "error",
     message: "Exception occurred while updating account access.",
   } as LeasePixieToastMsg,
+  100114: {
+    type: "info",
+    message: "Account user deleted successfully.",
+  } as LeasePixieToastMsg,
+  100115: {
+    type: "error",
+    message: "Failed to delete account user.",
+  } as LeasePixieToastMsg,
+  100116: {
+    type: "error",
+    message: "Exception occured while deleting account user.",
+  } as LeasePixieToastMsg,
 
   //100200 series for user access
   100200: {
@@ -207,6 +219,18 @@ const target = {
   100514: {
     type: "error",
     message: "Exception occured while fetching portfolios.",
+  } as LeasePixieToastMsg,
+  100515: {
+    type: "success",
+    message: "Portfolio user deleted successfully.",
+  } as LeasePixieToastMsg,
+  100516: {
+    type: "error",
+    message: "Error occured deleting portfolio user.",
+  } as LeasePixieToastMsg,
+  100517: {
+    type: "error",
+    message: "Exception occured deleting portfolio user.",
   } as LeasePixieToastMsg,
 
   //100600 series for property handle message

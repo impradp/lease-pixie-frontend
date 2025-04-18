@@ -1,6 +1,11 @@
+"use client";
+
 export class CookieHandler {
   // Generic method to get a cookie by name
   getCookie(name: string): string | undefined {
+    if (typeof document === "undefined") {
+      return undefined; // Handle server-side case
+    }
     return document.cookie
       .split("; ")
       .find((row) => row.startsWith(`${name}=`))

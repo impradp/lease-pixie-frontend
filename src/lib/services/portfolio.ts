@@ -23,6 +23,12 @@ class PortfolioService {
     );
   }
 
+  async deleteUser(id: number): Promise<PortfolioUserResponse> {
+    return await apiService.delete<PortfolioUserResponse>(
+      interpolate(ENDPOINTS.PORTFOLIO.DELETE.USER, id)
+    );
+  }
+
   async getUsers(
     options: { attachPortfolio?: boolean } = { attachPortfolio: false }
   ): Promise<PortfolioUserListResponse> {

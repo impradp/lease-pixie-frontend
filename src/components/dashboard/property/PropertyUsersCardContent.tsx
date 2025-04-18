@@ -78,7 +78,7 @@ export const PropertyUsersCardContent: React.FC<
               <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
                 <ChevronDown
                   className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isAccessLevelOpen ? "rotate-180" : ""
+                    isAccessLevelOpen ? "-rotate-90" : ""
                   }`}
                 />
               </div>

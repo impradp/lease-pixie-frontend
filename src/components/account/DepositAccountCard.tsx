@@ -9,6 +9,7 @@ import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { depositAccountService } from "@/lib/services/depositAccount";
 import DepositAccountForm from "@/components/account/DepositAccountForm";
 import DepositAccountContent from "@/components/account/DepositAccountContent";
+import { hasRole } from "@/lib/utils/authUtils";
 
 interface DepositAccountsCardProps {
   isEditable?: boolean; // Whether the card is editable (default: false)
@@ -32,6 +33,8 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
   const [showDepositAccountForm, setShowDepositAccountForm] = useState(false);
   const [depositAccounts, setDepositAccounts] =
     useState<DepositAccount[]>(sampleData);
+
+  const showAddIcon = hasRole("ACCOUNTUSER"); // Check if the user has the role to show add icon
 
   /**
    * Fetches deposit accounts from the service and updates state.
@@ -92,13 +95,12 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
         <PixieCardHeader
           label={"Deposit Accounts"}
           isEditable={isEditable}
-          showAddIcon={true}
+          showAddIcon={showAddIcon}
           onAddClick={() => setShowDepositAccountForm(true)} // Open form on add click
         />
-        {depositAccounts &&
-          depositAccounts.map((account, index) => (
-            <DepositAccountContent key={index} account={account} /> // Render each account
-          ))}
+        {depositAccounts?.map((account) => (
+          <DepositAccountContent key={account.id} account={account} /> // Render each account
+        ))}
       </div>
       {showDepositAccountForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

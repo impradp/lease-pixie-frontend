@@ -26,6 +26,17 @@ class AccountService {
   }
 
   /**
+   * Deletes an account
+   * @param id - The id of the account to delete
+   * @returns Promise resolving to the account deletion response
+   */
+  async delete(id: string): Promise<AccountResponse> {
+    return await apiService.delete<AccountResponse>(
+      interpolate(ENDPOINTS.ACCOUNT.DELETE.DEFAULT, id)
+    );
+  }
+
+  /**
    * Updates an existing account
    * @param accountId - The id of the account user
    * @param accountPayload - The account data to update

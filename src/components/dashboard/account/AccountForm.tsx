@@ -146,7 +146,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
               value={formData.companyName ?? ""}
               onChange={(value) => handleInputChange("companyName", value)}
               isEditing={true}
-              disabled={isFormDisabled || isReadonly}
+              disabled={isFormDisabled}
               isRequired={true}
             />
             <AddressAutocompleteInput

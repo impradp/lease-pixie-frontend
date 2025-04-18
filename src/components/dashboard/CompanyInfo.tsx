@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
 
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { Account } from "@/types/Account";
+import { ChevronDown } from "lucide-react";
 import { Pills } from "@/components/ui/pills";
+import { hasRole } from "@/lib/utils/authUtils";
 import { ServicePill } from "@/types/ServicePills";
 import { getServicePill } from "@/lib/utils/pillsColors";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 
 /**
@@ -19,6 +21,8 @@ interface CompanyInfoProps {
   onToggleAccess?: (accountId: string, isLocked: boolean) => Promise<boolean>; // Callback for toggling access
   onEditClick?: (id: string) => void; // Callback for edit button click
   isSubmitting: (value: boolean) => void;
+  onDelete?: (account: Account) => void;
+  globalPortfolioSearch?: (portfolioId: string) => void; // New prop for portfolio ID click handler
 }
 
 /**
@@ -32,6 +36,8 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   onToggleAccess,
   onEditClick,
   isSubmitting,
+  onDelete,
+  globalPortfolioSearch,
 }) => {
   const router = useRouter();
   const [isInvoicesOpen, setIsInvoicesOpen] = useState(false); // State for invoices section visibility
@@ -42,6 +48,8 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   const [isAccessLocked, setIsAccessLocked] = useState(
     details?.isLocked || false
   ); // State for access lock status
+
+  const hasDeletePermission = hasRole("ADMINUSER");
 
   /**
    * Syncs local access lock state with prop changes
@@ -105,6 +113,24 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
     onEditClick?.(accountId);
   };
 
+  /**
+   * Handles portfolio ID click
+   * @param event - The click event
+   * @param portfolioId - The ID of the clicked portfolio
+   */
+  const setPortfolioSearch = (
+    event: React.MouseEvent,
+    portfolioId: string | undefined
+  ) => {
+    // Stop event propagation to prevent the parent's onClick from firing
+    event.stopPropagation();
+
+    // Ensure we have both the callback and a valid portfolio ID
+    if (globalPortfolioSearch && portfolioId) {
+      globalPortfolioSearch(portfolioId);
+    }
+  };
+
   // Map raw service labels to ServicePill objects
   const servicePills: ServicePill[] =
     details?.services?.map((label) => getServicePill(label)) ?? [];
@@ -118,15 +144,13 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
               <div className="flex-1 justify-start text-secondary-light text-sm font-bold font-['Inter'] leading-tight">
                 {details?.companyName}
               </div>
-              <div
-                data-hierarchy="Link gray"
-                data-icon="Default"
-                data-size="sm"
-                data-state="Default"
-                className="flex justify-center items-center gap-1.5 overflow-hidden"
-              >
-                <div className="justify-start text-tertiary-light text-xs font-semibold font-['Inter'] underline leading-tight"></div>
-              </div>
+              <LinkButton
+                label="Delete"
+                hidden={
+                  !hasDeletePermission || details?.portfolios?.length !== 0
+                }
+                onClick={() => details?.id && onDelete && onDelete(details)} // Trigger onDelete callback if provided
+              />
             </div>
             <div className="self-stretch h-5 inline-flex justify-between items-center">
               <div className="flex justify-center items-center gap-2.5">
@@ -234,11 +258,11 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 Invoices
               </div>
               <div className="w-1/2 flex overflow-hidden justify-end">
-                {isInvoicesOpen ? (
-                  <ChevronUp className="w-4 h-4 text-tertiary-slateMist" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-tertiary-slateMist" />
-                )}
+                <ChevronDown
+                  className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                    isInvoicesOpen ? "-rotate-90" : ""
+                  }`}
+                />
               </div>
             </div>
             {isInvoicesOpen && (
@@ -278,11 +302,11 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 Portfolios
               </div>
               <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                {isPortfoliosOpen ? (
-                  <ChevronUp className="w-4 h-4 text-tertiary-slateMist" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-tertiary-slateMist" />
-                )}
+                <ChevronDown
+                  className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                    isPortfoliosOpen ? "-rotate-90" : ""
+                  }`}
+                />
               </div>
             </div>
             {isPortfoliosOpen && (
@@ -300,7 +324,15 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                       </div>
                       <div className="w-[310px] h-[18px] inline-flex justify-start items-start gap-1">
                         <div className="w-[321px] self-stretch flex justify-start items-center gap-2">
-                          <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px]">
+                          <div
+                            className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px] cursor-pointer hover:text-tertiary-midnightBlue hover:font-medium select-none"
+                            style={{ cursor: "pointer" }}
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) =>
+                              setPortfolioSearch(e, portfolio?.id)
+                            }
+                          >
                             {portfolio?.id}
                           </div>
                           {portfolio?.totalProperties && (
@@ -339,11 +371,13 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                             Cost (Margins)
                           </div>
                           <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                            {portfolioCostOpen[portfolio.name] ? (
-                              <ChevronUp className="w-4 h-4 text-tertiary-slateMist" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4 text-tertiary-slateMist" />
-                            )}
+                            <ChevronDown
+                              className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                                portfolioCostOpen[portfolio.name]
+                                  ? "-rotate-90"
+                                  : ""
+                              }`}
+                            />
                           </div>
                         </div>
                         {portfolioCostOpen[portfolio.name] && (

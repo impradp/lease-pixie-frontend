@@ -16,6 +16,7 @@ import PropertyAndPortfolioTab from "@/components/dashboard/property/PropertyAnd
 interface PropertyAndPortfolioCardProps {
   isEditable: boolean; // Whether the card is editable (default: false)
   isSubmitting: (value: boolean) => void;
+  defaultSearchTerm?: string; // Default search term for the card
 }
 
 /**
@@ -26,13 +27,19 @@ interface PropertyAndPortfolioCardProps {
 const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
   isEditable = false,
   isSubmitting,
+  defaultSearchTerm = "", // Default search term for the card
 }) => {
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [filteredPortfolios, setFilteredPortfolios] = useState<Portfolio[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
+
+  // Update searchTerm when defaultSearchTerm prop changes
+  useEffect(() => {
+    setSearchTerm(defaultSearchTerm);
+  }, [defaultSearchTerm]);
 
   // Handle search input changes
   const onSearchChange = (value: string) => {
@@ -41,35 +48,54 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
 
   const filterPortfolios = useCallback(
     (portfoliosToFilter: Portfolio[], term: string) => {
-      return portfoliosToFilter.filter((portfolio) =>
-        [portfolio.name].some((field) =>
+      if (!term) return portfoliosToFilter;
+
+      return portfoliosToFilter.filter((portfolio) => {
+        // Check all searchable fields
+        const searchableFields = [
+          portfolio.name,
+          portfolio.id,
+          // Add any other relevant portfolio fields here
+        ].filter(Boolean); // Remove null/undefined values
+
+        return searchableFields.some((field) =>
           field?.toLowerCase().includes(term.toLowerCase())
-        )
-      );
+        );
+      });
     },
     []
   );
 
   const filterProperties = useCallback(
     (propertiesToFilter: Property[], term: string) => {
-      return propertiesToFilter.filter((property) =>
-        [property.name].some((field) =>
+      if (!term) return propertiesToFilter;
+
+      return propertiesToFilter.filter((property) => {
+        // Check all searchable fields
+        const searchableFields = [
+          property.name,
+          property.address,
+          // Add any other relevant property fields here
+        ].filter(Boolean); // Remove null/undefined values
+
+        return searchableFields.some((field) =>
           field?.toLowerCase().includes(term.toLowerCase())
-        )
-      );
+        );
+      });
     },
     []
   );
 
+  // Apply filters whenever data or search term changes
   useEffect(() => {
     setFilteredPortfolios(filterPortfolios(portfolios, searchTerm));
     setFilteredProperties(filterProperties(properties, searchTerm));
   }, [properties, portfolios, searchTerm, filterPortfolios, filterProperties]);
 
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       isSubmitting(true);
-      setSearchTerm(""); // Reset search term on fetch
       try {
         const [portfolioResponse, propertyResponse] = await Promise.all([
           portfolioService.fetchAll(),
@@ -98,13 +124,35 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
   }, []);
 
   // Handle refresh button click
-  const onRefreshClick = () => {
+  const onRefreshClick = async () => {
     setIsRefreshClicked(true);
+    // Clear search on refresh and ensure the value is propagated to the header
     setSearchTerm("");
-    setTimeout(() => setIsRefreshClicked(false), 500); // Reset after 500ms
+
+    // Re-fetch data
+    isSubmitting(true);
+    try {
+      const [portfolioResponse, propertyResponse] = await Promise.all([
+        portfolioService.fetchAll(),
+        propertyService.fetchAll(),
+      ]);
+
+      if (portfolioResponse.status === "SUCCESS") {
+        setPortfolios(portfolioResponse.data);
+      }
+
+      if (propertyResponse.status === "SUCCESS") {
+        setProperties(propertyResponse.data);
+      }
+    } catch (err) {
+      handleInfo({ code: 100514, error: err });
+    } finally {
+      isSubmitting(false);
+      setTimeout(() => setIsRefreshClicked(false), 500); // Reset after 500ms
+    }
   };
 
-  // Define tabs outside of render to avoid recreation
+  // Define tabs
   const tabs = [
     { label: "Property list", value: "properties" },
     { label: "Portfolio list", value: "portfolios" },
@@ -123,6 +171,7 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
         label="Properties and Portfolios"
         isEditable={isEditable}
         onSearchChange={onSearchChange}
+        globalSearchValue={searchTerm} // Pass current search value to header
         showSearchFeat={true}
         showRefreshIcon={true}
         onRefreshClick={onRefreshClick}

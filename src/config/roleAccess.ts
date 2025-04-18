@@ -3,7 +3,7 @@
  */
 export const roleAccessMap: Record<string, string[]> = {
   // Defines routes accessible by each role
-  ADMINUSER: ["/admin", "/dashboard", "/workflows", "/portfolio", "/account"],
+  ADMINUSER: ["/admin", "/dashboard", "/workflows", "/portfolio", "/account","/"],
   READONLYADMINUSER: [
     "/admin",
     "/dashboard",

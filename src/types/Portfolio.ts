@@ -15,6 +15,8 @@ export interface Portfolio {
   totalProperties?: number;
   squareFootage?: string;
   costMargins?: CostMargin[];
+  primaryUserId?: number;
+  secondaryUserId?: number;
   primaryUser?: {
     id: string | number;
   };

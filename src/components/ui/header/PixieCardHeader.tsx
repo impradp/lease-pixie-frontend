@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowDownUpIcon, RotateCcw, Plus, Search } from "lucide-react";
 
 /**
@@ -20,6 +20,7 @@ interface PixieCardHeaderProps {
   showAddIcon?: boolean; // Show add button (default: false)
   showSearchFeat?: boolean; // Show search input (default: false)
   showSearchIcon?: boolean; // Show search icon in input (default: false)
+  globalSearchValue?: string; // Initial value for search input (default: empty string)
 }
 
 /**
@@ -41,14 +42,20 @@ function PixieCardHeader({
   showAddIcon = false,
   showSearchFeat = false,
   showSearchIcon = false,
+  globalSearchValue = "",
 }: PixieCardHeaderProps) {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(globalSearchValue);
 
-  // Handle refresh button click and reset search
+  // Update local search value when globalSearchValue changes
+  useEffect(() => {
+    setSearchValue(globalSearchValue);
+  }, [globalSearchValue]);
+
+  // Handle refresh button click
   const handleRefreshClicked = () => {
     if (isEditable) {
       onRefreshClick?.();
-      setSearchValue("");
+      // No need to reset search value here as it will be updated via props
     }
   };
 

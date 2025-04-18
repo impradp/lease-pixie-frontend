@@ -27,7 +27,10 @@ interface ResetCardProps {
   attempts?: number;
   emailSent?: boolean;
   isEmailCodeVerified?: boolean;
-  setShowLogin: (isVisible: boolean) => void;
+  setShowLogin: (isVisible: boolean, email?: string) => void;
+  email?: string; // New prop to receive email from parent
+  onEmailChange?: (email: string) => void; // New prop to report email changes
+  defaultData?: { email: string; mobileNumber: string };
 }
 
 function ResetCard({
@@ -42,11 +45,13 @@ function ResetCard({
   onResetCodeVerify,
   isEmailCodeVerified,
   setShowLogin,
+  defaultData,
+  onEmailChange = () => {}, // Default to no-op function
 }: ResetCardProps) {
   const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
-    email: "",
-    mobileNumber: "",
+    email: defaultData?.email ?? "", // Initialize with passed email
+    mobileNumber: defaultData?.mobileNumber ?? "",
     otp: "",
   });
   const [smsConsent, setSMSConsent] = useState(false);
@@ -74,16 +79,27 @@ function ResetCard({
   const handleInputChange =
     (field: keyof typeof formData) => (value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
+
+      // Report email changes back to parent
+      if (field === "email") {
+        onEmailChange(value);
+      }
     };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (formData.email && formData.mobileNumber) {
+      onSubmit({
+        email: formData.email,
+        mobileNumber: formData.mobileNumber,
+      });
+    }
   };
 
   const switchToLogin = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
-    setShowLogin(true);
+    // Pass the current email when switching back to login
+    setShowLogin(true, formData.email);
   };
 
   const handleAuthCodeSubmit = (authCode: string) => {
@@ -158,7 +174,7 @@ function ResetCard({
           <div className="self-stretch flex flex-col justify-center items-center gap-4">
             <CustomInput
               label="Email"
-              value={formData.email}
+              value={formData?.email ?? ""}
               onChange={handleInputChange("email")}
               placeholder="Enter your email"
               isEditing={true}
@@ -167,7 +183,7 @@ function ResetCard({
 
             <CustomInput
               label="Mobile number"
-              value={formData.mobileNumber}
+              value={formData?.mobileNumber ?? ""}
               onChange={handleInputChange("mobileNumber")}
               isEditing={true}
               placeholder="800-555-1234"

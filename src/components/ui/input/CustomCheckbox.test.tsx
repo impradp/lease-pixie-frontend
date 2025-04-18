@@ -63,7 +63,7 @@ describe("CustomCheckbox", () => {
     rerender(<CustomCheckbox {...defaultProps} checked={true} />);
     container = screen.getByRole("checkbox").nextElementSibling;
     expect(container).toHaveClass(
-      "absolute top-0 left-0 w-5 h-5 border rounded pointer-events-none flex items-center justify-center transition-colors bg-white border-black"
+      "absolute top-0 left-0 w-5 h-5 border rounded flex items-center justify-center transition-colors bg-white border-black"
     );
   });
 
@@ -92,7 +92,7 @@ describe("CustomCheckbox", () => {
     const label = screen.getByText("Test Checkbox");
 
     expect(checkbox).toHaveClass(
-      "absolute w-full h-full opacity-0 z-10 cursor-default"
+      "absolute w-5 h-5 opacity-0 z-10 top-0 left-0 cursor-default"
     );
     expect(label).toHaveClass(
       "text-tertiary-slateBlue text-sm font-medium font-['Inter'] leading-tight select-none cursor-default"

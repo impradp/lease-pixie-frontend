@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
@@ -18,9 +18,11 @@ interface LoginCardProps {
   initialAuthCode?: string[];
   error?: string;
   attempts?: number;
-  setShowLogin: (isVisible: boolean) => void;
+  setShowLogin: (isVisible: boolean, email?: string) => void;
   isAuthFormVisible?: boolean;
   setShowAuthForm: (isVisible: boolean) => void;
+  email?: string; // New prop to receive email from parent
+  onEmailChange?: (email: string) => void; // New prop to report email changes
 }
 
 export default function LoginCard({
@@ -32,23 +34,36 @@ export default function LoginCard({
   setShowLogin,
   isAuthFormVisible = false,
   setShowAuthForm,
+  email = "", // Default to empty string
+  onEmailChange = () => {}, // Default to no-op function
 }: LoginCardProps) {
   const { setLoading } = useContext(LoadingContext);
   const [formData, setFormData] = useState({
-    email: "",
+    email: email, // Initialize with passed email
     identifier: "",
     otp: "",
   });
   const [authCode, setAuthCode] = useState<string[]>(initialAuthCode);
 
+  // Update local state when email prop changes
+  useEffect(() => {
+    if (email !== formData.email) {
+      setFormData((prev) => ({ ...prev, email }));
+    }
+  }, [email]);
+
   const handleInputChange =
     (field: keyof typeof formData) => (value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
+
+      // Report email changes back to parent
+      if (field === "email") {
+        onEmailChange(value);
+      }
     };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // setShowAuthForm(true);
     setShowAuthForm(true);
   };
 
@@ -56,13 +71,13 @@ export default function LoginCard({
     setLoading(true); // Trigger loading overlay
     setAuthCode(authCode.split(""));
     onSubmit({ ...formData, otp: authCode });
-    // handleCloseAuth();
     setAuthCode(initialAuthCode);
   };
 
   const switchToReset = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
-    setShowLogin(false);
+    // Pass the current email when switching to reset page
+    setShowLogin(false, formData.email);
   };
 
   return (

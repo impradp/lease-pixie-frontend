@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 
+import { ChevronDown } from "lucide-react";
 import { Pills } from "@/components/ui/pills";
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { DepositAccount } from "@/types/DepositAccount";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import { defaultMerchantAccountPill } from "@/data/servicePills";
@@ -133,11 +133,11 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
             Using deposit account
           </div>
           <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-            {isDepositAccountOpen ? (
-              <ChevronUp className="w-4 h-4 text-tertiary-slateMist" /> // Show up arrow when open
-            ) : (
-              <ChevronDown className="w-4 h-4 text-tertiary-slateMist" /> // Show down arrow when closed
-            )}
+            <ChevronDown
+              className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                isDepositAccountOpen ? "-rotate-90" : ""
+              }`}
+            />
           </div>
         </div>
       </div>

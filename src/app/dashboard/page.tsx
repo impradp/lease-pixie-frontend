@@ -26,8 +26,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [isReadonly, setIsReadonly] = useState(false);
-
-  // Set loading state to false
+  const [defaultSearchTerm, setDefaultSearchTerm] = useState(""); // State to track if a form is being submitted
 
   // Show success toast and redirect on initial load if login succeeded
   useEffect(() => {
@@ -61,10 +60,12 @@ function DashboardContent() {
           <PropertyAndPortfolioCard
             isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
+            defaultSearchTerm={defaultSearchTerm}
           />
           <PortfolioUsersCard
             isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
+            defaultSearchTerm={defaultSearchTerm}
           />
           <PropertyUsersCard />
           <ROAdminUsersCard
@@ -76,6 +77,9 @@ function DashboardContent() {
           <AccountsCard
             isEditable={!isLoading && !isReadonly}
             isSubmitting={(value: boolean) => setLoading(value)}
+            globalPortfolioSearch={(value: string) =>
+              setDefaultSearchTerm(value)
+            }
           />
         </div>
       </div>

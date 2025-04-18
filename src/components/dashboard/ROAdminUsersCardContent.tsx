@@ -30,7 +30,7 @@ export const ROAdminUsersCardContent: React.FC<
                 {user.firstName + " " + user.lastName} {/* Display full name */}
               </div>
               <LinkButton
-                disabled={!isEditable}
+                hidden={!isEditable}
                 label="Delete"
                 onClick={() => user.id && onDelete && onDelete(user)} // Trigger onDelete callback if provided
               />
