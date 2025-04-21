@@ -26,7 +26,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.482.0",
+    "lucide-react": "^0.501.0",
     "next": "^15.2.2",
     "radar-sdk-js": "^4.4.10",
     "react": "^19.0.0",
