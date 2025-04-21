@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { PortfolioUser } from "@/types/Portfolio";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 
@@ -54,9 +54,9 @@ export const PortfolioUserCardContent: React.FC<
                 Portfolios
               </div>
               <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                <ChevronDown
+                <ChevronRight
                   className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isPortfoliosOpen ? "-rotate-90" : ""
+                    isPortfoliosOpen ? "rotate-90" : ""
                   }`}
                 />
               </div>

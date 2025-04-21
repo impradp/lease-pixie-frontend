@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Pills } from "@/components/ui/pills";
 import { DepositAccount } from "@/types/DepositAccount";
 import LinkButton from "@/components/ui/buttons/LinkButton";
@@ -133,9 +133,9 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
             Using deposit account
           </div>
           <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-            <ChevronDown
+            <ChevronRight
               className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                isDepositAccountOpen ? "-rotate-90" : ""
+                isDepositAccountOpen ? "rotate-90" : ""
               }`}
             />
           </div>

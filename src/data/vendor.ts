@@ -7,7 +7,7 @@ export const defaultData: NewVendorFormData = {
   officePhoneNumber: "",
   contactFirstName: "",
   contactLastName: "",
-  email: "",
+  emailAddress: "",
   mobileNumber: "",
   requestW9: false,
   send1099: false,

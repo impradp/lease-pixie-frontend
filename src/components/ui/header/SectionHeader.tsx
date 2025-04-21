@@ -12,6 +12,8 @@ interface SectionHeaderProps {
   showInfo?: boolean;
   infoContent?: string;
   editDisabled?: boolean; // New prop to disable the Edit button
+  editLabel?: string; // Optional label for the Edit button
+  closeLabel?: string;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -25,6 +27,8 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   showInfo = false,
   infoContent = "",
   editDisabled = false, // Default to false
+  editLabel = "Edit", // Default label for the Edit button
+  closeLabel = "Cancel",
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<"left" | "right">(
@@ -104,7 +108,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           }`}
           disabled={editDisabled}
         >
-          Edit
+          {editLabel}
         </button>
       )}
       {showTextCloseButton && onTextCancel && (
@@ -112,7 +116,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           onClick={onTextCancel}
           className="text-card-open-icon text-sm font-semibold font-['Inter'] underline leading-tight"
         >
-          Cancel
+          {closeLabel}
         </button>
       )}
       {showCloseButton && onClose && (

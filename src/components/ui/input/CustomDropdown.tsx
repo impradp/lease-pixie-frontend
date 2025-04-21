@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useId } from "react";
 
-import { ChevronDown, Info } from "lucide-react";
+import { ChevronRight, Info } from "lucide-react";
 import { DropdownOption } from "@/types/user";
 
 interface CustomDropdownProps {
@@ -200,9 +200,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             )}
           </div>
           {isEditing && !readOnly && !isLocked && (
-            <ChevronDown
+            <ChevronRight
               className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                isOpen && !isLocked ? "-rotate-90" : ""
+                isOpen && !isLocked ? "rotate-90" : ""
               }`}
             />
           )}

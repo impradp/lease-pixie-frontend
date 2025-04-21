@@ -83,7 +83,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
       formData.contactFirstName.trim() &&
       formData.contactLastName.trim() &&
       formData.mobileNumber.trim() &&
-      formData.email.trim;
+      formData.emailAddress.trim;
 
     return !!isValid;
   };
@@ -188,9 +188,9 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
 
             <CustomInput
               label="Email address"
-              value={formData.email}
+              value={formData.emailAddress}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, email: value }))
+                setFormData((prev) => ({ ...prev, emailAddress: value }))
               }
               isEditing={true}
               disabled={isLoading}

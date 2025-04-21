@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
 
 import { Account } from "@/types/Account";
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Pills } from "@/components/ui/pills";
 import { hasRole } from "@/lib/utils/authUtils";
 import { ServicePill } from "@/types/ServicePills";
@@ -258,9 +258,9 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 Invoices
               </div>
               <div className="w-1/2 flex overflow-hidden justify-end">
-                <ChevronDown
+                <ChevronRight
                   className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isInvoicesOpen ? "-rotate-90" : ""
+                    isInvoicesOpen ? "rotate-90" : ""
                   }`}
                 />
               </div>
@@ -302,9 +302,9 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 Portfolios
               </div>
               <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                <ChevronDown
+                <ChevronRight
                   className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isPortfoliosOpen ? "-rotate-90" : ""
+                    isPortfoliosOpen ? "rotate-90" : ""
                   }`}
                 />
               </div>
@@ -330,10 +330,10 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                             role="button"
                             tabIndex={0}
                             onClick={(e) =>
-                              setPortfolioSearch(e, portfolio?.id)
+                              setPortfolioSearch(e, portfolio?.code)
                             }
                           >
-                            {portfolio?.id}
+                            {portfolio?.code}
                           </div>
                           {portfolio?.totalProperties && (
                             <>
@@ -371,10 +371,10 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
                             Cost (Margins)
                           </div>
                           <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                            <ChevronDown
+                            <ChevronRight
                               className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
                                 portfolioCostOpen[portfolio.name]
-                                  ? "-rotate-90"
+                                  ? "rotate-90"
                                   : ""
                               }`}
                             />

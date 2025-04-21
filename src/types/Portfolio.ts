@@ -7,7 +7,8 @@ interface CostMargin {
 }
 
 export interface Portfolio {
-  id?: string;
+  id?: number;
+  code?: string;
   name: string; // The portfolio's name or title
   completionPercentage?: number; // Completion percentage (0-100)
   category?: string;
@@ -17,6 +18,9 @@ export interface Portfolio {
   costMargins?: CostMargin[];
   primaryUserId?: number;
   secondaryUserId?: number;
+  insuranceSeatVendorId?: number;
+  attorneySeatVendorId?: number;
+  taxReportingSeatVendorId?: number;
   primaryUser?: {
     id: string | number;
   };

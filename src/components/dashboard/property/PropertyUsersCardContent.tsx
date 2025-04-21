@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { PropertyUser } from "@/types/PropertyUser";
 import { privilegeColors } from "@/lib/utils/privilegeColors";
 
@@ -76,9 +76,9 @@ export const PropertyUsersCardContent: React.FC<
                 Access level
               </div>
               <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                <ChevronDown
+                <ChevronRight
                   className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isAccessLevelOpen ? "-rotate-90" : ""
+                    isAccessLevelOpen ? "rotate-90" : ""
                   }`}
                 />
               </div>

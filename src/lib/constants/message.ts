@@ -174,11 +174,11 @@ const target = {
   } as LeasePixieToastMsg,
   100503: {
     type: "error",
-    message: "Error fetching portfolio vendors.",
+    message: "Error fetching vendors.",
   } as LeasePixieToastMsg,
   100504: {
     type: "error",
-    message: "Exception occurred while fetching portfolio vendors.",
+    message: "Exception occurred while fetching vendors.",
   } as LeasePixieToastMsg,
   100505: {
     type: "error",
@@ -202,15 +202,15 @@ const target = {
   } as LeasePixieToastMsg,
   100510: {
     type: "success",
-    message: "New portfolio vendor added successfully.",
+    message: "New vendor added successfully.",
   } as LeasePixieToastMsg,
   100511: {
     type: "error",
-    message: "Error adding new portfolio vendor.",
+    message: "Error adding new vendor.",
   } as LeasePixieToastMsg,
   100512: {
     type: "error",
-    message: "Exception occured adding new portfolio vendor.",
+    message: "Exception occured adding new vendor.",
   } as LeasePixieToastMsg,
   100513: {
     type: "error",
@@ -275,6 +275,40 @@ const target = {
   100704: {
     type: "error",
     message: "Exception occured while creating deposit accounts.",
+  } as LeasePixieToastMsg,
+
+  //100800 series for deposit account handle message
+  100800: {
+    type: "info",
+    message: "Vendor deleted successfully.",
+  } as LeasePixieToastMsg,
+  100801: {
+    type: "error",
+    message: "Error occured while deleting vendor.",
+  } as LeasePixieToastMsg,
+  100802: {
+    type: "error",
+    message: "Exception occured while deleting vendor.",
+  } as LeasePixieToastMsg,
+  100803: {
+    type: "success",
+    message: "Vendor updated successfully.",
+  } as LeasePixieToastMsg,
+  100804: {
+    type: "error",
+    message: "Error updating vendor.",
+  } as LeasePixieToastMsg,
+  100805: {
+    type: "error",
+    message: "Exception occured while updating vendor.",
+  } as LeasePixieToastMsg,
+  100806: {
+    type: "error",
+    message: "Error fetching vendor.",
+  } as LeasePixieToastMsg,
+  100807: {
+    type: "error",
+    message: "Exception occured while fetching vendor.",
   } as LeasePixieToastMsg,
 } as const;
 

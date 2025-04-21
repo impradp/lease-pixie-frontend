@@ -54,7 +54,7 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
         // Check all searchable fields
         const searchableFields = [
           portfolio.name,
-          portfolio.id,
+          portfolio.code,
           // Add any other relevant portfolio fields here
         ].filter(Boolean); // Remove null/undefined values
 

@@ -13,6 +13,20 @@ export const ENDPOINTS = {
       DELETE: "/api/v1/admin/%s",
     },
   },
+
+  VENDOR: {
+    DEFAULT: "/api/v1/vendor",
+    FETCH: {
+      DEFAULT: "/api/v1/vendor",
+      BY_ID: "/api/v1/vendor/%s",
+    },
+    DELETE: {
+      DEFAULT: "/api/v1/vendor/%s",
+    },
+    UPDATE: {
+      DEFAULT: "/api/v1/vendor/%s",
+    },
+  },
   ACCOUNT: {
     DEFAULT: "/api/v1/account",
     EDIT: {

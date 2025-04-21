@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useId } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronRight, ListFilter } from "lucide-react";
 
 interface DropdownOption {
   value: string;
@@ -21,6 +21,7 @@ interface PixieDropdownProps {
   containerClassName?: string;
   customInputClassName?: string;
   type?: "large" | "default" | "small";
+  showFilterIcon?: boolean;
 }
 
 export const PixieDropdown: React.FC<PixieDropdownProps> = ({
@@ -38,6 +39,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   containerClassName,
   customInputClassName,
   type = "small",
+  showFilterIcon = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string>(value);
@@ -190,12 +192,15 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
                 {selectedOption.label}
               </div>
             </div>
-            {isEditing && !readOnly && !isLocked && (
-              <ChevronDown
+            {isEditing && !readOnly && !isLocked && !showFilterIcon && (
+              <ChevronRight
                 className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                  isOpen && !isLocked ? "-rotate-90" : ""
+                  isOpen && !isLocked ? "rotate-90" : ""
                 }`}
               />
+            )}
+            {isEditing && !readOnly && !isLocked && showFilterIcon && (
+              <ListFilter className="w-[20px] h-[20px] stroke-secondary-button" />
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState, useContext } from "react";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { MenuItem } from "@/types/menuItem";
 import handleInfo from "@/lib/utils/errorHandler";
 import { loginService } from "@/lib/services/login";
@@ -46,6 +46,14 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
     if (subItem === "Portfolio") {
       setLoading(true); // Set loading true before navigation
       router.push("/portfolio");
+      onClose(); // Optional: close the sidebar after navigation
+    } else if (subItem === "Vendors") {
+      setLoading(true); // Set loading true before navigation
+      router.push("/vendors");
+      onClose(); // Optional: close the sidebar after navigation
+    } else if (subItem === "Property") {
+      setLoading(true); // Set loading true before navigation
+      router.push("/property");
       onClose(); // Optional: close the sidebar after navigation
     }
     // Add more conditions here for other subItems if needed
@@ -94,9 +102,9 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
                 <span className="text-black text-base truncate">
                   {item.title}
                 </span>
-                <ChevronDown
+                <ChevronRight
                   className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    item.isExpanded ? "-rotate-90" : ""
+                    item.isExpanded ? "rotate-90" : ""
                   }`}
                 />
               </dt>

@@ -1,3 +1,5 @@
+import { Portfolio } from "./Portfolio";
+
 export interface NewVendorFormData {
   id?: number;
   companyName: string;
@@ -6,9 +8,10 @@ export interface NewVendorFormData {
   officePhoneNumber: string;
   contactFirstName: string;
   contactLastName: string;
-  email: string;
+  emailAddress: string;
   mobileNumber: string;
   requestW9: boolean;
   send1099: boolean;
   getInsuranceCert: boolean;
+  portfolios?: Portfolio[]; // Optional property for portfolios
 }

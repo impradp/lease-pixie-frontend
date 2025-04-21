@@ -72,7 +72,7 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
           // Check if any portfolio id or name contains the search term
           return user.portfolioList.some(
             (portfolio) =>
-              portfolio.id?.toLowerCase().includes(lowerCaseTerm) ||
+              portfolio.code?.toLowerCase().includes(lowerCaseTerm) ||
               portfolio.name?.toLowerCase().includes(lowerCaseTerm)
           );
         }
