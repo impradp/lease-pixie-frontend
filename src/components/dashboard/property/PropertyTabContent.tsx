@@ -20,6 +20,19 @@ const PropertyTabContent: React.FC<PropertyTabContentProps> = ({
 }) => {
   return (
     <div className="w-full flex flex-col justify-start items-center gap-3">
+      {properties.length === 0 && (
+        <div className="self-stretch p-2 bg-tertiary-whisperGray rounded-md inline-flex flex-col justify-start items-start gap-1 overflow-hidden">
+          <div className="self-stretch flex flex-col justify-start items-start gap-2">
+            <div className="self-stretch flex flex-col justify-start items-start gap-2">
+              <div className="self-stretch inline-flex justify-start items-center gap-2">
+                <div className="flex-1 justify-start text-dropdown-regular text-xs font-normal font-['Inter'] leading-[18px]">
+                  No properties available
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {properties.map((property, index) => (
         <div
           key={property.id} // Assumes property.id is unique

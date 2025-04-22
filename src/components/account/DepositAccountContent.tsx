@@ -140,6 +140,21 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
             />
           </div>
         </div>
+        {isDepositAccountOpen && (
+          <div className="self-stretch flex flex-col justify-start items-start gap-2">
+            <div className="self-stretch p-2 bg-gray-50 rounded-md inline-flex flex-col justify-start items-start gap-1 overflow-hidden">
+              <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                  <div className="self-stretch inline-flex justify-start items-center gap-2">
+                    <div className="flex-1 justify-start text-dropdown-regular text-xs font-normal font-['Inter'] leading-[18px]">
+                      No deposit accounts available
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

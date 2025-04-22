@@ -170,7 +170,21 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
           isRefreshClicked={isRefreshClicked}
           showSearchIcon={true}
         />
+
         <div className="flex flex-col gap-2">
+          {filteredPortfolioUsers.length === 0 && (
+            <div className="self-stretch p-2 bg-secondary-fill rounded-md inline-flex flex-col justify-start items-start gap-1 overflow-hidden">
+              <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                  <div className="self-stretch inline-flex justify-start items-center gap-2">
+                    <div className="flex-1 justify-start text-dropdown-regular text-xs font-normal font-['Inter'] leading-[18px]">
+                      No portfolio user available matching your search.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {filteredPortfolioUsers.map((user: PortfolioUser) => (
             <PortfolioUserCardContent
               key={user.id}

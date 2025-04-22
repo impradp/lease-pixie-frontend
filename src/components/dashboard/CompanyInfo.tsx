@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter
-
+import React, { useState, useEffect, useCallback, memo } from "react";
+import { useRouter } from "next/navigation";
 import { Account } from "@/types/Account";
 import { ChevronRight } from "lucide-react";
 import { Pills } from "@/components/ui/pills";
@@ -30,7 +29,7 @@ interface CompanyInfoProps {
  * @param props - The properties for configuring the component
  * @returns JSX.Element - The rendered company info component
  */
-export const CompanyInfo: React.FC<CompanyInfoProps> = ({
+const CompanyInfo: React.FC<CompanyInfoProps> = ({
   isEditable = false,
   details,
   onToggleAccess,
@@ -40,14 +39,14 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
   globalPortfolioSearch,
 }) => {
   const router = useRouter();
-  const [isInvoicesOpen, setIsInvoicesOpen] = useState(false); // State for invoices section visibility
-  const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false); // State for portfolios section visibility
+  const [isInvoicesOpen, setIsInvoicesOpen] = useState(false);
+  const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false);
   const [portfolioCostOpen, setPortfolioCostOpen] = useState<{
     [key: string]: boolean;
-  }>({}); // State for individual portfolio cost visibility
+  }>({});
   const [isAccessLocked, setIsAccessLocked] = useState(
-    details?.isLocked || false
-  ); // State for access lock status
+    details?.isLocked ?? false
+  );
 
   const hasDeletePermission = hasRole("ADMINUSER");
 
@@ -55,360 +54,347 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({
    * Syncs local access lock state with prop changes
    */
   useEffect(() => {
-    setIsAccessLocked(details?.isLocked || false);
+    setIsAccessLocked(details?.isLocked ?? false);
   }, [details?.isLocked]);
 
   /**
    * Toggles the visibility of the invoices section
    */
-  const toggleInvoices = () => setIsInvoicesOpen(!isInvoicesOpen);
+  const toggleInvoices = useCallback(() => {
+    setIsInvoicesOpen((prev) => !prev);
+  }, []);
 
   /**
    * Toggles the visibility of the portfolios section
    */
-  const togglePortfolios = () => setIsPortfoliosOpen(!isPortfoliosOpen);
+  const togglePortfolios = useCallback(() => {
+    setIsPortfoliosOpen((prev) => !prev);
+  }, []);
 
   /**
    * Toggles the visibility of cost details for a specific portfolio
    * @param portfolioName - The name of the portfolio
    */
-  const togglePortfolioCost = (portfolioName: string) => {
+  const togglePortfolioCost = useCallback((portfolioName: string) => {
     setPortfolioCostOpen((prev) => ({
       ...prev,
-      [portfolioName]: !prev[portfolioName],
+      [portfolioName]: !prev[portfolioName] || true,
     }));
-  };
+  }, []);
 
   /**
    * Handles toggling the access lock state with optimistic UI update
    */
-  const handleToggleAccess = async () => {
+  const handleToggleAccess = useCallback(async () => {
     if (!details?.id) return;
 
     const previousLockedState = isAccessLocked;
     const newLockedState = !isAccessLocked;
     setIsAccessLocked(newLockedState);
 
-    const success = await onToggleAccess?.(details.id, newLockedState);
-    if (!success) {
+    try {
+      const success = await onToggleAccess?.(details.id, newLockedState);
+      if (!success) {
+        setIsAccessLocked(previousLockedState);
+      }
+    } catch {
       setIsAccessLocked(previousLockedState);
     }
-  };
+  }, [details?.id, isAccessLocked, onToggleAccess]);
 
   /**
    * Handles dashboard button click
    */
-  const onDashboardClick = () => {
+  const onDashboardClick = useCallback(() => {
+    if (!details?.id) return;
     isSubmitting(true);
-    if (details?.id) {
-      router.push(`/account?id=${details.id}`); // Route to /account/{id}
-    }
-  };
+    router.push(`/account?id=${details.id}`);
+  }, [details?.id, isSubmitting, router]);
 
   /**
    * Handles edit account button click
    * @param param - Object containing the account ID
    */
-  const onEditAccountClick = ({ accountId }: { accountId: string }) => {
-    onEditClick?.(accountId);
-  };
+  const onEditAccountClick = useCallback(
+    ({ accountId }: { accountId: string }) => {
+      onEditClick?.(accountId);
+    },
+    [onEditClick]
+  );
 
   /**
    * Handles portfolio ID click
    * @param event - The click event
    * @param portfolioId - The ID of the clicked portfolio
    */
-  const setPortfolioSearch = (
-    event: React.MouseEvent,
-    portfolioId: string | undefined
-  ) => {
-    // Stop event propagation to prevent the parent's onClick from firing
-    event.stopPropagation();
-
-    // Ensure we have both the callback and a valid portfolio ID
-    if (globalPortfolioSearch && portfolioId) {
-      globalPortfolioSearch(portfolioId);
-    }
-  };
+  const setPortfolioSearch = useCallback(
+    (
+      event: React.MouseEvent | React.KeyboardEvent,
+      portfolioId: string | undefined
+    ) => {
+      event.stopPropagation();
+      if (globalPortfolioSearch && portfolioId) {
+        globalPortfolioSearch(portfolioId);
+      }
+    },
+    [globalPortfolioSearch]
+  );
 
   // Map raw service labels to ServicePill objects
   const servicePills: ServicePill[] =
-    details?.services?.map((label) => getServicePill(label)) ?? [];
+    details?.services?.map(getServicePill) ?? [];
+
+  if (!details) {
+    return null;
+  }
 
   return (
-    <div className="w-full p-3 bg-secondary-fill rounded-xl inline-flex flex-col justify-start items-start gap-3">
-      <div className="self-stretch inline-flex justify-start items-start gap-2">
-        <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
-          <div className="self-stretch flex flex-col justify-start items-start gap-1">
-            <div className="w-full inline-flex justify-start items-start gap-1">
-              <div className="flex-1 justify-start text-secondary-light text-sm font-bold font-['Inter'] leading-tight">
-                {details?.companyName}
-              </div>
-              <LinkButton
-                label="Delete"
-                hidden={
-                  !hasDeletePermission || details?.portfolios?.length !== 0
+    <div className="w-full p-3 bg-secondary-fill rounded-xl flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-start gap-1">
+            <span className="flex-1 text-sm font-bold text-secondary-light">
+              {details.companyName}
+            </span>
+            <LinkButton
+              label="Delete"
+              hidden={
+                !hasDeletePermission || (details.portfolios?.length ?? 0) > 0
+              }
+              onClick={() => onDelete?.(details)}
+            />
+          </div>
+          <div className="flex items-center justify-between h-5">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-semibold text-secondary-light">
+                Contact Name
+              </span>
+              <span className="text-xs text-secondary-light">
+                {details.contactFirstName} {details.contactLastName}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between h-5">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-semibold text-secondary-light">
+                Email
+              </span>
+              <span className="text-xs text-secondary-light">
+                {details.email}
+              </span>
+            </div>
+          </div>
+          <Pills items={servicePills} className="py-[3px]" />
+        </div>
+        <div className="h-px bg-tertiary-stroke" />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onDashboardClick}
+                className="px-2 py-1 rounded bg-tertiary-platinumGray flex items-center gap-1 hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                disabled={!details.id}
+              >
+                <span className="text-xs font-medium text-primary-button">
+                  Dashboard
+                </span>
+              </button>
+              <button
+                disabled={!isEditable || !details.id}
+                onClick={() =>
+                  details.id && onEditAccountClick({ accountId: details.id })
                 }
-                onClick={() => details?.id && onDelete && onDelete(details)} // Trigger onDelete callback if provided
+                className={`px-2 py-1 rounded bg-tertiary-platinumGray flex items-center gap-1 ${
+                  isEditable && details.id
+                    ? "hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                    : "cursor-not-allowed opacity-50"
+                }`}
+              >
+                <span className="text-xs font-medium text-primary-button">
+                  Edit Account
+                </span>
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-tertiary-midnightBlue">
+                Access
+              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-secondary-light">Unlocked</span>
+                <ToggleSwitch
+                  isOn={isAccessLocked}
+                  onToggle={handleToggleAccess}
+                  isDisabled={!isEditable || !details.id}
+                />
+                <span className="text-xs text-secondary-light">Locked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="h-px bg-tertiary-stroke" />
+        <div className="flex flex-col gap-2">
+          <div
+            className="flex items-center h-5 cursor-pointer"
+            onClick={toggleInvoices}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && toggleInvoices()}
+          >
+            <span className="w-1/2 text-xs font-bold text-secondary-light">
+              Invoices
+            </span>
+            <div className="w-1/2 flex justify-end">
+              <ChevronRight
+                className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                  isInvoicesOpen ? "rotate-90" : ""
+                }`}
               />
             </div>
-            <div className="self-stretch h-5 inline-flex justify-between items-center">
-              <div className="flex justify-center items-center gap-2.5">
-                <div className="justify-start text-secondary-light text-xs font-semibold font-['Inter'] leading-[18px]">
-                  Contact Name
-                </div>
-                <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                  {details?.contactFirstName} {details?.contactLastName}
-                </div>
-              </div>
-              <div
-                data-hierarchy="Link gray"
-                data-icon="Default"
-                data-size="sm"
-                data-state="Default"
-                className="flex justify-center items-center gap-1.5 overflow-hidden"
-              >
-                <div className="justify-start text-tertiary-light text-xs font-semibold font-['Inter'] underline leading-tight"></div>
-              </div>
-            </div>
-            <div className="self-stretch h-5 inline-flex justify-between items-center">
-              <div className="flex justify-center items-center gap-2.5">
-                <div className="justify-start text-secondary-light text-xs font-semibold font-['Inter'] leading-[18px]">
-                  Email
-                </div>
-                <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                  {details?.email}
-                </div>
-              </div>
-              <div
-                data-hierarchy="Link gray"
-                data-icon="Default"
-                data-size="sm"
-                data-state="Default"
-                className="flex justify-center items-center gap-1.5 overflow-hidden"
-              >
-                <div className="justify-start text-tertiary-light text-xs font-semibold font-['Inter'] underline leading-tight"></div>
-              </div>
-            </div>
-            <Pills items={servicePills} className="self-stretch py-[3px]" />
           </div>
-          <div className="w-full flex flex-col justify-start items-start gap-2">
-            <div className="self-stretch h-px bg-tertiary-stroke" />
-          </div>
-          <div className="self-stretch flex flex-col justify-start items-start gap-4">
-            <div className="self-stretch flex flex-col justify-center items-center gap-1">
-              <div className="self-stretch inline-flex justify-center items-center gap-3">
-                <button
-                  onClick={onDashboardClick}
-                  className="px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1 cursor-pointer hover:bg-tertiary-platinumGray/80 active:cursor-progress"
-                >
-                  <div className="justify-start text-primary-button text-xs font-medium font-['Inter'] leading-[18px]">
-                    Dashboard
-                  </div>
-                </button>
-                <button
-                  disabled={!isEditable}
-                  onClick={() =>
-                    details?.id && onEditAccountClick({ accountId: details.id })
-                  }
-                  className={`px-2 py-1 bg-tertiary-platinumGray rounded flex justify-start items-center gap-1 ${
-                    isEditable
-                      ? "cursor-pointer hover:bg-tertiary-platinumGray/80 active:cursor-progress"
-                      : "cursor-not-allowed opacity-50"
-                  }`}
-                >
-                  <div className="justify-start text-primary-button text-xs font-medium font-['Inter'] leading-[18px]">
-                    Edit Account
-                  </div>
-                </button>
-              </div>
-            </div>
-            <div className="w-full flex flex-col justify-start items-start gap-2">
-              <div className="w-full flex justify-between items-center">
-                <div className="w-1/2 flex justify-start items-center gap-0.5">
-                  <div className="justify-start text-tertiary-midnightBlue text-xs font-bold font-['Inter'] leading-tight">
-                    Access
-                  </div>
-                </div>
-                <div className="w-1/2 flex justify-end items-center gap-3">
-                  <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                    Unlocked
-                  </div>
-                  <ToggleSwitch
-                    isOn={isAccessLocked}
-                    onToggle={handleToggleAccess}
-                    isDisabled={!isEditable}
-                  />
-                  <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                    Locked
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="w-full flex flex-col justify-start items-start gap-2">
-            <div className="self-stretch h-px bg-tertiary-stroke" />
-          </div>
-          <div className="w-full flex flex-col justify-start items-start gap-2">
-            <div
-              className="w-full h-5 flex items-center cursor-pointer"
-              onClick={toggleInvoices}
-            >
-              <div className="w-1/2 justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-tight">
-                Invoices
-              </div>
-              <div className="w-1/2 flex overflow-hidden justify-end">
-                <ChevronRight
-                  className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isInvoicesOpen ? "rotate-90" : ""
-                  }`}
-                />
-              </div>
-            </div>
-            {isInvoicesOpen && (
-              <div className="w-full flex flex-col justify-start items-start gap-1">
-                {(details?.invoices ?? []).map((invoice, index) => (
+          {isInvoicesOpen && (
+            <div className="flex flex-col gap-1">
+              {details.invoices?.length ? (
+                details.invoices.map((invoice, index) => (
                   <div
-                    key={index}
-                    className="self-stretch p-2 bg-gray-50 rounded-md flex flex-col justify-start items-start gap-1 overflow-hidden"
+                    key={`${invoice.date}-${index}`}
+                    className="p-2 bg-gray-50 rounded-md flex flex-col gap-1"
                   >
-                    <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                      <div className="self-stretch h-[18px] inline-flex justify-start items-start gap-1">
-                        <div className="w-[54px] justify-start text-tertiary-charcoalBlue text-xs font-normal font-['Inter'] underline leading-[18px]">
-                          {invoice.date}
-                        </div>
-                        <div className="w-[54px] justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                          {invoice.amount}
-                        </div>
-                        <div className="flex-1 flex justify-end items-center gap-1">
-                          <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                            {invoice.status}
-                          </div>
-                        </div>
+                    <div className="flex items-start gap-1">
+                      <span className="w-[54px] text-xs text-tertiary-charcoalBlue underline">
+                        {invoice.date}
+                      </span>
+                      <span className="w-[54px] text-xs text-secondary-light">
+                        {invoice.amount}
+                      </span>
+                      <div className="flex-1 flex justify-end">
+                        <span className="text-xs text-secondary-light">
+                          {invoice.status}
+                        </span>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="w-full h-px bg-tertiary-stroke" />
-          <div className="self-stretch flex flex-col justify-start items-start gap-2">
-            <div
-              className="w-full h-5 inline-flex justify-between items-center cursor-pointer"
-              onClick={togglePortfolios}
-            >
-              <div className="text-center justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-tight">
-                Portfolios
-              </div>
-              <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                <ChevronRight
-                  className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                    isPortfoliosOpen ? "rotate-90" : ""
-                  }`}
-                />
-              </div>
+                ))
+              ) : (
+                <div className="p-2 bg-gray-50 rounded-md flex flex-col gap-1">
+                  <span className="text-xs text-dropdown-regular">
+                    No invoice available.
+                  </span>
+                </div>
+              )}
             </div>
-            {isPortfoliosOpen && (
-              <div className="w-full flex flex-col justify-start items-start gap-1">
-                {(details?.portfolios ?? []).map((portfolio, index) => (
-                  <div
-                    key={index}
-                    className="self-stretch p-2 bg-gray-50 rounded-md flex flex-col justify-start items-start gap-3 overflow-hidden"
-                  >
-                    <div className="self-stretch flex flex-col justify-start items-start gap-1">
-                      <div className="self-stretch inline-flex justify-start items-center gap-1">
-                        <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-tight">
-                          {portfolio.name}
-                        </div>
+          )}
+        </div>
+        <div className="h-px bg-tertiary-stroke" />
+        <div className="flex flex-col gap-2">
+          <div
+            className="flex items-center justify-between h-5 cursor-pointer"
+            onClick={togglePortfolios}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && togglePortfolios()}
+          >
+            <span className="text-xs font-bold text-secondary-light">
+              Portfolios
+            </span>
+            <div className="flex items-center justify-center w-5 h-5">
+              <ChevronRight
+                className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                  isPortfoliosOpen ? "rotate-90" : ""
+                }`}
+              />
+            </div>
+          </div>
+          {isPortfoliosOpen && (
+            <div className="flex flex-col gap-1">
+              {details.portfolios?.map((portfolio, index) => (
+                <div
+                  key={`${portfolio.code}-${index}`}
+                  className="p-2 bg-gray-50 rounded-md flex flex-col gap-3"
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-secondary-light">
+                      {portfolio.name}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="text-xs text-tertiary-light underline cursor-pointer hover:text-tertiary-midnightBlue hover:font-medium bg-transparent border-0 p-0"
+                        onClick={(e) => setPortfolioSearch(e, portfolio.code)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" &&
+                          setPortfolioSearch(e, portfolio.code)
+                        }
+                      >
+                        {portfolio.code}
+                      </button>
+                      {portfolio.totalProperties && (
+                        <>
+                          <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
+                          <span className="text-xs text-tertiary-light">
+                            {portfolio.totalProperties}
+                          </span>
+                        </>
+                      )}
+                      {portfolio.squareFootage && (
+                        <>
+                          <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
+                          <span className="text-xs text-tertiary-light">
+                            {portfolio.squareFootage}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="h-px bg-tertiary-stroke" />
+                  <div className="flex flex-col gap-1">
+                    <div
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => togglePortfolioCost(portfolio.name)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && togglePortfolioCost(portfolio.name)
+                      }
+                    >
+                      <span className="text-xs font-bold text-secondary-light">
+                        Cost (Margins)
+                      </span>
+                      <div className="flex items-center justify-center w-5 h-5">
+                        <ChevronRight
+                          className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                            portfolioCostOpen[portfolio.name] ? "rotate-90" : ""
+                          }`}
+                        />
                       </div>
-                      <div className="w-[310px] h-[18px] inline-flex justify-start items-start gap-1">
-                        <div className="w-[321px] self-stretch flex justify-start items-center gap-2">
+                    </div>
+                    {portfolioCostOpen[portfolio.name] && (
+                      <div className="flex flex-col gap-1">
+                        {portfolio.costMargins?.map((cost, idx) => (
                           <div
-                            className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px] cursor-pointer hover:text-tertiary-midnightBlue hover:font-medium select-none"
-                            style={{ cursor: "pointer" }}
-                            role="button"
-                            tabIndex={0}
-                            onClick={(e) =>
-                              setPortfolioSearch(e, portfolio?.code)
-                            }
+                            key={`${cost.month}-${cost.year}-${idx}`}
+                            className="flex items-start gap-1"
                           >
-                            {portfolio?.code}
+                            <span className="w-[54px] text-xs text-tertiary-midnightBlue">
+                              {cost.month} {cost.year}
+                            </span>
+                            <span className="text-xs text-secondary-light">
+                              {cost.cost} ({cost.margin})
+                              {cost.isHighlighted && " *"}
+                            </span>
                           </div>
-                          {portfolio?.totalProperties && (
-                            <>
-                              <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
-                              <div className="flex justify-start items-center gap-0.5">
-                                <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                                  {portfolio?.totalProperties}
-                                </div>
-                              </div>
-                            </>
-                          )}
-                          {portfolio.squareFootage && (
-                            <>
-                              <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
-                              <div className="flex justify-start items-center gap-0.5">
-                                <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                                  {portfolio.squareFootage}
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
+                        ))}
                       </div>
-                    </div>
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                      <div className="self-stretch h-px bg-tertiary-stroke" />
-                    </div>
-                    <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                      <div className="self-stretch flex flex-col justify-start items-start gap-1">
-                        <div
-                          className="self-stretch inline-flex justify-between items-center cursor-pointer"
-                          onClick={() => togglePortfolioCost(portfolio.name)}
-                        >
-                          <div className="w-[189px] justify-start text-secondary-light text-xs font-bold font-['Inter'] leading-[18px]">
-                            Cost (Margins)
-                          </div>
-                          <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
-                            <ChevronRight
-                              className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                                portfolioCostOpen[portfolio.name]
-                                  ? "rotate-90"
-                                  : ""
-                              }`}
-                            />
-                          </div>
-                        </div>
-                        {portfolioCostOpen[portfolio.name] && (
-                          <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                            {(portfolio.costMargins ?? []).map((cost, idx) => (
-                              <div
-                                key={idx}
-                                className="self-stretch h-[18px] inline-flex justify-start items-start gap-1"
-                              >
-                                <div className="w-[54px] justify-start text-tertiary-midnightBlue text-xs font-normal font-['Inter'] leading-[18px]">
-                                  {cost?.month} `{cost?.year}
-                                </div>
-                                <div className="w-[190px] justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                                  {cost.cost} ({cost.margin})
-                                  {cost.isHighlighted && " *"}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default CompanyInfo;
+export default memo(CompanyInfo);

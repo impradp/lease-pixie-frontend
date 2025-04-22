@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
 import handleInfo from "@/lib/utils/errorHandler";
 import { defaultData, sampleData } from "@/data/depositAccount";
@@ -39,7 +39,7 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
   /**
    * Fetches deposit accounts from the service and updates state.
    */
-  const fetchDepositAccounts = useCallback(async () => {
+  const fetchDepositAccounts = async () => {
     isSubmitting(true); // Set submitting state to true
     try {
       const response = await depositAccountService.fetch();
@@ -53,7 +53,7 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
     } finally {
       isSubmitting(false); // Reset submitting state
     }
-  }, [isSubmitting]);
+  };
 
   /**
    * Handles adding a new deposit account and refreshes the account list.
@@ -89,17 +89,24 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
     setSelectedDepositAccount(defaultData); // Reset selected account
   };
 
+  const handleAddClick = () => {
+    setShowDepositAccountForm(true);
+  };
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
         <PixieCardHeader
           label={"Deposit Accounts"}
           isEditable={isEditable}
-          showAddIcon={showAddIcon}
-          onAddClick={() => setShowDepositAccountForm(true)} // Open form on add click
+          showAddIcon={showAddIcon && isEditable} // Only show add icon if both conditions are met
+          onAddClick={isEditable ? handleAddClick : undefined} // Pass undefined if not editable
         />
-        {depositAccounts?.map((account) => (
-          <DepositAccountContent key={account.id} account={account} /> // Render each account
+        {depositAccounts?.map((account, index) => (
+          <DepositAccountContent
+            key={account.id ?? `account-${index}`}
+            account={account}
+          /> // Render each account with unique key
         ))}
       </div>
       {showDepositAccountForm && (

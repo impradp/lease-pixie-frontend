@@ -54,8 +54,8 @@ function PixieCardHeader({
   // Handle refresh button click
   const handleRefreshClicked = () => {
     if (isEditable) {
+      setSearchValue("");
       onRefreshClick?.();
-      // No need to reset search value here as it will be updated via props
     }
   };
 
@@ -75,19 +75,20 @@ function PixieCardHeader({
         <div className="flex items-center gap-[4px]">
           {showSortIcon && (
             <button
-              onClick={isEditable ? onSortIconClick : undefined}
+              onClick={onSortIconClick}
               className={`w-[40px] h-[35px] flex justify-center items-center rounded-[4px] ${
                 isEditable ? "hover:bg-tertiary-blueTint" : "cursor-not-allowed"
               }`}
               disabled={!isEditable}
               aria-label="Sort"
+              aria-disabled={!isEditable}
             >
               <ArrowDownUpIcon className="w-[18px] h-[18px] stroke-secondary-button" />
             </button>
           )}
           {showRefreshIcon && (
             <button
-              onClick={isEditable ? handleRefreshClicked : undefined}
+              onClick={handleRefreshClicked}
               className={`w-[40px] h-[35px] flex justify-center items-center rounded-[4px] ${
                 isRefreshClicked
                   ? "bg-tertiary-darkNavy"
@@ -95,13 +96,14 @@ function PixieCardHeader({
               }`}
               disabled={!isEditable}
               aria-label="Refresh"
+              aria-disabled={!isEditable}
             >
               <RotateCcw className="w-[18px] h-[18px] stroke-secondary-button" />
             </button>
           )}
           {showAddIcon && (
             <button
-              onClick={isEditable ? onAddClick : undefined}
+              onClick={onAddClick}
               className={`w-[40px] h-[35px] flex justify-center items-center rounded-[4px] transition-colors ${
                 isEditable
                   ? isPlusClicked
@@ -111,6 +113,7 @@ function PixieCardHeader({
               }`}
               disabled={!isEditable}
               aria-label="Add"
+              aria-disabled={!isEditable}
             >
               <Plus className="w-[20px] h-[20px] stroke-secondary-button" />
             </button>
