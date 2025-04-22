@@ -2,21 +2,23 @@
  * Page component for displaying a list of vendors with editable cards.
  * Fetches vendor data and renders VendorCard components for each vendor.
  * Manages global editing state to ensure only one card is editable at a time.
+ * Includes a filter dropdown to filter vendors by status (Active/Inactive) and a search input.
+ *
  * @returns JSX.Element - The rendered vendors page
  */
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { CirclePlus, Search } from "lucide-react";
-import { defaultFilter } from "@/data/filter";
 import handleInfo from "@/lib/utils/errorHandler";
 import { NewVendorFormData } from "@/types/vendor";
 import { vendorService } from "@/lib/services/vendor";
 import VendorCard from "@/components/vendor/VendorCard";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
-import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { NewVendor } from "@/components/portfolio/vendor/NewVendor";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import { FilterConfig } from "@/types/Filter";
 
 /**
  * Renders the content for the vendors page
@@ -28,7 +30,12 @@ const VendorsContent: React.FC = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState("");
   const [showNewVendorForm, setShowNewVendorForm] = useState(false);
+  // Initialize selectedFilters with default "Active" status
+  const [selectedFilters, setSelectedFilters] = useState<{
+    [key: string]: string[] | string | null;
+  }>({ Status: "true" });
 
+  // Fetch vendors from the API
   const fetchVendors = async () => {
     try {
       setIsLoading(true);
@@ -52,14 +59,17 @@ const VendorsContent: React.FC = () => {
     fetchVendors();
   }, []);
 
+  // Handle section edit state
   const handleSectionEdit = (section: string) => {
     setEditingSection(section);
   };
 
+  // Close editing section
   const handleSectionClose = () => {
     setEditingSection(null);
   };
 
+  // Update vendor data
   const handleVendorUpdate = async (
     vendorId: string,
     updatedData: NewVendorFormData
@@ -115,6 +125,7 @@ const VendorsContent: React.FC = () => {
     setShowNewVendorForm(false);
   };
 
+  // Delete a vendor
   const handleDelete = async (id: string) => {
     try {
       setIsLoading(true);
@@ -134,13 +145,64 @@ const VendorsContent: React.FC = () => {
     }
   };
 
+  // Restore a vendor
+  const handleRestore = async (id: string) => {
+    try {
+      setIsLoading(true);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const response = await vendorService.restore(id);
+
+      if (response?.status === "SUCCESS") {
+        handleInfo({ code: 100518 });
+        await fetchVendors();
+      } else {
+        handleInfo({ code: 100519 });
+      }
+    } catch (err) {
+      handleInfo({ code: 100520, error: err });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
-  const filteredVendors = vendors.filter((vendor) =>
-    vendor.companyName?.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  // Handle filter changes
+  const handleFilterChange = (filters: {
+    [key: string]: string[] | string | null;
+  }) => {
+    setSelectedFilters(filters);
+  };
+
+  // Filter vendors based on search term and status
+  const filteredVendors = useMemo(() => {
+    handleSectionClose();
+    return vendors.filter((vendor) => {
+      const matchesSearch = vendor.companyName
+        ?.toLowerCase()
+        .includes(searchValue.toLowerCase());
+      const matchesStatus =
+        selectedFilters.Status === null ||
+        (selectedFilters.Status === "true" && !vendor.isDeleted) ||
+        (selectedFilters.Status === "false" && vendor.isDeleted);
+      return matchesSearch && matchesStatus;
+    });
+  }, [vendors, searchValue, selectedFilters]);
+
+  // Configure the filter for Status
+  const filters: FilterConfig[] = [
+    {
+      filterLabel: "Status",
+      filterType: "radio",
+      options: [
+        { id: "true", name: "Active" },
+        { id: "false", name: "Inactive" },
+      ],
+    },
+  ];
 
   const breadcrumbItems = [
     { href: "/account", label: "Account Dashboard" },
@@ -170,14 +232,11 @@ const VendorsContent: React.FC = () => {
             </div>
           </div>
           <div className="relative w-[287px]">
-            <PixieDropdown
-              options={defaultFilter}
-              isEditing={true}
-              className="w-full"
-              containerClassName="w-full"
-              type="large"
-              labelClassName="hidden"
-              showFilterIcon={true}
+            <FilterDropdown
+              label="Select Status"
+              filters={filters}
+              initialFilters={{ Status: "true" }} // Set default to Active
+              onFilterChange={handleFilterChange}
             />
           </div>
           <button
@@ -189,28 +248,27 @@ const VendorsContent: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="space-y-8 py-4">
-        <div className="max-w-[800px] mx-auto">
-          {filteredVendors.map((vendor) => (
-            <VendorCard
-              key={vendor.id ?? `vendor-${vendor.companyName}`}
-              vendorId={vendor.id?.toString() ?? ""}
-              defaultData={vendor}
-              editingSection={editingSection}
-              onSectionEdit={handleSectionEdit}
-              onSectionClose={handleSectionClose}
-              onSubmit={handleVendorUpdate}
-              onDelete={handleDelete}
-            />
-          ))}
-          {filteredVendors.length === 0 && (
-            <div className="p-4 bg-secondary-fill rounded-md flex justify-center items-center">
-              <span className="text-xs text-dropdown-regular font-normal font-['Inter'] leading-[18px]">
-                No vendors available matching your search.
-              </span>
-            </div>
-          )}
-        </div>
+      <div className="max-w-[800px] mx-auto space-y-8 py-4">
+        {filteredVendors.map((vendor) => (
+          <VendorCard
+            key={vendor.id ?? `vendor-${vendor.companyName}`}
+            vendorId={vendor.id?.toString() ?? ""}
+            defaultData={vendor}
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+            onSubmit={handleVendorUpdate}
+            onDelete={handleDelete}
+            onRestore={handleRestore}
+          />
+        ))}
+        {filteredVendors.length === 0 && (
+          <div className="p-4 bg-secondary-fill rounded-md flex justify-center items-center">
+            <span className="text-xs text-dropdown-regular font-normal font-['Inter'] leading-[18px]">
+              No vendors available matching your search or filter.
+            </span>
+          </div>
+        )}
       </div>
       {showNewVendorForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">

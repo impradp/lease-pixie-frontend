@@ -42,6 +42,7 @@ interface VendorCardProps {
   onSectionClose: () => void;
   onSubmit: (vendorId: string, updatedData: NewVendorFormData) => void;
   onDelete?: (vendorId: string) => void;
+  onRestore?: (vendorId: string) => void;
 }
 
 const VendorCard: React.FC<VendorCardProps> = ({
@@ -52,6 +53,7 @@ const VendorCard: React.FC<VendorCardProps> = ({
   onSectionClose,
   onSubmit,
   onDelete,
+  onRestore,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<NewVendorFormData>(defaultData);
@@ -61,6 +63,8 @@ const VendorCard: React.FC<VendorCardProps> = ({
   const [showDeleteRevisionDialog, setShowDeleteRevisionDialog] =
     useState(false);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
+    useState(false);
+  const [showRestoreConfirmationDialog, setShowRestoreConfirmationDialog] =
     useState(false);
 
   // Sync initialFormData when defaultData changes
@@ -93,10 +97,23 @@ const VendorCard: React.FC<VendorCardProps> = ({
     }
   };
 
+  const handleRestore = () => {
+    if (defaultData.isDeleted) {
+      setShowRestoreConfirmationDialog(true);
+    }
+  };
+
   const initiateDelete = () => {
     setShowPreConfirmationDialog(false);
     if (defaultData?.id) {
       onDelete?.(defaultData.id.toString());
+    }
+  };
+
+  const initiateRestore = () => {
+    setShowRestoreConfirmationDialog(false);
+    if (defaultData?.id) {
+      onRestore?.(defaultData.id.toString());
     }
   };
 
@@ -382,7 +399,7 @@ const VendorCard: React.FC<VendorCardProps> = ({
           )}
 
           {/* Show buttons only in edit mode */}
-          {isEditMode && (
+          {isEditMode && !defaultData?.isDeleted && (
             <div className="flex flex-col gap-3">
               <PixieButton
                 label={"Update"}
@@ -393,6 +410,18 @@ const VendorCard: React.FC<VendorCardProps> = ({
                 className="w-full"
               />
               <LinkButton onClick={handleDelete} label="Delete" />
+            </div>
+          )}
+          {isEditMode && defaultData?.isDeleted && (
+            <div className="flex flex-col gap-3">
+              <PixieButton
+                label={"Restore from Archive"}
+                type="button"
+                disabled={isLoading}
+                isLoading={isLoading}
+                className="w-full"
+                onClick={handleRestore}
+              />
             </div>
           )}
         </form>
@@ -412,6 +441,15 @@ const VendorCard: React.FC<VendorCardProps> = ({
         title="Confirm Delete"
         message="Delete vendor. This action will archive the vendor and cannot be undone."
         confirmButtonLabel="Delete Vendor"
+      />
+
+      <PreConfirmationDialog
+        isOpen={showRestoreConfirmationDialog}
+        onClose={() => setShowRestoreConfirmationDialog(false)}
+        onConfirm={initiateRestore}
+        title="Confirm Restore"
+        message="Restore vendor. This action will restore the vendor and will be set active."
+        confirmButtonLabel="Restore"
       />
     </>
   );

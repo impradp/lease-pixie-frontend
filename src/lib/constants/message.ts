@@ -232,6 +232,18 @@ const target = {
     type: "error",
     message: "Exception occured deleting portfolio user.",
   } as LeasePixieToastMsg,
+  100518: {
+    type: "success",
+    message: "Vendor restored successfully.",
+  } as LeasePixieToastMsg,
+  100519: {
+    type: "error",
+    message: "Error restoring vendor.",
+  } as LeasePixieToastMsg,
+  100520: {
+    type: "error",
+    message: "Exception occured restoring vendor.",
+  } as LeasePixieToastMsg,
 
   //100600 series for property handle message
   100600: {

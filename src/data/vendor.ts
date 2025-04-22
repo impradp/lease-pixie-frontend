@@ -12,4 +12,5 @@ export const defaultData: NewVendorFormData = {
   requestW9: false,
   send1099: false,
   getInsuranceCert: false,
+  isDeleted: false,
 };

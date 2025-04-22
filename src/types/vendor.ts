@@ -13,5 +13,6 @@ export interface NewVendorFormData {
   requestW9: boolean;
   send1099: boolean;
   getInsuranceCert: boolean;
+  isDeleted: boolean;
   portfolios?: Portfolio[]; // Optional property for portfolios
 }

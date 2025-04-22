@@ -22,6 +22,13 @@ class VendorService {
     );
   }
 
+  async restore(id: string | number): Promise<VendorResponse> {
+    return await apiService.patch<VendorResponse>(
+      interpolate(ENDPOINTS.VENDOR.RESTORE.DEFAULT, id),
+      {}
+    );
+  }
+
   async fetchAll(): Promise<VendorListResponse> {
     return await apiService.get<VendorListResponse>(ENDPOINTS.VENDOR.DEFAULT);
   }

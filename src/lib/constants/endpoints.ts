@@ -26,6 +26,9 @@ export const ENDPOINTS = {
     UPDATE: {
       DEFAULT: "/api/v1/vendor/%s",
     },
+    RESTORE: {
+      DEFAULT: "/api/v1/vendor/%s/restore",
+    },
   },
   ACCOUNT: {
     DEFAULT: "/api/v1/account",
