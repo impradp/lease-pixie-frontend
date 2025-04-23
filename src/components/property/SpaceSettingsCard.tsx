@@ -169,7 +169,9 @@ const SpaceSettingsCard: React.FC<SpaceSettingsCardProps> = ({
             onClick={handleUpdate}
             className="w-full"
           />
-          <LinkButton onClick={handleTextClose} />
+          <div className="flex justify-center">
+            <LinkButton onClick={handleTextClose} />
+          </div>
         </div>
       )}
     </div>

@@ -186,7 +186,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             onChange={(value) =>
               setFormData((prev) => ({ ...prev, portfolioName: value }))
             }
-            readOnly={!isEditing}
             isEditing={isEditing}
             type="large"
           />
@@ -252,7 +251,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, requestedCategory: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -284,7 +282,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
                   largestMonthlyInvoice: value,
                 }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -344,7 +341,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, floorPlan: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -356,7 +352,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, elvatorPlan: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -370,7 +365,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, buildingStructure: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -382,7 +376,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, roofStructure: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -425,7 +418,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, firePanels: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -437,7 +429,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, sprinklerSystem: value }))
               }
-              readOnly={!isEditing}
               isEditing={isEditing}
               type="large"
             />
@@ -451,7 +442,9 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <LinkButton onClick={handleTextClose} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleTextClose} />
+              </div>
             </div>
           )}
         </form>

@@ -46,6 +46,10 @@ export const ENDPOINTS = {
   },
   DEPOSIT_ACCOUNT: {
     DEFAULT: "/api/v1/deposit-account",
+    EDIT: {
+      DEFAULT: "/api/v1/deposit-account/%s",
+      ONBOARD_MERCHANT: "/api/v1/deposit-account/%s/onboard-merchant",
+    },
   },
   PORTFOLIO: {
     ADD: {

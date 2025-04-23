@@ -9,6 +9,7 @@ import PixieButton from "@/components/ui/buttons/PixieButton";
 import { samplePaymentProcessor } from "@/data/paymentProcessor";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
+import { CustomCheckbox } from "../ui/input/CustomCheckbox";
 
 /**
  * Props for the AccountForm component
@@ -66,11 +67,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
       formData?.accountHolderName?.trim() &&
       formData?.expMonthlyTotalInvoice?.trim() &&
       formData?.reqMaxSingleACHTxnLimit?.trim() &&
-      formData?.lastFourDigits?.trim() &&
-      formData?.issProcessor?.trim() &&
-      formData?.issProcessorId?.trim() &&
-      formData?.issMaxSingleACHTxnLimit?.trim() &&
-      formData?.issMerchantAccountNumber?.trim();
+      formData?.lastFourDigits?.trim();
     return !!isValid;
   };
 
@@ -118,6 +115,13 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
     if (!isFormDisabled) {
       onClose();
     }
+  };
+
+  const handleCheckboxChange = (field: keyof DepositAccount) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   return (
@@ -184,21 +188,34 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
               />
             </div>
 
-            <CustomInput
-              label="Last 4 digits of deposit account"
-              value={formData.lastFourDigits ?? ""}
-              onChange={(value) => handleInputChange("lastFourDigits", value)}
-              isEditing={true}
-              disabled={isFormDisabled}
-              isRequired={true}
-              type="number"
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <CustomInput
+                label="Account Number(last 4 digits)"
+                value={formData.lastFourDigits ?? ""}
+                onChange={(value) => handleInputChange("lastFourDigits", value)}
+                isEditing={true}
+                disabled={isFormDisabled}
+                isRequired={true}
+                type="number"
+              />
+              <CustomInput
+                label="Plaid link Account Number"
+                value={formData.plaidAccountNumber ?? ""}
+                onChange={(value) =>
+                  handleInputChange("plaidAccountNumber", value)
+                }
+                isEditing={true}
+                disabled={true}
+                type="number"
+              />
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="self-stretch flex flex-col justify-center items-start gap-1">
-                <div className="justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]">
-                  Issued Processor{" "}
-                  <span className="text-[#878aa4] text-sm"> *</span>
+                <div
+                  className={`justify-start opacity-50 text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+                >
+                  Issued Processor
                 </div>
                 <PixieDropdown
                   options={samplePaymentProcessor}
@@ -206,7 +223,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                   onChange={(option) =>
                     handleInputChange("issProcessor", option)
                   }
-                  isEditing={true}
+                  isEditing={false}
                   placeholder="Select processor"
                   className="w-full"
                   containerClassName="w-full"
@@ -218,9 +235,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 label="Issued processor UUID"
                 value={formData.issProcessorId ?? ""}
                 onChange={(value) => handleInputChange("issProcessorId", value)}
-                isEditing={true}
-                disabled={isFormDisabled}
-                isRequired={true}
+                disabled={true}
                 type="number"
               />
             </div>
@@ -232,9 +247,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 onChange={(value) =>
                   handleInputChange("issMaxSingleACHTxnLimit", value)
                 }
-                isEditing={true}
-                disabled={isFormDisabled}
-                isRequired={true}
+                disabled={true}
                 type="money"
               />
               <CustomInput
@@ -243,11 +256,23 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 onChange={(value) =>
                   handleInputChange("issMerchantAccountNumber", value)
                 }
-                isEditing={true}
-                disabled={isFormDisabled}
-                isRequired={true}
+                disabled={true}
                 type="number"
               />
+            </div>
+            <div className="w-full relative mb-6">
+              <div className="self-stretch flex flex-col justify-start items-start gap-4">
+                <CustomCheckbox
+                  id="consent-checkbox"
+                  checked={formData.consentChecked}
+                  onChange={() => handleCheckboxChange("consentChecked")}
+                  label={
+                    "I understand the bank account linked via Plaid must also be the same bank account used with the merchant account to receive processed payments. "
+                  }
+                  isEditing={true}
+                  labelClassName="text-[#344053] text-xs font-medium"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-3 pb-6">
@@ -257,7 +282,9 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 type="submit"
                 isLoading={isLoading}
               />
-              <LinkButton onClick={handleClose} disabled={isFormDisabled} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleClose} disabled={isFormDisabled} />
+              </div>
             </div>
           </form>
         </div>

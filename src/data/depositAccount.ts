@@ -11,19 +11,7 @@ export const defaultData: DepositAccount = {
   issMaxSingleACHTxnLimit: "",
   issMerchantAccountNumber: "",
   consentChecked: false,
+  plaidAccountNumber: "",
+  isPaymentProcessingOn: false,
+  id: "",
 };
-
-export const sampleData: DepositAccount[] = [
-  {
-    accountHolderName: "John Doe",
-    description: "",
-    expMonthlyTotalInvoice: "",
-    reqMaxSingleACHTxnLimit: "200,000",
-    lastFourDigits: "4526",
-    issProcessor: "",
-    issProcessorId: "",
-    issMaxSingleACHTxnLimit: "80,000",
-    issMerchantAccountNumber: "",
-    consentChecked: false,
-  },
-];

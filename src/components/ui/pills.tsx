@@ -14,9 +14,9 @@ export const Pills: React.FC<PillsProps> = ({ items = [], className = "" }) => {
       {items.map((item, index) => (
         <div
           key={index}
-          className="px-2 py-0.5 mix-blend-multiply rounded-2xl outline outline-1 outline-offset-[-1px] flex justify-start items-center"
+          className={`px-2 py-0.5 mix-blend-multiply rounded-2xl outline outline-1 outline-offset-[-1px] flex justify-start items-center`}
           style={{
-            backgroundColor: `${item.color}1A`, // 10% opacity
+            backgroundColor: item.color,
             outlineColor: item.borderColor,
           }}
         >

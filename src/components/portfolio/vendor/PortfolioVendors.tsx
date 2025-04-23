@@ -287,7 +287,9 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <LinkButton onClick={handleTextClose} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleTextClose} />
+              </div>
             </div>
           </>
         )}

@@ -5,11 +5,13 @@ export interface DepositAccount {
   expMonthlyTotalInvoice: string;
   reqMaxSingleACHTxnLimit: string;
   lastFourDigits: string;
+  plaidAccountNumber: string;
   issProcessor: string;
   issProcessorId: string;
   issMaxSingleACHTxnLimit: string;
   issMerchantAccountNumber: string;
   consentChecked: boolean;
+  isPaymentProcessingOn: boolean;
 }
 
 export interface DepositAccountResponse {

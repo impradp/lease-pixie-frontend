@@ -327,7 +327,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -359,7 +358,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -391,7 +389,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -423,7 +420,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -455,7 +451,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -518,7 +513,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -550,7 +544,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -582,7 +575,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -735,7 +727,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -770,7 +761,6 @@ export const PortfolioAutomationSync: React.FC<
                         }))
                       }
                       isEditing={isEditing}
-                      readOnly={!isEditing}
                     />
                   </div>
                 </div>
@@ -788,7 +778,6 @@ export const PortfolioAutomationSync: React.FC<
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -836,7 +825,9 @@ export const PortfolioAutomationSync: React.FC<
               formId="portfolio-automation-card"
               className="w-full"
             />
-            <LinkButton onClick={handleCancel} />
+            <div className="flex justify-center">
+              <LinkButton onClick={handleCancel} />
+            </div>
           </div>
         )}
       </div>

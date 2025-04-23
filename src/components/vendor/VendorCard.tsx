@@ -409,7 +409,9 @@ const VendorCard: React.FC<VendorCardProps> = ({
                 isLoading={isLoading}
                 className="w-full"
               />
-              <LinkButton onClick={handleDelete} label="Delete" />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleDelete} label="Delete" />
+              </div>
             </div>
           )}
           {isEditMode && defaultData?.isDeleted && (

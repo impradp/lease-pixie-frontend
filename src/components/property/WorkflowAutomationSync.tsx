@@ -325,7 +325,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -357,7 +356,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -389,7 +387,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -421,7 +418,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -453,7 +449,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -484,7 +479,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -516,7 +510,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -548,7 +541,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -580,7 +572,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -733,7 +724,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -768,7 +758,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                         }))
                       }
                       isEditing={isEditing}
-                      readOnly={!isEditing}
                     />
                   </div>
                 </div>
@@ -786,7 +775,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -817,7 +805,6 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
                       }))
                     }
                     isEditing={isEditing}
-                    readOnly={!isEditing}
                   />
                 </div>
               </div>
@@ -834,7 +821,9 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
               formId="portfolio-automation-card"
               className="w-full"
             />
-            <LinkButton onClick={handleCancel} />
+            <div className="flex justify-center">
+              <LinkButton onClick={handleCancel} />
+            </div>
           </div>
         )}
       </div>

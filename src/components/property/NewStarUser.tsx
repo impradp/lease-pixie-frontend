@@ -146,7 +146,9 @@ const NewStarUser: React.FC<NewStarUserProps> = ({ onClose, onSubmit }) => {
                 disabled={isLoading}
                 isLoading={isLoading}
               />
-              <LinkButton onClick={onClose} />
+              <div className="flex justify-center">
+                <LinkButton onClick={onClose} />
+              </div>
             </div>
           </form>
         </div>

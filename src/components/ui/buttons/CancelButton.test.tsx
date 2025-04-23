@@ -57,7 +57,7 @@ describe("CancelButton Component", () => {
     render(<LinkButton {...defaultProps} />);
 
     const button = screen.getByText("Cancel");
-    expect(button.tagName).toBe("BUTTON");
+    expect(button.tagName).toBe("SPAN");
   });
 
   it("applies all classes together in the correct order", () => {

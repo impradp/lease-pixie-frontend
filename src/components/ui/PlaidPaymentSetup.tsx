@@ -5,13 +5,17 @@ import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { Info } from "lucide-react";
 
 interface PlaidPaymentSetupProps {
-  onClose: () => void;
+  onClose?: () => void;
+  onRemoveLink?: () => void;
   onSubmit: (setLoading: (loading: boolean) => void) => Promise<void>;
+  canRemoveLink?: boolean;
 }
 
 const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
   onClose,
   onSubmit,
+  canRemoveLink = false,
+  onRemoveLink,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -87,17 +91,23 @@ const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <PixieButton
-            label="Continue"
+            label="Continue to Plaid"
             type="submit"
             disabled={isLoading}
             isLoading={isLoading}
             className="w-full px-3.5 py-2.5 bg-black rounded text-white text-sm font-semibold font-['Inter'] leading-tight shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_-2px_0px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] outline outline-2 outline-offset-[-2px] outline-white/10"
           />
-          <LinkButton
-            onClick={onClose}
-            label="Remove Plaid Link"
-            className="w-full text-[#475466] text-sm font-semibold font-['Inter'] underline leading-tight text-center"
-          />
+          <div className="flex justify-center">
+            <LinkButton
+              onClick={() =>
+                canRemoveLink
+                  ? onRemoveLink && onRemoveLink()
+                  : onClose && onClose()
+              }
+              label={canRemoveLink ? "Remove Plaid Link" : "Cancel"}
+              className="text-[#475466] text-sm font-semibold font-['Inter'] underline leading-tight"
+            />
+          </div>
         </form>
       </div>
     </div>

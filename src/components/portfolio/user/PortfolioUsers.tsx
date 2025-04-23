@@ -256,7 +256,9 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
                 className="w-full"
                 isLoading={isLoading}
               />
-              <LinkButton onClick={handleTextClose} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleTextClose} />
+              </div>
             </div>
           </>
         )}

@@ -286,7 +286,9 @@ const WorkflowSeats: React.FC<WorkflowSeatsProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <LinkButton onClick={handleTextClose} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleTextClose} />
+              </div>
             </div>
           </>
         )}

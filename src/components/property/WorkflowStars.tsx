@@ -228,7 +228,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               ? (option) => handleFieldChange("maintainenceStar", option)
               : undefined
           }
-          readOnly={!isEditMode}
           isEditing={isEditMode}
           label={subLabels[0]}
           showInfo={showInfo}
@@ -243,7 +242,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("maintainenceStarThreshold", value)
             }
             isEditing={isEditMode}
-            readOnly={!isEditMode}
             className="w-[162px]"
           />
         </div>
@@ -263,7 +261,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               ? (option) => handleFieldChange("accountingStar", option)
               : undefined
           }
-          readOnly={!isEditMode}
           isEditing={isEditMode}
           label={subLabels[1]}
           showInfo={showInfo}
@@ -278,7 +275,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("accountingStarThreshold", value)
             }
             isEditing={isEditMode}
-            readOnly={!isEditMode}
             className="w-[162px]"
           />
         </div>
@@ -297,7 +293,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               ? (option) => handleFieldChange("leaseStar", option)
               : undefined
           }
-          readOnly={!isEditMode}
           isEditing={isEditMode}
           label={subLabels[2]}
           showInfo={showInfo}
@@ -312,7 +307,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("leaseStarThreshold", value)
             }
             isEditing={isEditMode}
-            readOnly={!isEditMode}
             className="w-[162px]"
           />
         </div>
@@ -331,7 +325,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               ? (option) => handleFieldChange("billPayStar", option)
               : undefined
           }
-          readOnly={!isEditMode}
           isEditing={isEditMode}
           label={subLabels[3]}
           showInfo={showInfo}
@@ -346,7 +339,6 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("billPayStarThreshold", value)
             }
             isEditing={isEditMode}
-            readOnly={!isEditMode}
             className="w-[162px]"
           />
         </div>
@@ -364,7 +356,9 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
                 onClick={handleUpdate}
                 className="w-full"
               />
-              <LinkButton onClick={handleTextClose} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleTextClose} />
+              </div>
             </div>
           </>
         )}

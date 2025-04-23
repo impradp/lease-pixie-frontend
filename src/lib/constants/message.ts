@@ -278,15 +278,43 @@ const target = {
   } as LeasePixieToastMsg,
   100702: {
     type: "error",
-    message: "Exception occured while fetching deposit accounts.",
+    message: "Exception occured while fetching deposit account.",
   } as LeasePixieToastMsg,
   100703: {
     type: "error",
-    message: "Failed to create deposit accounts.",
+    message: "Failed to create deposit account.",
   } as LeasePixieToastMsg,
   100704: {
     type: "error",
-    message: "Exception occured while creating deposit accounts.",
+    message: "Exception occured while creating deposit account.",
+  } as LeasePixieToastMsg,
+  100705: {
+    type: "success",
+    message: "Payment processing enabled successfully.",
+  } as LeasePixieToastMsg,
+  100706: {
+    type: "info",
+    message: "Payment processing disabled successfully.",
+  } as LeasePixieToastMsg,
+  100707: {
+    type: "error",
+    message: "Error updating payment processing flag.",
+  } as LeasePixieToastMsg,
+  100708: {
+    type: "error",
+    message: "Exception occured updating payment processing flag.",
+  } as LeasePixieToastMsg,
+  100709: {
+    type: "success",
+    message: "Merchant onboarded successfully.",
+  } as LeasePixieToastMsg,
+  100710: {
+    type: "error",
+    message: "Error onboarding merchant.",
+  } as LeasePixieToastMsg,
+  100711: {
+    type: "error",
+    message: "Exception occured onboarding merchant.",
   } as LeasePixieToastMsg,
 
   //100800 series for deposit account handle message

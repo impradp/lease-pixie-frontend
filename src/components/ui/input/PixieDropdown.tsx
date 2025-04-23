@@ -1,17 +1,30 @@
 import React, { useState, useRef, useEffect, useId } from "react";
-import { ChevronRight, ListFilter } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { DropdownOption } from "@/types/user";
 
-interface DropdownOption {
-  value: string;
-  label: string;
-}
-
+/**
+ * Props for the PixieDropdown component
+ * @interface PixieDropdownProps
+ * @property {string} [label] - Optional label text displayed above the dropdown
+ * @property {DropdownOption[]} options - Array of options to display in the dropdown
+ * @property {string} [value] - Currently selected value
+ * @property {function} [onChange] - Callback function triggered when selection changes
+ * @property {boolean} [readOnly=false] - Whether the dropdown can be interacted with
+ * @property {boolean} isEditing - Whether the component is in edit mode
+ * @property {boolean} [isLocked=false] - Whether the dropdown is locked (shows lockMessage)
+ * @property {string} [lockMessage] - Message to display when dropdown is locked
+ * @property {string} [className] - Additional CSS class for the dropdown
+ * @property {string} [labelClassName] - Additional CSS class for the label
+ * @property {string} [placeholder] - Text to display when no option is selected
+ * @property {string} [containerClassName] - Additional CSS class for the container
+ * @property {string} [customInputClassName] - Additional CSS class for the input field
+ * @property {"large" | "default" | "small"} [type="small"] - Size variant of the dropdown
+ */
 interface PixieDropdownProps {
   label?: string;
   options: DropdownOption[];
   value?: string;
   onChange?: (value: string) => void;
-  readOnly?: boolean;
   isEditing: boolean;
   isLocked?: boolean;
   lockMessage?: string;
@@ -21,15 +34,20 @@ interface PixieDropdownProps {
   containerClassName?: string;
   customInputClassName?: string;
   type?: "large" | "default" | "small";
-  showFilterIcon?: boolean;
 }
 
+/**
+ * A customizable dropdown component with different size variants and states
+ *
+ * @component
+ * @param {PixieDropdownProps} props - Component props
+ * @returns {React.ReactElement} Rendered dropdown component
+ */
 export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   label = "",
   options,
   value = "",
   onChange,
-  readOnly = false,
   isEditing,
   lockMessage,
   isLocked = false,
@@ -39,15 +57,19 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   containerClassName,
   customInputClassName,
   type = "small",
-  showFilterIcon = false,
 }) => {
+  // Track if dropdown menu is open
   const [isOpen, setIsOpen] = useState(false);
+  // Track the currently selected value
   const [selectedValue, setSelectedValue] = useState<string>(value);
+  // Ref for the dropdown container element for click-outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
+  // Ref for the options list for focus management
   const listboxRef = useRef<HTMLUListElement>(null);
+  // Unique ID for associating label with input
   const inputId = useId();
 
-  // Define size-based styling
+  // Define size-based styling based on the type prop
   let sizeClassName: string;
   let sizeLabelClassName: string;
   let sizeContainerClassName: string;
@@ -55,6 +77,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   let dropdownPosition: string;
   let optionItemClassName: string;
 
+  // Set styling variables based on dropdown size type
   if (type === "large") {
     sizeClassName = className ?? "self-stretch";
     sizeLabelClassName =
@@ -92,31 +115,41 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
       " py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight cursor-pointer"; // Default for small
   }
 
+  // Ensure options are properly formatted with value and label properties
   const formattedOptions: DropdownOption[] = options.map((opt) =>
     typeof opt === "object" && "value" in opt && "label" in opt
       ? opt
       : { value: String(opt), label: String(opt) }
   );
 
+  // Update selectedValue when the value prop changes
   useEffect(() => {
     setSelectedValue(value);
   }, [value]);
 
+  // Get the currently selected option object or fallback to placeholder
   const selectedOption = isLocked
     ? { label: lockMessage ?? "Locked", value: "" }
     : formattedOptions.find((option) => option.value === selectedValue) || {
         value: "",
-        label: placeholder || "Select option",
+        label: placeholder ?? "Select option",
       };
 
+  /**
+   * Toggles dropdown menu open/closed when clicked
+   */
   const handleClick = () => {
-    if (!readOnly && isEditing) {
+    if (isEditing) {
       setIsOpen(!isOpen);
     }
   };
 
+  /**
+   * Handles keyboard interactions with the dropdown field
+   * @param {React.KeyboardEvent} event - Keyboard event
+   */
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!readOnly && isEditing) {
+    if (isEditing) {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         setIsOpen(!isOpen);
@@ -126,6 +159,10 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     }
   };
 
+  /**
+   * Handles selection of an option from the dropdown
+   * @param {DropdownOption} option - The selected option
+   */
   const handleOptionClick = (option: DropdownOption) => {
     setSelectedValue(option.value);
     if (onChange) {
@@ -134,6 +171,11 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     setIsOpen(false);
   };
 
+  /**
+   * Handles keyboard interactions for dropdown options
+   * @param {React.KeyboardEvent} event - Keyboard event
+   * @param {DropdownOption} option - The current option
+   */
   const handleOptionKeyDown = (
     event: React.KeyboardEvent,
     option: DropdownOption
@@ -144,7 +186,12 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     }
   };
 
+  // Add click-outside listener to close dropdown when clicking elsewhere
   useEffect(() => {
+    /**
+     * Closes dropdown when user clicks outside the component
+     * @param {MouseEvent} event - Mouse click event
+     */
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef?.current &&
@@ -153,6 +200,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
         setIsOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -162,50 +210,62 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
       className={`w-full justify-end ${sizeContainerClassName} inline-flex relative`}
       ref={dropdownRef}
     >
+      {/* Render label if provided */}
       {label && (
-        <div className={`${sizeLabelClassName} font-['Inter']`}>{label}</div>
+        <div
+          className={`${sizeLabelClassName} font-['Inter'] ${
+            isEditing ? "opacity-50" : ""
+          }`}
+        >
+          {label}
+        </div>
       )}
       <div
         className={`w-full ${sizeClassName} self-stretch justify-start items-center gap-2 flex`}
       >
+        {/* Main dropdown input field */}
         <div
           id={inputId}
-          tabIndex={!readOnly && isEditing ? 0 : -1}
+          tabIndex={isEditing ? 0 : -1}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           className={`w-full grow shrink basis-0 px-3.5 py-2.5 bg-white rounded-lg border border-tertiary-stroke justify-start items-center gap-2 flex overflow-hidden ${sizeCustomInputClassName} ${
-            isEditing && !isLocked ? "cursor-pointer" : "cursor-default"
+            isEditing && !isLocked
+              ? "cursor-pointer"
+              : "opacity-50 cursor-not-allowed"
           }`}
           aria-label={label || "Dropdown selection"}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={`${inputId}-options`}
-          aria-disabled={readOnly}
+          aria-disabled={!isEditing}
         >
           <div
-            className={`grow shrink basis-0 h-5 justify-between items-center flex`}
+            className={`grow shrink basis-0 h-5 justify-between items-center flex `}
           >
             <div className="justify-start items-center gap-2 flex">
+              {/* Display selected option label or placeholder */}
               <div
-                className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight`}
+                className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight${
+                  isEditing ? "opacity-50" : ""
+                }`}
               >
                 {selectedOption.label}
               </div>
             </div>
-            {isEditing && !readOnly && !isLocked && !showFilterIcon && (
+            {/* Render dropdown chevron icon if editable */}
+            {isEditing && !isLocked && (
               <ChevronRight
                 className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
                   isOpen && !isLocked ? "rotate-90" : ""
                 }`}
               />
             )}
-            {isEditing && !readOnly && !isLocked && showFilterIcon && (
-              <ListFilter className="w-[20px] h-[20px] stroke-secondary-button" />
-            )}
           </div>
         </div>
       </div>
 
+      {/* Options dropdown menu */}
       {isOpen && !isLocked && (
         <ul
           id={`${inputId}-options`}
@@ -218,6 +278,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
           }
           className={`absolute z-10 right-0 ${dropdownPosition} w-full ${sizeClassName} bg-white rounded-lg shadow-lg border border-tertiary-stroke max-h-60 overflow-auto p-0 m-0 list-none`}
         >
+          {/* Render each option in the dropdown */}
           {formattedOptions.map((option, index) => {
             const isSelected = option.value === selectedValue;
             const isLast = index === formattedOptions.length - 1;

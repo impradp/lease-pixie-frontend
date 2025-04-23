@@ -7,6 +7,7 @@ import {
   DepositAccountListResponse,
   DepositAccountResponse,
 } from "@/types/DepositAccount";
+import { interpolate } from "../utils/stringUtils";
 
 /**
  * Service class for managing deposit account-related API operations
@@ -33,6 +34,31 @@ class DepositAccountService {
   async fetch(): Promise<DepositAccountListResponse> {
     return await apiService.get<DepositAccountListResponse>(
       ENDPOINTS.DEPOSIT_ACCOUNT.DEFAULT
+    );
+  }
+
+  /**
+   * Patches the single attribute update for associated deposit account data
+   * @returns Promise resolving to the patch process with deposit account data response
+   */
+  async updatePaymentProcessing(
+    id: string,
+    isPaymentProcessingOn: boolean
+  ): Promise<DepositAccountResponse> {
+    return await apiService.patch<DepositAccountResponse>(
+      interpolate(ENDPOINTS.DEPOSIT_ACCOUNT.EDIT.DEFAULT, id),
+      { isPaymentProcessingOn: isPaymentProcessingOn }
+    );
+  }
+
+  /**
+   * Patches the single attribute update for associated deposit account data
+   * @returns Promise resolving to the patch process with deposit account data response
+   */
+  async onboardMerchant(id: string): Promise<DepositAccountResponse> {
+    return await apiService.patch<DepositAccountResponse>(
+      interpolate(ENDPOINTS.DEPOSIT_ACCOUNT.EDIT.ONBOARD_MERCHANT, id),
+      {}
     );
   }
 }

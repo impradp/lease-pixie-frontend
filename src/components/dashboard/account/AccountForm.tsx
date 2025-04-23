@@ -220,7 +220,9 @@ const AccountForm: React.FC<AccountFormProps> = ({
                 type="submit"
                 isLoading={isLoading}
               />
-              <LinkButton onClick={handleClose} disabled={isFormDisabled} />
+              <div className="flex justify-center">
+                <LinkButton onClick={handleClose} disabled={isFormDisabled} />
+              </div>
             </div>
           </form>
         </div>

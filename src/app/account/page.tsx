@@ -43,6 +43,7 @@ function AccountContent() {
         const accountDetails = await accountService.fetchById(Number(id));
         if (accountDetails?.status === "SUCCESS") {
           setSelectedAccount(accountDetails?.data); // Update state with fetched account
+          router.replace("/account?id=" + id);
         } else {
           router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
         }
@@ -50,6 +51,7 @@ function AccountContent() {
         const accountDetails = await accountService.fetch();
         if (accountDetails?.status === "SUCCESS") {
           setSelectedAccount(accountDetails?.data[0]); // Set first account as default
+          router.replace("/account");
         } else {
           router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
         }
