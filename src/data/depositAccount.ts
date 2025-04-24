@@ -14,4 +14,5 @@ export const defaultData: DepositAccount = {
   plaidAccountNumber: "",
   isPaymentProcessingOn: false,
   id: "",
+  plaidLink: "",
 };

@@ -12,6 +12,7 @@ export interface DepositAccount {
   issMerchantAccountNumber: string;
   consentChecked: boolean;
   isPaymentProcessingOn: boolean;
+  plaidLink: string;
 }
 
 export interface DepositAccountResponse {
@@ -24,4 +25,9 @@ export interface DepositAccountListResponse {
   status: string;
   data: DepositAccount[];
   message?: string;
+}
+
+export interface DepositAccountPlaidSetup {
+  hasPlaidLink: boolean;
+  publicToken: string;
 }

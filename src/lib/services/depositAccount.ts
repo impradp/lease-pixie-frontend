@@ -5,6 +5,7 @@ import { ENDPOINTS } from "@/lib/constants/endpoints";
 import {
   DepositAccount,
   DepositAccountListResponse,
+  DepositAccountPlaidSetup,
   DepositAccountResponse,
 } from "@/types/DepositAccount";
 import { interpolate } from "../utils/stringUtils";
@@ -55,10 +56,29 @@ class DepositAccountService {
    * Patches the single attribute update for associated deposit account data
    * @returns Promise resolving to the patch process with deposit account data response
    */
-  async onboardMerchant(id: string): Promise<DepositAccountResponse> {
+  async onboardMerchant(
+    depositAccountId: string
+  ): Promise<DepositAccountResponse> {
     return await apiService.patch<DepositAccountResponse>(
-      interpolate(ENDPOINTS.DEPOSIT_ACCOUNT.EDIT.ONBOARD_MERCHANT, id),
+      interpolate(
+        ENDPOINTS.DEPOSIT_ACCOUNT.EDIT.SETUP_MERCHANT,
+        depositAccountId
+      ),
       {}
+    );
+  }
+
+  /**
+   * Patches the single attribute update for associated deposit account data
+   * @returns Promise resolving to the patch process with deposit account data response
+   */
+  async setUpPlaid(
+    depositAccountId: string,
+    plaidSetup: DepositAccountPlaidSetup
+  ): Promise<DepositAccountResponse> {
+    return await apiService.patch<DepositAccountResponse>(
+      interpolate(ENDPOINTS.DEPOSIT_ACCOUNT.EDIT.SETUP_PLAID, depositAccountId),
+      plaidSetup
     );
   }
 }

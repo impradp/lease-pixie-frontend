@@ -46,7 +46,7 @@ const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[395px] max-w-lg mx-4 p-6 flex flex-col gap-4">
+      <div className="bg-white rounded-xl w-[360px] h-[608px] max-w-lg mx-4 p-6 flex flex-col gap-4">
         <SectionHeader
           title="Set Payment Method"
           showCloseButton={true}

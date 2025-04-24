@@ -40,6 +40,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
   const [formData, setFormData] = useState<DepositAccount>(data); // State for form data
   const [isLoading, setIsLoading] = useState(false); // State for form submission loading
   const isFormDisabled = isLoading || disabled; // Combined disabled state
+  const [agreeCheck, setAgreeCheck] = useState(false);
 
   const isReadonly = isEditForm;
 
@@ -122,6 +123,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
       ...prev,
       [field]: !prev[field],
     }));
+    setAgreeCheck(!formData.consentChecked);
   };
 
   return (
@@ -278,7 +280,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
             <div className="flex flex-col gap-3 pb-6">
               <PixieButton
                 label={isEditForm ? "Update" : "Add Deposit Account"}
-                disabled={isFormDisabled}
+                disabled={isFormDisabled || !agreeCheck}
                 type="submit"
                 isLoading={isLoading}
               />

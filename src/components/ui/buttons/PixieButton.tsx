@@ -34,7 +34,7 @@ const PixieButton: React.FC<PixieButtonProps> = ({
       onClick={handleClick}
       disabled={isButtonDisabled}
       className={`${buttonStyles.base} ${buttonStyles.shadow} ${className} ${
-        isLoading ? "opacity-75 cursor-not-allowed" : ""
+        isLoading ?? disabled ? "opacity-75 cursor-not-allowed" : ""
       }`}
       type={type}
       form={formId}

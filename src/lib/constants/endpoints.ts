@@ -48,8 +48,12 @@ export const ENDPOINTS = {
     DEFAULT: "/api/v1/deposit-account",
     EDIT: {
       DEFAULT: "/api/v1/deposit-account/%s",
-      ONBOARD_MERCHANT: "/api/v1/deposit-account/%s/onboard-merchant",
+      SETUP_MERCHANT: "/api/v1/deposit-account/%s/setup/merchant",
+      SETUP_PLAID: "/api/v1/deposit-account/%s/setup/plaid",
     },
+  },
+  PLAID: {
+    LINK_TOKEN: "/api/v1/plaid/create/link-token",
   },
   PORTFOLIO: {
     ADD: {

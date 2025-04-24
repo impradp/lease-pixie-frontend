@@ -16,20 +16,31 @@ import {
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import PlaidPaymentSetup from "@/components/ui/PlaidPaymentSetup";
 
+/**
+ * Props for the DepositAccountContent component
+ * @interface DepositAccountContentProps
+ * @property {DepositAccount} account - The deposit account data to display
+ * @property {function} [onTogglePaymentProcessing] - Callback that toggles payment processing for an account
+ * @property {boolean} [isEditable=false] - Controls whether deposit account can be edited
+ * @property {function} [onBoardingClick] - Callback when onboarding is initiated
+ * @property {function} [onPlaidContinueClick] - Callback when Plaid connection is initiated
+ * @property {function} [onPlaidLinkRemove] - Callback to remove Plaid link
+ */
 interface DepositAccountContentProps {
   onTogglePaymentProcessing?: (
     accountId: string,
     isLocked: boolean
-  ) => Promise<boolean>; // Callback for toggling access
+  ) => Promise<boolean>;
   account: DepositAccount;
   isEditable?: boolean;
   onBoardingClick?: (value: string) => void;
+  onPlaidContinueClick?: (value: string) => void;
+  onPlaidLinkRemove?: (value: string) => void;
 }
 
 /**
  * DepositAccountContent displays details of a deposit account with toggling sections and actions.
  * @param {DepositAccountContentProps} props - The component props
- * @param {DepositAccount} props.account - The deposit account data to display
  * @returns {JSX.Element} The rendered deposit account content component
  */
 export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
@@ -37,8 +48,10 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
   onTogglePaymentProcessing,
   isEditable = false,
   onBoardingClick,
+  onPlaidContinueClick,
+  onPlaidLinkRemove,
 }) => {
-  const [isDepositAccountOpen, setIsDepositAccountOpen] = useState(false); // Initially collapsed
+  const [isDepositAccountOpen, setIsDepositAccountOpen] = useState(false);
   const [isPaymentProcessingOn, setIsPaymentProcessingOn] = useState(
     account?.isPaymentProcessingOn ?? false
   );
@@ -49,28 +62,27 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
     ? activeMerchantAccountPill
     : inActiveMerchantAccountPill;
 
-  const isPlaidActivated = account?.plaidAccountNumber ? true : false;
+  const isPlaidActivated = account?.plaidLink ? true : false;
   const selectedPlaidPill = isPlaidActivated
     ? activePlaidPill
     : inActivePlaidPill;
 
   /**
-   * Syncs local access lock state with prop changes
+   * Syncs local payment processing state with account props
    */
   useEffect(() => {
     setIsPaymentProcessingOn(account?.isPaymentProcessingOn ?? false);
   }, [account?.isPaymentProcessingOn]);
 
   /**
-   * Toggles the visibility of the deposit account details section.
+   * Toggles the visibility of the deposit account details section
    */
   const toggleDepositAccount = () => {
     setIsDepositAccountOpen(!isDepositAccountOpen);
-    // TODO: Handle toggling
   };
 
   /**
-   * Toggles the payment processing state and updates related logic.
+   * Handles payment processing toggle with optimistic update and rollback
    */
   const handleTogglePaymentProcessing = useCallback(async () => {
     if (!account?.id) return;
@@ -93,7 +105,7 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
   }, [account?.id, isPaymentProcessingOn, onTogglePaymentProcessing]);
 
   /**
-   * Initiates the onboarding process for the deposit account.
+   * Initiates merchant account onboarding process
    */
   const startOnBoarding = () => {
     if (onBoardingClick && account?.id) {
@@ -101,33 +113,55 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
     }
   };
 
+  /**
+   * Handles downloading onboarding details
+   * @todo Implement download functionality
+   */
   const downloadOnboardingDetails = () => {
     if (onBoardingClick && account?.id) {
       //TODO: Handle download.
     }
   };
 
+  /**
+   * Opens the Plaid link dialog
+   */
   const onLinkPlaid = () => {
     setShowPlaidLinkDialog(true);
   };
 
-  const initiatePlaidSetup = async (setLoading: (loading: boolean) => void) => {
-    try {
-      setLoading(true);
+  /**
+   * Opens the Plaid edit dialog
+   */
+  const onEditPlaidLink = () => {
+    setShowPlaidLinkDialog(true);
+  };
+
+  /**
+   * Initiates Plaid setup process
+   */
+  const initiatePlaidSetup = async () => {
+    if (onPlaidContinueClick && account?.id) {
       closePlaidSetup();
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      window.open("https://www.plaid.com", "_blank");
-    } finally {
-      setLoading(false);
+      onPlaidContinueClick(account?.id);
     }
   };
 
+  /**
+   * Closes the Plaid setup dialog
+   */
   const closePlaidSetup = () => {
     setShowPlaidLinkDialog(false);
   };
 
+  /**
+   * Initiates Plaid link removal
+   */
   const initiateLinkRemove = () => {
-    setShowPlaidLinkDialog(false);
+    if (onPlaidLinkRemove && account?.id) {
+      closePlaidSetup();
+      onPlaidLinkRemove(account?.id);
+    }
   };
 
   return (
@@ -193,9 +227,7 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
                 <LinkButton
                   className="text-primary-button text-xs font-normal font-['Inter'] leading-[18px]"
                   label="Edit Plaid Link"
-                  onClick={downloadOnboardingDetails}
-                  showIcon={true}
-                  iconType="download"
+                  onClick={onEditPlaidLink}
                 />
               </div>
             ) : (

@@ -350,6 +350,40 @@ const target = {
     type: "error",
     message: "Exception occured while fetching vendor.",
   } as LeasePixieToastMsg,
+
+  //100900 series for plaid service handle message
+  100900: {
+    type: "info",
+    message: "Hold on. Redirecting to secure plaid setup .",
+  } as LeasePixieToastMsg,
+  100901: {
+    type: "error",
+    message: "Error creating link token.",
+  } as LeasePixieToastMsg,
+  100902: {
+    type: "error",
+    message: "Exception occured creating link token.",
+  } as LeasePixieToastMsg,
+  100903: {
+    type: "info",
+    message: "Plaid Setup cancelled by user.",
+  } as LeasePixieToastMsg,
+  100904: {
+    type: "success",
+    message: "Plaid link generated sucessfully.",
+  } as LeasePixieToastMsg,
+  100905: {
+    type: "info",
+    message: "Plaid link removed sucessfully.",
+  } as LeasePixieToastMsg,
+  100906: {
+    type: "error",
+    message: "Error removing plaid link.",
+  } as LeasePixieToastMsg,
+  100907: {
+    type: "error",
+    message: "Exception occured removing plaid link.",
+  } as LeasePixieToastMsg,
 } as const;
 
 export type MessageCode = keyof typeof target;
