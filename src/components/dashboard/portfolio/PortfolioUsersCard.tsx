@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 
 import { hasRole } from "@/lib/utils/authUtils";
 import { PortfolioUser } from "@/types/Portfolio";
@@ -9,6 +9,7 @@ import { portfolioService } from "@/lib/services/portfolio";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import PortfolioUserCardContent from "@/components/dashboard/portfolio/PortfolioUserCardContent";
+import { Account } from "@/types/Account";
 
 /**
  * Props for the PortfolioUsers component
@@ -17,23 +18,24 @@ interface PortfolioUsersCardProps {
   isEditable: boolean; // Whether the card is editable (default: false)
   isSubmitting: (value: boolean) => void;
   defaultSearchTerm?: string; // Default search term for the card
+  accountDetails?: Account;
+  showAll?: boolean;
 }
 
 /**
  * Renders a card displaying a searchable list of portfolio users
  * @returns JSX.Element - The rendered portfolio users card
  */
-const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
+const PortfolioUsersCard = ({
   isEditable = false,
   isSubmitting,
-  defaultSearchTerm = "", // Default search term for the card
-}) => {
+  defaultSearchTerm = "",
+  accountDetails,
+  showAll = false,
+}: PortfolioUsersCardProps) => {
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
   const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolioUsers, setPortfolioUsers] = useState<PortfolioUser[]>([]);
-  const [filteredPortfolioUsers, setFilteredPortfolioUsers] = useState<
-    PortfolioUser[]
-  >([]);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState(false);
   const [selectedPortfolioUser, setSelectedPortfolioUser] =
@@ -47,9 +49,9 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
   }, [defaultSearchTerm]);
 
   // Handle search input changes
-  const onSearchChange = (value: string) => {
+  const onSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-  };
+  }, []);
 
   const filterPortfolioUsers = useCallback(
     (usersToFilter: PortfolioUser[], term: string) => {
@@ -83,18 +85,32 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
     []
   );
 
-  useEffect(() => {
-    setFilteredPortfolioUsers(filterPortfolioUsers(portfolioUsers, searchTerm));
-  }, [portfolioUsers, searchTerm, filterPortfolioUsers]);
+  const filteredPortfolioUsers = useMemo(
+    () => filterPortfolioUsers(portfolioUsers, searchTerm),
+    [portfolioUsers, searchTerm, filterPortfolioUsers]
+  );
 
-  const fetchPortfolioUsers = async () => {
+  const fetchPortfolioUsers = useCallback(async () => {
+    if (!showAll && !accountDetails?.id) {
+      return;
+    }
     isSubmitting(true);
     try {
-      const response = await portfolioService.getUsers({
-        attachPortfolio: true,
-      });
-      if (response.status === "SUCCESS") {
-        setPortfolioUsers(response?.data);
+      let response;
+      if (showAll) {
+        response = await portfolioService.getUsers({
+          attachPortfolio: true,
+        });
+      } else if (accountDetails?.id) {
+        response = await portfolioService.getUsersByAccoundId(
+          accountDetails.id,
+          {
+            attachPortfolio: true,
+          }
+        );
+      }
+      if (response?.status === "SUCCESS") {
+        setPortfolioUsers(response.data);
       } else {
         handleInfo({ code: 100501 });
       }
@@ -103,14 +119,14 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
     } finally {
       isSubmitting(false);
     }
-  };
+  }, [accountDetails?.id, showAll, isSubmitting]);
 
   useEffect(() => {
     fetchPortfolioUsers();
-  }, []);
+  }, [fetchPortfolioUsers]);
 
   // Handle refresh button click
-  const onRefreshClick = async () => {
+  const onRefreshClick = useCallback(async () => {
     setIsRefreshClicked(true);
     setSearchTerm(""); // Clear search on refresh
 
@@ -118,20 +134,20 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
     await fetchPortfolioUsers();
 
     setTimeout(() => setIsRefreshClicked(false), 500); // Reset after 500ms
-  };
+  }, [fetchPortfolioUsers]);
 
-  const onClickDelete = async (user: PortfolioUser) => {
+  const onClickDelete = useCallback((user: PortfolioUser) => {
     setShowPreConfirmationDialog(true);
     setSelectedPortfolioUser(user);
-  };
+  }, []);
 
-  const handlePreConfirmationClose = () => {
+  const handlePreConfirmationClose = useCallback(() => {
     setShowPreConfirmationDialog(false);
     setSelectedPortfolioUser(undefined);
-  };
+  }, []);
 
   // Handle delete action (placeholder for API call)
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     try {
       isSubmitting(true);
       setShowPreConfirmationDialog(false);
@@ -154,7 +170,7 @@ const PortfolioUsersCard: React.FC<PortfolioUsersCardProps> = ({
     } finally {
       isSubmitting(false);
     }
-  };
+  }, [selectedPortfolioUser?.id, fetchPortfolioUsers, isSubmitting]);
 
   return (
     <>

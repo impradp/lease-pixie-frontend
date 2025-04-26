@@ -38,6 +38,20 @@ class PortfolioService {
     );
   }
 
+  async getUsersByAccoundId(
+    accountId: string,
+    options: { attachPortfolio?: boolean } = { attachPortfolio: false }
+  ): Promise<PortfolioUserListResponse> {
+    const { attachPortfolio } = options;
+    return await apiService.get<PortfolioUserListResponse>(
+      interpolate(
+        ENDPOINTS.PORTFOLIO.FETCH.USERS_BY_ACCOUNT_ID,
+        accountId,
+        attachPortfolio ?? false
+      )
+    );
+  }
+
   async addVendor(
     vendorData: NewVendorFormData
   ): Promise<PortfolioVendorResponse> {
@@ -60,9 +74,31 @@ class PortfolioService {
     );
   }
 
+  async update(
+    portfolioId: number,
+    portfolioData: Portfolio
+  ): Promise<PortfolioResponse> {
+    return await apiService.put<PortfolioResponse>(
+      interpolate(ENDPOINTS.PORTFOLIO.UPDATE.DEFAULT, portfolioId),
+      portfolioData
+    );
+  }
+
   async fetchAll(): Promise<PortfolioListResponse> {
     return await apiService.get<PortfolioListResponse>(
       ENDPOINTS.PORTFOLIO.FETCH.DEFAULT
+    );
+  }
+
+  async fetchByAccountId(accountId: string): Promise<PortfolioListResponse> {
+    return await apiService.get<PortfolioListResponse>(
+      interpolate(ENDPOINTS.PORTFOLIO.FETCH.BY_ACCOUNT_ID, accountId)
+    );
+  }
+
+  async fetchById(portfolioId: string): Promise<PortfolioResponse> {
+    return await apiService.get<PortfolioResponse>(
+      interpolate(ENDPOINTS.PORTFOLIO.FETCH.BY_ID, portfolioId)
     );
   }
 }

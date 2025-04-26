@@ -16,26 +16,26 @@ import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
  * Props for the PortfolioVendors component
  */
 interface PortfolioVendorsProps {
-  label?: string; // Label for the component
-  selectedVendor?: DropdownOption; // Primary selected vendor
-  selectedSecondaryVendor?: DropdownOption; // Secondary selected vendor
-  selectedTertiaryVendor?: DropdownOption; // Tertiary selected vendor
-  onVendorChange?: (vendor: DropdownOption) => void; // Callback for primary vendor change
-  onSecondaryVendorChange?: (vendor: DropdownOption) => void; // Callback for secondary vendor change
-  onTertiaryVendorChange?: (vendor: DropdownOption) => void; // Callback for tertiary vendor change
-  vendors: DropdownOption[]; // List of available primary vendors
-  secondaryVendors: DropdownOption[]; // List of available secondary vendors
-  tertiaryVendors: DropdownOption[]; // List of available tertiary vendors
-  onAddVendor?: (vendorData: NewVendorFormData) => void; // Callback for adding a new vendor
-  showInfo?: boolean; // Whether to show info tooltips
-  infoContents?: string[]; // Content for info tooltips
-  vendorType?: string; // Type of vendor (e.g., Vendor)
-  sectionId: string; // Unique identifier for the section
-  editingSection: string | null; // Currently editing section ID
-  onSectionEdit: (section: string) => void; // Callback for entering edit mode
-  onSectionClose: () => void; // Callback for closing edit mode
-  subLabels: string[]; // Labels for dropdowns
-  refreshVendors: () => void; // Callback to refresh vendor list
+  label?: string;
+  selectedVendor?: DropdownOption;
+  selectedSecondaryVendor?: DropdownOption;
+  selectedTertiaryVendor?: DropdownOption;
+  onVendorChange?: (vendor: DropdownOption) => void;
+  onSecondaryVendorChange?: (vendor: DropdownOption) => void;
+  onTertiaryVendorChange?: (vendor: DropdownOption) => void;
+  vendors: DropdownOption[];
+  secondaryVendors: DropdownOption[];
+  tertiaryVendors: DropdownOption[];
+  onAddVendor?: (vendorData: NewVendorFormData) => void;
+  showInfo?: boolean;
+  infoContents?: string[];
+  vendorType?: string;
+  sectionId: string;
+  editingSection: string | null;
+  onSectionEdit: (section: string) => void;
+  onSectionClose: () => void;
+  subLabels: string[];
+  refreshVendors: () => void;
 }
 
 /**
@@ -45,9 +45,9 @@ interface PortfolioVendorsProps {
  */
 export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
   label = "",
-  selectedVendor,
-  selectedSecondaryVendor,
-  selectedTertiaryVendor,
+  selectedVendor = { value: "", label: "" },
+  selectedSecondaryVendor = { value: "", label: "" },
+  selectedTertiaryVendor = { value: "", label: "" },
   onVendorChange,
   onSecondaryVendorChange,
   onTertiaryVendorChange,
@@ -64,43 +64,62 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
   subLabels = ["Selected Vendor 1", "Selected Vendor 2", "Selected Vendor 3"],
   refreshVendors,
 }) => {
-  const [showNewVendorModal, setShowNewVendorModal] = useState(false); // Controls new vendor modal visibility
-  const [isEditMode, setIsEditMode] = useState(false); // Tracks edit mode state
-  const [editedVendor, setEditedVendor] = useState(selectedVendor); // Tracks edited primary vendor
-  const [editedSecondaryVendor, setEditedSecondaryVendor] = useState(
-    selectedSecondaryVendor
-  ); // Tracks edited secondary vendor
-  const [editedTertiaryVendor, setEditedTertiaryVendor] = useState(
-    selectedTertiaryVendor
-  ); // Tracks edited tertiary vendor
-  const [originalVendor, setOriginalVendor] = useState(selectedVendor); // Stores original primary vendor
-  const [originalSecondaryVendor, setOriginalSecondaryVendor] = useState(
-    selectedSecondaryVendor
-  ); // Stores original secondary vendor
-  const [originalTertiaryVendor, setOriginalTertiaryVendor] = useState(
-    selectedTertiaryVendor
-  ); // Stores original tertiary vendor
+  const [showNewVendorModal, setShowNewVendorModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedVendor, setEditedVendor] =
+    useState<DropdownOption>(selectedVendor);
+  const [editedSecondaryVendor, setEditedSecondaryVendor] =
+    useState<DropdownOption>(selectedSecondaryVendor);
+  const [editedTertiaryVendor, setEditedTertiaryVendor] =
+    useState<DropdownOption>(selectedTertiaryVendor);
+  const [originalVendor, setOriginalVendor] =
+    useState<DropdownOption>(selectedVendor);
+  const [originalSecondaryVendor, setOriginalSecondaryVendor] =
+    useState<DropdownOption>(selectedSecondaryVendor);
+  const [originalTertiaryVendor, setOriginalTertiaryVendor] =
+    useState<DropdownOption>(selectedTertiaryVendor);
 
-  const isEditing = isEditMode; // Alias for edit mode state
+  const isEditing = isEditMode;
 
   /**
-   * Syncs original and edited vendor selections with props
+   * Syncs internal state with props and validates selected vendors against options
    */
   useEffect(() => {
-    // Updates state when selected vendors change
-    setOriginalVendor(selectedVendor);
-    setOriginalSecondaryVendor(selectedSecondaryVendor);
-    setOriginalTertiaryVendor(selectedTertiaryVendor);
-    setEditedVendor(selectedVendor);
-    setEditedSecondaryVendor(selectedSecondaryVendor);
-    setEditedTertiaryVendor(selectedTertiaryVendor);
-  }, [selectedVendor, selectedSecondaryVendor, selectedTertiaryVendor]);
+    // Validate and sync selectedVendor
+    const validSelectedVendor =
+      vendors.find((vendor) => vendor.value === selectedVendor.value) ||
+      selectedVendor;
+    setOriginalVendor(validSelectedVendor);
+    setEditedVendor(validSelectedVendor);
+
+    // Validate and sync selectedSecondaryVendor
+    const validSelectedSecondaryVendor =
+      secondaryVendors.find(
+        (vendor) => vendor.value === selectedSecondaryVendor.value
+      ) || selectedSecondaryVendor;
+    setOriginalSecondaryVendor(validSelectedSecondaryVendor);
+    setEditedSecondaryVendor(validSelectedSecondaryVendor);
+
+    // Validate and sync selectedTertiaryVendor
+    const validSelectedTertiaryVendor =
+      tertiaryVendors.find(
+        (vendor) => vendor.value === selectedTertiaryVendor.value
+      ) || selectedTertiaryVendor;
+    setOriginalTertiaryVendor(validSelectedTertiaryVendor);
+    setEditedTertiaryVendor(validSelectedTertiaryVendor);
+  }, [
+    selectedVendor,
+    selectedSecondaryVendor,
+    selectedTertiaryVendor,
+    vendors,
+    secondaryVendors,
+    tertiaryVendors,
+  ]);
 
   /**
    * Manages body overflow based on modal visibility
    */
   useEffect(() => {
-    // Locks/unlocks scroll when modal is open
     if (showNewVendorModal) {
       document.body.style.overflow = "hidden";
     } else {
@@ -112,18 +131,17 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
   }, [showNewVendorModal]);
 
   /**
-   * Handles adding a new vendor via API
-   * @param userData - Data for the new vendor
+   * Adds a new vendor via API
+   * @param vendorData - Data for the new vendor
    * @param setLoading - Function to toggle loading state
    */
   const handleAddVendor = async (
-    userData: NewVendorFormData,
+    vendorData: NewVendorFormData,
     setLoading: (loading: boolean) => void
   ) => {
-    // Submits new vendor data and refreshes list
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const response = await portfolioService.addVendor(userData);
+      const response = await portfolioService.addVendor(vendorData);
       if (response?.status === "SUCCESS") {
         setShowNewVendorModal(false);
         handleInfo({ code: 100510 });
@@ -142,7 +160,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * Closes the new vendor modal
    */
   const handleCloseVendorModal = () => {
-    // Hides the new vendor modal
     setShowNewVendorModal(false);
   };
 
@@ -150,7 +167,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * Enters edit mode for the section
    */
   const handleEdit = () => {
-    // Initiates edit mode if allowed
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
@@ -161,7 +177,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * Cancels edit mode and reverts changes
    */
   const handleTextClose = () => {
-    // Exits edit mode and reverts vendor selections
     setIsEditMode(false);
     setEditedVendor(originalVendor);
     setEditedSecondaryVendor(originalSecondaryVendor);
@@ -173,7 +188,6 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * Saves changes and exits edit mode
    */
   const handleUpdate = () => {
-    // Applies vendor changes and exits edit mode
     setIsEditMode(false);
     if (onVendorChange && editedVendor) {
       onVendorChange(editedVendor);
@@ -192,8 +206,8 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * @param vendor - The selected vendor
    */
   const handleVendorChange = (vendor: DropdownOption) => {
-    // Updates primary vendor selection
     setEditedVendor(vendor);
+    console.log("Updated editedVendor:", vendor);
   };
 
   /**
@@ -201,8 +215,8 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * @param vendor - The selected vendor
    */
   const handleSecondaryVendorChange = (vendor: DropdownOption) => {
-    // Updates secondary vendor selection
     setEditedSecondaryVendor(vendor);
+    console.log("Updated editedSecondaryVendor:", vendor);
   };
 
   /**
@@ -210,12 +224,12 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
    * @param vendor - The selected vendor
    */
   const handleTertiaryVendorChange = (vendor: DropdownOption) => {
-    // Updates tertiary vendor selection
     setEditedTertiaryVendor(vendor);
+    console.log("Updated editedTertiaryVendor:", vendor);
   };
 
   const isEditDisabled =
-    editingSection !== null && editingSection !== sectionId; // Determines if edit is disabled
+    editingSection !== null && editingSection !== sectionId;
 
   return (
     <>
@@ -234,7 +248,7 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
         />
         <CustomDropdown
           options={vendors}
-          value={editedVendor?.value}
+          value={editedVendor?.value || ""}
           onChange={isEditing ? handleVendorChange : undefined}
           readOnly={!isEditing}
           isEditing={isEditing}
@@ -250,7 +264,7 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
         )}
         <CustomDropdown
           options={secondaryVendors}
-          value={editedSecondaryVendor?.value}
+          value={editedSecondaryVendor?.value || ""}
           onChange={isEditing ? handleSecondaryVendorChange : undefined}
           readOnly={!isEditing}
           isEditing={isEditing}
@@ -266,7 +280,7 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
         )}
         <CustomDropdown
           options={tertiaryVendors}
-          value={editedTertiaryVendor?.value}
+          value={editedTertiaryVendor?.value || ""}
           onChange={isEditing ? handleTertiaryVendorChange : undefined}
           readOnly={!isEditing}
           isEditing={isEditing}

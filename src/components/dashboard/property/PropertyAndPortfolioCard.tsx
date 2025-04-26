@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
+
+import { Account } from "@/types/Account";
+import { useRouter } from "next/navigation";
 import { Property } from "@/types/Property";
 import { Portfolio } from "@/types/Portfolio";
 import handleInfo from "@/lib/utils/errorHandler";
 import PixieTab from "@/components/ui/tab/PixieTab";
+import { interpolate } from "@/lib/utils/stringUtils";
 import { propertyService } from "@/lib/services/property";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
@@ -17,6 +21,8 @@ interface PropertyAndPortfolioCardProps {
   isEditable: boolean; // Whether the card is editable (default: false)
   isSubmitting: (value: boolean) => void;
   defaultSearchTerm?: string; // Default search term for the card
+  showAll?: boolean;
+  accountDetails?: Account;
 }
 
 /**
@@ -24,17 +30,20 @@ interface PropertyAndPortfolioCardProps {
  * @param props - The properties for configuring the card
  * @returns JSX.Element - The rendered property and portfolio card
  */
-const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
+const PropertyAndPortfolioCard = ({
   isEditable = false,
   isSubmitting,
-  defaultSearchTerm = "", // Default search term for the card
-}) => {
+  defaultSearchTerm = "",
+  showAll = false,
+  accountDetails,
+}: PropertyAndPortfolioCardProps) => {
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
   const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
-  const [filteredPortfolios, setFilteredPortfolios] = useState<Portfolio[]>([]);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
+  const [activeTab, setActiveTab] = useState("portfolios");
+
+  const router = useRouter();
 
   // Update searchTerm when defaultSearchTerm prop changes
   useEffect(() => {
@@ -42,9 +51,9 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
   }, [defaultSearchTerm]);
 
   // Handle search input changes
-  const onSearchChange = (value: string) => {
+  const onSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-  };
+  }, []);
 
   const filterPortfolios = useCallback(
     (portfoliosToFilter: Portfolio[], term: string) => {
@@ -86,71 +95,68 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
     []
   );
 
-  // Apply filters whenever data or search term changes
-  useEffect(() => {
-    setFilteredPortfolios(filterPortfolios(portfolios, searchTerm));
-    setFilteredProperties(filterProperties(properties, searchTerm));
-  }, [properties, portfolios, searchTerm, filterPortfolios, filterProperties]);
+  const filteredPortfolios = useMemo(
+    () => filterPortfolios(portfolios, searchTerm),
+    [portfolios, searchTerm, filterPortfolios]
+  );
+
+  const filteredProperties = useMemo(
+    () => filterProperties(properties, searchTerm),
+    [properties, searchTerm, filterProperties]
+  );
 
   // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      isSubmitting(true);
-      try {
-        const [portfolioResponse, propertyResponse] = await Promise.all([
+  const fetchData = useCallback(async () => {
+    if (!showAll && !accountDetails?.id) {
+      return;
+    }
+    isSubmitting(true);
+    try {
+      let portfolioResponse, propertyResponse;
+      if (showAll) {
+        [portfolioResponse, propertyResponse] = await Promise.all([
           portfolioService.fetchAll(),
           propertyService.fetchAll(),
         ]);
-
-        if (portfolioResponse.status === "SUCCESS") {
-          setPortfolios(portfolioResponse.data);
-        } else {
-          handleInfo({ code: 100513 });
-        }
-
-        if (propertyResponse.status === "SUCCESS") {
-          setProperties(propertyResponse.data);
-        } else {
-          handleInfo({ code: 100603 });
-        }
-      } catch (err) {
-        handleInfo({ code: 100514, error: err });
-      } finally {
-        isSubmitting(false);
+      } else if (accountDetails?.id) {
+        [portfolioResponse, propertyResponse] = await Promise.all([
+          portfolioService.fetchByAccountId(accountDetails?.id),
+          propertyService.fetchByAccountId(accountDetails?.id),
+        ]);
       }
-    };
 
-    fetchData();
-  }, []);
-
-  // Handle refresh button click
-  const onRefreshClick = async () => {
-    setIsRefreshClicked(true);
-    // Clear search on refresh and ensure the value is propagated to the header
-    setSearchTerm("");
-
-    // Re-fetch data
-    isSubmitting(true);
-    try {
-      const [portfolioResponse, propertyResponse] = await Promise.all([
-        portfolioService.fetchAll(),
-        propertyService.fetchAll(),
-      ]);
-
-      if (portfolioResponse.status === "SUCCESS") {
+      if (portfolioResponse?.status === "SUCCESS") {
         setPortfolios(portfolioResponse.data);
+      } else {
+        handleInfo({ code: 100513 });
       }
 
-      if (propertyResponse.status === "SUCCESS") {
+      if (propertyResponse?.status === "SUCCESS") {
         setProperties(propertyResponse.data);
+      } else {
+        handleInfo({ code: 100603 });
       }
     } catch (err) {
       handleInfo({ code: 100514, error: err });
     } finally {
       isSubmitting(false);
-      setTimeout(() => setIsRefreshClicked(false), 500); // Reset after 500ms
     }
-  };
+  }, [accountDetails?.id, showAll, isSubmitting]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Handle refresh button click
+  const onRefreshClick = useCallback(async () => {
+    setIsRefreshClicked(true);
+    setSearchTerm(""); // Clear search on refresh
+
+    // Re-fetch data
+    await fetchData();
+
+    setTimeout(() => setIsRefreshClicked(false), 500); // Reset after 500ms
+  }, [fetchData]);
 
   // Define tabs
   const tabs = [
@@ -158,11 +164,14 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
     { label: "Portfolio list", value: "portfolios" },
   ];
 
-  const [activeTab, setActiveTab] = useState(tabs[1].value); // Default to "portfolios"
-
   // Handle tab switching
-  const handleTabClick = (value: string) => {
+  const handleTabClick = useCallback((value: string) => {
     setActiveTab(value);
+  }, []);
+
+  const handleEditClick = (portfolioId: number) => {
+    isSubmitting(true);
+    router.push(interpolate("/portfolio?id=%s", portfolioId));
   };
 
   return (
@@ -188,6 +197,8 @@ const PropertyAndPortfolioCard: React.FC<PropertyAndPortfolioCardProps> = ({
           activeTab={activeTab}
           portfolios={filteredPortfolios}
           properties={filteredProperties}
+          isEditable={isEditable}
+          onEditClick={handleEditClick}
         />
       </div>
     </div>

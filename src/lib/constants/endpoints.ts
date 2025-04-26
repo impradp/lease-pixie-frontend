@@ -56,6 +56,7 @@ export const ENDPOINTS = {
     LINK_TOKEN: "/api/v1/plaid/create/link-token",
   },
   PORTFOLIO: {
+    DEFAULT: "/api/v1/portfolio",
     ADD: {
       DEFAULT: "/api/v1/portfolio",
       VENDOR: "/api/v1/portfolio/vendor",
@@ -64,8 +65,14 @@ export const ENDPOINTS = {
     FETCH: {
       DEFAULT: "/api/v1/portfolio",
       BY_ID: "/api/v1/portfolio/%s",
+      BY_ACCOUNT_ID: "/api/v1/portfolio/account/%s",
       VENDORS: "/api/v1/portfolio/vendors",
       USERS: "/api/v1/portfolio/users?attachPortfolio=%s",
+      USERS_BY_ACCOUNT_ID:
+        "/api/v1/portfolio/users/account/%s?attachPortfolio=%s",
+    },
+    UPDATE: {
+      DEFAULT: "/api/v1/portfolio/%s",
     },
     DELETE: {
       USER: "/api/v1/portfolio/users/%s",
@@ -75,6 +82,7 @@ export const ENDPOINTS = {
   PROPERTY: {
     FETCH: {
       DEFAULT: "/api/v1/properties",
+      BY_ACCOUNT_ID: "/api/v1/properties/account/%s",
     },
   },
 } as const;

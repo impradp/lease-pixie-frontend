@@ -13,6 +13,8 @@ interface PropertyAndPortfolioTabProps {
   activeTab: string; // The currently active tab ("properties" or "portfolios")
   portfolios: Portfolio[]; // List of portfolios to display
   properties: Property[]; // List of properties to display
+  isEditable?: boolean;
+  onEditClick?: (portfolioId: number) => void;
 }
 
 /**
@@ -24,13 +26,19 @@ const PropertyAndPortfolioTab: React.FC<PropertyAndPortfolioTabProps> = ({
   activeTab,
   portfolios,
   properties,
+  isEditable = false,
+  onEditClick,
 }) => {
   return (
     <div className="w-full">
       {activeTab === "properties" ? (
         <PropertyTabContent properties={properties} />
       ) : (
-        <PortfolioTabContent portfolios={portfolios} />
+        <PortfolioTabContent
+          portfolios={portfolios}
+          isEditable={isEditable}
+          onEditClick={onEditClick}
+        />
       )}
     </div>
   );

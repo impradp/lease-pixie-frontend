@@ -34,9 +34,10 @@ const LinkButton: React.FC<LinkButtonProps> = ({
     <button
       onClick={handleClick}
       type="button"
-      hidden={hidden}
       disabled={isButtonDisabled}
-      className={`flex text-secondary-button text-sm font-semibold underline leading-[1.43] ${
+      className={`text-secondary-button text-sm font-semibold underline leading-[1.43] ${
+        hidden ? "hidden" : "flex"
+      } ${
         isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
     >

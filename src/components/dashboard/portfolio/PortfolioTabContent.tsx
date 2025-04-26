@@ -9,6 +9,8 @@ import CircularProgressBar from "@/components/ui/CircularProgressBar";
  */
 interface PortfolioTabContentProps {
   portfolios: Portfolio[]; // List of portfolios to display
+  isEditable?: boolean;
+  onEditClick?: (portfolioId: number) => void;
 }
 
 /**
@@ -18,6 +20,8 @@ interface PortfolioTabContentProps {
  */
 const PortfolioTabContent: React.FC<PortfolioTabContentProps> = ({
   portfolios,
+  isEditable = false,
+  onEditClick,
 }) => {
   // Track which portfolio is currently expanded
   const [expandedId, setExpandedId] = useState<string | number | null>(null);
@@ -106,10 +110,19 @@ const PortfolioTabContent: React.FC<PortfolioTabContentProps> = ({
                     Dashboard
                   </button>
                   <button
-                    className="px-2 py-1 bg-tertiary-platinumGray rounded text-secondary-light text-xs font-medium font-['Inter'] leading-[18px] cursor-pointer"
-                    onClick={(e) => e.stopPropagation()} // Prevent toggling when buttons are clicked
+                    disabled={!isEditable || !portfolio.id}
+                    onClick={() =>
+                      portfolio.id && onEditClick && onEditClick(portfolio?.id)
+                    }
+                    className={`px-2 py-1 bg-tertiary-platinumGray rounded text-secondary-light text-xs font-medium font-['Inter'] leading-[18px] cursor-pointer ${
+                      isEditable && portfolio.id
+                        ? "hover:bg-tertiary-platinumGray/80 active:cursor-progress"
+                        : "cursor-not-allowed opacity-50"
+                    }`}
                   >
-                    Settings
+                    <span className="text-xs font-medium text-primary-button">
+                      Settings
+                    </span>
                   </button>
                 </div>
               </div>

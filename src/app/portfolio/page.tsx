@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useContext, Suspense } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Suspense,
+  useCallback,
+} from "react";
 import {
   emptyUserOption,
   emptyVendorOption,
@@ -24,6 +30,10 @@ import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
+import { hasRole } from "@/lib/utils/authUtils";
+import handleToast from "@/lib/utils/toastr";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getDefaultPage } from "@/config/roleAccess";
 
 /**
  * Renders the content for the portfolio page
@@ -32,6 +42,8 @@ import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomat
 function PortfolioContent() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { setLoading, isLoading } = useContext(LoadingContext);
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -53,7 +65,121 @@ function PortfolioContent() {
     useState<DropdownOption>(emptyVendorOption);
   const [tertiaryVendor, setTertiaryVendor] =
     useState<DropdownOption>(emptyVendorOption);
+  const [isReadonly, setIsReadonly] = useState(false);
+  const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio>();
+  const [isVendorListLoaded, setIsVendorListLoaded] = useState(false);
 
+  /**
+   * Fetches portfolio details by ID
+   * @param id - The portfolio ID
+   */
+  const fetchPortfolioDetails = useCallback(
+    async (id?: string) => {
+      if (!isVendorListLoaded) return; // Wait until vendors are loaded
+
+      setLoading(true);
+      try {
+        if (id) {
+          const portfolioDetails = await portfolioService.fetchById(id);
+          if (portfolioDetails?.status === "SUCCESS") {
+            const portfolio = portfolioDetails.data;
+            setSelectedPortfolio(portfolio);
+            setPortfolioName(portfolio.name);
+            if (portfolio?.primaryUser) {
+              setPrimaryUser({
+                label:
+                  portfolio?.primaryUser?.firstName +
+                  " " +
+                  portfolio?.primaryUser?.lastName,
+                value: String(portfolio?.primaryUser?.id),
+                subLabel: portfolio?.primaryUser?.email,
+              });
+            } else {
+              setPrimaryUser(emptyUserOption);
+            }
+
+            if (portfolio?.secondaryUser) {
+              const secondary = {
+                label:
+                  portfolio?.secondaryUser?.firstName +
+                  " " +
+                  portfolio?.secondaryUser?.lastName,
+                value: String(portfolio?.secondaryUser?.id),
+                subLabel: portfolio?.secondaryUser?.email,
+              };
+              setSecondaryUser(secondary);
+            } else {
+              setSecondaryUser(emptySecondaryUserOption);
+            }
+
+            if (portfolio?.preferredInsuranceSeats) {
+              const primary = {
+                label: portfolio?.preferredInsuranceSeats?.companyName ?? "",
+                value: String(portfolio?.preferredInsuranceSeats?.id),
+                subLabel:
+                  portfolio?.preferredInsuranceSeats?.companyAddress ?? "",
+              };
+              setPrimaryVendor(primary);
+            } else {
+              setPrimaryVendor(emptyVendorOption);
+            }
+
+            if (portfolio?.preferredAttorneys) {
+              const secondary = {
+                label: portfolio?.preferredAttorneys?.companyName ?? "",
+                value: String(portfolio?.preferredAttorneys?.id),
+                subLabel: portfolio?.preferredAttorneys?.companyAddress ?? "",
+              };
+              setSecondaryVendor(secondary);
+            } else {
+              setSecondaryVendor(emptyVendorOption);
+            }
+
+            if (portfolio?.preferredAccountingSeats) {
+              const tertiary = {
+                label: portfolio?.preferredAccountingSeats?.companyName ?? "",
+                value: String(portfolio?.preferredAccountingSeats?.id),
+                subLabel:
+                  portfolio?.preferredAccountingSeats?.companyAddress ?? "",
+              };
+              setTertiaryVendor(tertiary);
+            } else {
+              setTertiaryVendor(emptyVendorOption);
+            }
+
+            // Update URL if necessary
+            const currentUrl = `/portfolio?id=${id}`;
+            if (
+              window.location.pathname + window.location.search !==
+              currentUrl
+            ) {
+              router.replace(currentUrl);
+            }
+          } else {
+            router.push(getDefaultPage() + "?msg=100101");
+          }
+        }
+      } catch {
+        router.push(getDefaultPage() + "?msg=100101");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router, setLoading, isVendorListLoaded]
+  );
+
+  useEffect(() => {
+    setIsReadonly(hasRole("READONLYADMINUSER"));
+    handleToast(searchParams);
+    const id = searchParams.get("id") ?? undefined;
+    if (id && isVendorListLoaded) {
+      fetchPortfolioDetails(id);
+    }
+  }, [searchParams, fetchPortfolioDetails, isVendorListLoaded]);
+
+  /**
+   * Fetches list of users
+   */
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -66,8 +192,6 @@ function PortfolioContent() {
         }));
         setUsers([emptyUserOption, ...fetchedUsers]);
         setSecondaryUsers([emptySecondaryUserOption, ...fetchedUsers]);
-        setPrimaryUser(emptyUserOption);
-        setSecondaryUser(emptySecondaryUserOption);
       } else {
         handleInfo({ code: 100501 });
       }
@@ -80,6 +204,9 @@ function PortfolioContent() {
     }
   };
 
+  /**
+   * Fetches list of vendors
+   */
   const fetchVendors = async () => {
     setLoading(true);
     try {
@@ -93,9 +220,7 @@ function PortfolioContent() {
           })
         );
         setVendors([emptyVendorOption, ...fetchedVendors]);
-        setPrimaryVendor(emptyVendorOption);
-        setSecondaryVendor(emptyVendorOption);
-        setTertiaryVendor(emptyVendorOption);
+        setIsVendorListLoaded(true); // Mark vendors as loaded
       } else {
         handleInfo({ code: 100503 });
       }
@@ -107,13 +232,17 @@ function PortfolioContent() {
     }
   };
 
+  /**
+   * Validates the portfolio form
+   * @returns boolean - Whether the form is valid
+   */
   const validateForm = (): boolean => {
-    // Only check if required fields are empty, don't store specific errors
-    const isValid = portfolioName && primaryUser.value !== "";
-
-    return !!isValid;
+    return !!portfolioName && primaryUser.value !== "";
   };
 
+  /**
+   * Handles form submission to create a portfolio
+   */
   const handleSubmit = async () => {
     if (!validateForm()) {
       handleInfo({ code: 100000 });
@@ -158,13 +287,59 @@ function PortfolioContent() {
     }
   };
 
+  const handleUpdate = async (portfolioId: number) => {
+    if (!validateForm()) {
+      handleInfo({ code: 100000 });
+      return;
+    }
+    setLoading(true);
+    try {
+      const formData: Portfolio = {
+        id: portfolioId,
+        name: portfolioName,
+        primaryUser: { id: parseInt(primaryUser.value) },
+        ...(secondaryUser.value && {
+          secondaryUser: { id: parseInt(secondaryUser.value) },
+        }),
+        ...(primaryVendor.value && {
+          preferredInsuranceSeats: { id: parseInt(primaryVendor.value) },
+        }),
+        ...(secondaryVendor.value && {
+          preferredAttorneys: { id: parseInt(secondaryVendor.value) },
+        }),
+        ...(tertiaryVendor.value && {
+          preferredAccountingSeats: { id: parseInt(tertiaryVendor.value) },
+        }),
+      };
+
+      const response = await portfolioService.update(portfolioId, formData);
+      if (response.status === "SUCCESS") {
+        handleInfo({ code: 100521 });
+      } else {
+        handleInfo({ code: 100522 });
+      }
+    } catch (err) {
+      handleInfo({ code: 100523, error: err });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Handles primary user change and locks/unlocks secondary user
+   * @param user - The selected primary user
+   */
   const handlePrimaryUserChange = (user: DropdownOption) => {
     setPrimaryUser(user);
     setIsSecondaryUserLocked(user.value === "");
     setSecondaryUser(emptySecondaryUserOption);
   };
 
-  const toggleEditingSection = (section: string | null) => {
+  /**
+   * Toggles the editing section
+   * @param section - The section to edit or null to close
+   */
+  const toggleEditingSection = (section: string | null): void => {
     setEditingSection(section);
   };
 
@@ -249,13 +424,25 @@ function PortfolioContent() {
           />
         </div>
         <div className="pt-8 flex justify-center">
-          <PixieButton
-            label={messages?.portfolio?.button?.label}
-            disabled={isLoading}
-            onClick={handleSubmit}
-            className="w-3/4"
-            isLoading={isLoading}
-          />
+          {selectedPortfolio?.id ? (
+            <PixieButton
+              label={"Update Portfolio"}
+              disabled={isLoading || isReadonly}
+              onClick={() =>
+                selectedPortfolio?.id && handleUpdate(selectedPortfolio?.id)
+              }
+              className="w-2/3"
+              isLoading={isLoading}
+            />
+          ) : (
+            <PixieButton
+              label={messages?.portfolio?.button?.label}
+              disabled={isLoading || isReadonly}
+              onClick={handleSubmit}
+              className="w-2/3"
+              isLoading={isLoading}
+            />
+          )}
         </div>
       </div>
     </>

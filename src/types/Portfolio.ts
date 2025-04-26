@@ -23,18 +23,30 @@ export interface Portfolio {
   taxReportingSeatVendorId?: number;
   primaryUser?: {
     id: string | number;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
   };
   secondaryUser?: {
     id?: string | number; // Optional since it uses optional chaining in the original
+    firstName?: string;
+    lastName?: string;
+    email?: string;
   };
   preferredInsuranceSeats?: {
     id?: string | number; // Optional since it uses optional chaining in the original
+    companyName?: string;
+    companyAddress?: string;
   };
   preferredAttorneys?: {
     id?: string | number; // Optional since it uses optional chaining in the original
+    companyName?: string;
+    companyAddress?: string;
   };
   preferredAccountingSeats?: {
     id?: string | number; // Optional since it uses optional chaining in the original
+    companyName?: string;
+    companyAddress?: string;
   };
 }
 

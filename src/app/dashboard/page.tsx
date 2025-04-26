@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useContext, Suspense, useState } from "react";
+import React, {
+  useEffect,
+  useContext,
+  Suspense,
+  useState,
+  useCallback,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import handleToast from "@/lib/utils/toastr";
@@ -26,20 +32,26 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [isReadonly, setIsReadonly] = useState(false);
-  const [defaultSearchTerm, setDefaultSearchTerm] = useState(""); // State to track if a form is being submitted
+  const [defaultSearchTerm, setDefaultSearchTerm] = useState("");
 
-  // Show success toast and redirect on initial load if login succeeded
+  const isSubmitting = useCallback(
+    (value: boolean) => setLoading(value),
+    [setLoading]
+  );
+  const globalPortfolioSearch = useCallback(
+    (value: string) => setDefaultSearchTerm(value),
+    []
+  );
+
   useEffect(() => {
-    if (hasRole("READONLYADMINUSER")) {
-      setIsReadonly(true);
-    } else {
-      setIsReadonly(false);
-    }
+    setIsReadonly(hasRole("READONLYADMINUSER"));
+  }, []);
+
+  useEffect(() => {
     handleToast(searchParams);
     router.replace("/dashboard");
   }, [searchParams, router]);
 
-  // Static breadcrumb items defined outside render to avoid recreation
   const breadcrumbItems = [
     { href: "#", label: "Admin Dashboard", isActive: true },
   ];
@@ -59,27 +71,27 @@ function DashboardContent() {
           />
           <PropertyAndPortfolioCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
+            isSubmitting={isSubmitting}
             defaultSearchTerm={defaultSearchTerm}
+            showAll={true}
           />
           <PortfolioUsersCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
+            isSubmitting={isSubmitting}
             defaultSearchTerm={defaultSearchTerm}
+            showAll={true}
           />
           <PropertyUsersCard />
           <ROAdminUsersCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
+            isSubmitting={isSubmitting}
           />
         </div>
         <div className="w-[408px] max-w-full flex justify-center mb-4 custom:mb-0">
           <AccountsCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
-            globalPortfolioSearch={(value: string) =>
-              setDefaultSearchTerm(value)
-            }
+            isSubmitting={isSubmitting}
+            globalPortfolioSearch={globalPortfolioSearch}
           />
         </div>
       </div>

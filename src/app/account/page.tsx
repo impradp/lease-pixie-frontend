@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useEffect, Suspense, useState, useContext } from "react";
+import React, {
+  useEffect,
+  Suspense,
+  useState,
+  useContext,
+  useCallback,
+  useMemo,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Account } from "@/types/Account";
@@ -31,49 +38,66 @@ function AccountContent() {
   const [selectedAccount, setSelectedAccount] = useState<Account>();
   const [isReadonly, setIsReadonly] = useState(false);
 
+  const isSubmitting = useCallback(
+    (value: boolean) => setLoading(value),
+    [setLoading]
+  );
+
+  // Memoize selectedAccount to prevent unnecessary prop changes
+  const memoizedAccount = useMemo(() => selectedAccount, [selectedAccount]);
+
   /**
    * Fetches account details based on provided ID or retrieves the default account.
    * Handles loading state and error redirection.
    * @param id - Optional account ID to fetch specific account details
    */
-  const fetchAccountDetails = async (id?: string) => {
-    setLoading(true); // Set loading state to true
-    try {
-      if (id) {
-        const accountDetails = await accountService.fetchById(Number(id));
-        if (accountDetails?.status === "SUCCESS") {
-          setSelectedAccount(accountDetails?.data); // Update state with fetched account
-          router.replace("/account?id=" + id);
+  const fetchAccountDetails = useCallback(
+    async (id?: string) => {
+      setLoading(true); // Set loading state to true
+      try {
+        if (id) {
+          const accountDetails = await accountService.fetchById(Number(id));
+          if (accountDetails?.status === "SUCCESS") {
+            setSelectedAccount(accountDetails?.data); // Update state with fetched account
+            // Only replace if the URL doesn't already match
+            const currentUrl = `/account?id=${id}`;
+            if (
+              window.location.pathname + window.location.search !==
+              currentUrl
+            ) {
+              router.replace(currentUrl);
+            }
+          } else {
+            router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
+          }
         } else {
-          router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
+          const accountDetails = await accountService.fetch();
+          if (accountDetails?.status === "SUCCESS") {
+            setSelectedAccount(accountDetails?.data[0]); // Set first account as default
+            // Only replace if the URL doesn't already match
+            if (window.location.pathname !== "/account") {
+              router.replace("/account");
+            }
+          } else {
+            router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
+          }
         }
-      } else {
-        const accountDetails = await accountService.fetch();
-        if (accountDetails?.status === "SUCCESS") {
-          setSelectedAccount(accountDetails?.data[0]); // Set first account as default
-          router.replace("/account");
-        } else {
-          router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
-        }
+      } catch {
+        router.push(getDefaultPage() + "?msg=100101"); // Redirect on error
+      } finally {
+        setLoading(false); // Reset loading state
       }
-    } catch {
-      router.push(getDefaultPage() + "?msg=100101"); // Redirect on error
-    } finally {
-      setLoading(false); // Reset loading state
-    }
-  };
+    },
+    [router, setLoading]
+  );
 
   // Effect to handle toast notifications and fetch account details on mount or search param change
   useEffect(() => {
-    if (hasRole("READONLYADMINUSER")) {
-      setIsReadonly(true);
-    } else {
-      setIsReadonly(false);
-    }
+    setIsReadonly(hasRole("READONLYADMINUSER"));
     handleToast(searchParams); // Display toast based on search params
     const id = searchParams.get("id") ?? undefined;
     fetchAccountDetails(id); // Fetch account details
-  }, [searchParams, router]);
+  }, [searchParams, fetchAccountDetails]);
 
   // Breadcrumb navigation items
   const breadcrumbItems = [
@@ -86,14 +110,14 @@ function AccountContent() {
       <div className="flex flex-col custom:flex-row custom:gap-4 mt-4 custom:mt-0 min-h-screen py-4 items-center custom:items-start justify-center relative">
         <div className="w-[408px] flex flex-col max-w-full justify-center mb-4 custom:mb-0 gap-4">
           <WorkflowCard />
-          {selectedAccount && (
+          {memoizedAccount && (
             <AccountDetailsCard
               isEditable={!isLoading && !isReadonly}
-              isSubmitting={(value: boolean) => setLoading(value)} // Update loading state on submission
-              details={selectedAccount}
-              onAccountUpdated={
-                () => fetchAccountDetails(selectedAccount?.id?.toString()) // Refetch account on update
-              }
+              isSubmitting={isSubmitting} // Update loading state on submission
+              details={memoizedAccount}
+              onAccountUpdated={() =>
+                fetchAccountDetails(memoizedAccount?.id?.toString())
+              } // Refetch account on update
             />
           )}
           <PaymentMethod />
@@ -107,17 +131,19 @@ function AccountContent() {
           />
           <PropertyAndPortfolioCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
+            isSubmitting={isSubmitting}
+            accountDetails={memoizedAccount}
           />
         </div>
         <div className="w-[408px] flex flex-col max-w-full flex justify-center mb-4 custom:mb-0 gap-4">
           <DepositAccountsCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
+            isSubmitting={isSubmitting}
           />
           <PortfolioUsersCard
             isEditable={!isLoading && !isReadonly}
-            isSubmitting={(value: boolean) => setLoading(value)}
+            isSubmitting={isSubmitting}
+            accountDetails={memoizedAccount}
           />
         </div>
       </div>

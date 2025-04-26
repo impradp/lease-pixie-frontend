@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+
 import { hasRole } from "@/lib/utils/authUtils";
 import handleInfo from "@/lib/utils/errorHandler";
 import { defaultData } from "@/data/depositAccount";
@@ -28,10 +29,10 @@ interface DepositAccountsCardProps {
  * @param {DepositAccountsCardProps} props - Component props
  * @returns {JSX.Element} Deposit accounts management card
  */
-const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
+const DepositAccountsCard = ({
   isEditable = false,
   isSubmitting,
-}) => {
+}: DepositAccountsCardProps) => {
   const [displayEditFeature, setDisplayEditFeature] = useState(false);
   const [selectedDepositAccount, setSelectedDepositAccount] =
     useState<DepositAccount>(defaultData);
@@ -41,6 +42,19 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
   const [plaidAccountId, setPlaidAccountId] = useState<string | null>(null);
   const [isPlaidLoading, setIsPlaidLoading] = useState(false);
   const hasDepositSectionEditAcess = hasRole("ACCOUNTUSER");
+
+  // Ref to track if component is mounted
+  const isMounted = useRef(true);
+
+  // Ref to track if a fetch is in progress
+  const isFetching = useRef(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   /**
    * Loads deposit accounts from the API on component mount
@@ -52,11 +66,13 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
   /**
    * Fetches deposit accounts from the service
    */
-  const fetchDepositAccounts = async () => {
+  const fetchDepositAccounts = useCallback(async () => {
+    if (isFetching.current || !isMounted.current) return;
+    isFetching.current = true;
     isSubmitting(true);
     try {
       const response = await depositAccountService.fetch();
-      if (response.status === "SUCCESS") {
+      if (response.status === "SUCCESS" && isMounted.current) {
         setDepositAccounts(response?.data);
       } else {
         handleInfo({ code: 100701 });
@@ -64,45 +80,51 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
     } catch (err) {
       handleInfo({ code: 100702, error: err });
     } finally {
-      isSubmitting(false);
+      if (isMounted.current) {
+        isSubmitting(false);
+        isFetching.current = false;
+      }
     }
-  };
+  }, [isSubmitting]);
 
   /**
    * Creates a new deposit account
    * @param {DepositAccount} data - New deposit account data
    */
-  const handleAddDepositAccount = async (data: DepositAccount) => {
-    try {
-      setShowDepositAccountForm(false);
-      await new Promise((resolve) => requestAnimationFrame(resolve)); // Ensure UI updates before API call
-      const response = await depositAccountService.create(data);
-      if (response?.status === "SUCCESS") {
-        handleInfo({ code: 100700 });
-        fetchDepositAccounts();
-      } else {
-        handleInfo({ code: 100703 });
+  const handleAddDepositAccount = useCallback(
+    async (data: DepositAccount) => {
+      try {
+        setShowDepositAccountForm(false);
+        await new Promise((resolve) => requestAnimationFrame(resolve)); // Ensure UI updates before API call
+        const response = await depositAccountService.create(data);
+        if (response?.status === "SUCCESS") {
+          handleInfo({ code: 100700 });
+          fetchDepositAccounts();
+        } else {
+          handleInfo({ code: 100703 });
+        }
+      } catch (err) {
+        handleInfo({ code: 100704, error: err });
       }
-    } catch (err) {
-      handleInfo({ code: 100704, error: err });
-    }
-  };
+    },
+    [fetchDepositAccounts]
+  );
 
   /**
    * Closes the account form modal
    */
-  const handleCloseAccountModal = () => {
+  const handleCloseAccountModal = useCallback(() => {
     setShowDepositAccountForm(false);
     setDisplayEditFeature(false);
     setSelectedDepositAccount(defaultData);
-  };
+  }, []);
 
   /**
    * Opens the add account form
    */
-  const handleAddClick = () => {
+  const handleAddClick = useCallback(() => {
     setShowDepositAccountForm(true);
-  };
+  }, []);
 
   /**
    * Toggles payment processing for an account
@@ -110,70 +132,83 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
    * @param {boolean} isPaymentProcessingOn - New payment processing state
    * @returns {Promise<boolean>} Success status
    */
-  const handlePaymentProcessing = async (
-    accountId: string,
-    isPaymentProcessingOn: boolean
-  ): Promise<boolean> => {
-    isSubmitting(true);
-    const previousAccounts = [...depositAccounts]; // Store for rollback
-    try {
-      // Optimistic update
-      setDepositAccounts((prev) =>
-        prev.map((acc) =>
-          acc.id === accountId
-            ? { ...acc, isPaymentProcessingOn: isPaymentProcessingOn }
-            : acc
-        )
-      );
-      const account = depositAccounts.find((acc) => acc.id === accountId);
-      if (!account) {
-        throw new Error("Deposit Account not found");
-      }
-      const response = await depositAccountService.updatePaymentProcessing(
-        accountId,
-        isPaymentProcessingOn
-      );
-      if (response?.status === "SUCCESS") {
-        handleInfo({ code: isPaymentProcessingOn ? 100705 : 100706 });
-        return true;
-      } else {
+  const handlePaymentProcessing = useCallback(
+    async (
+      accountId: string,
+      isPaymentProcessingOn: boolean
+    ): Promise<boolean> => {
+      if (!isMounted.current) return false;
+      isSubmitting(true);
+      const previousAccounts = [...depositAccounts]; // Store for rollback
+      try {
+        // Optimistic update
+        setDepositAccounts((prev) =>
+          prev.map((acc) =>
+            acc.id === accountId
+              ? { ...acc, isPaymentProcessingOn: isPaymentProcessingOn }
+              : acc
+          )
+        );
+        const account = depositAccounts.find((acc) => acc.id === accountId);
+        if (!account) {
+          throw new Error("Deposit Account not found");
+        }
+        const response = await depositAccountService.updatePaymentProcessing(
+          accountId,
+          isPaymentProcessingOn
+        );
+        if (response?.status === "SUCCESS") {
+          handleInfo({ code: isPaymentProcessingOn ? 100705 : 100706 });
+          return true;
+        } else {
+          setDepositAccounts(previousAccounts); // Rollback on error
+          handleInfo({ code: 100707 });
+          return false;
+        }
+      } catch (err) {
         setDepositAccounts(previousAccounts); // Rollback on error
-        handleInfo({ code: 100707 });
+        handleInfo({ code: 100708, error: err });
         return false;
+      } finally {
+        if (isMounted.current) {
+          isSubmitting(false);
+        }
       }
-    } catch (err) {
-      setDepositAccounts(previousAccounts); // Rollback on error
-      handleInfo({ code: 100708, error: err });
-      return false;
-    } finally {
-      isSubmitting(false);
-    }
-  };
+    },
+    [depositAccounts, isSubmitting]
+  );
 
   /**
    * Initiates merchant onboarding for an account
    * @param {string} accountId - ID of the account to onboard
    */
-  const handleOnboarding = async (accountId: string) => {
-    try {
-      isSubmitting(true);
-      const response = await depositAccountService.onboardMerchant(accountId);
-      if (response.status === "SUCCESS") {
-        handleInfo({ code: 100709 });
-        fetchDepositAccounts();
-      } else {
-        handleInfo({ code: 100710 });
+  const handleOnboarding = useCallback(
+    async (accountId: string) => {
+      if (!isMounted.current) return;
+      try {
+        isSubmitting(true);
+        const response = await depositAccountService.onboardMerchant(accountId);
+        if (response.status === "SUCCESS") {
+          handleInfo({ code: 100709 });
+          fetchDepositAccounts();
+        } else {
+          handleInfo({ code: 100710 });
+        }
+      } catch (err) {
+        handleInfo({ code: 100711, error: err });
+      } finally {
+        if (isMounted.current) {
+          isSubmitting(false);
+        }
       }
-    } catch (err) {
-      handleInfo({ code: 100711, error: err });
-    } finally {
-      isSubmitting(false);
-    }
-  };
+    },
+    [fetchDepositAccounts, isSubmitting]
+  );
 
   // Handle Plaid Link success
   const onPlaidSuccess = useCallback<PlaidLinkOnSuccess>(
     async (publicToken) => {
+      if (!isMounted.current) return;
       if (plaidAccountId && publicToken) {
         isSubmitting(true);
         try {
@@ -194,7 +229,9 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
           console.error("Error setting up Plaid:", err);
           handleInfo({ code: 100901, error: err });
         } finally {
-          isSubmitting(false);
+          if (isMounted.current) {
+            isSubmitting(false);
+          }
         }
       } else {
         handleInfo({ code: 100901 });
@@ -226,51 +263,65 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
   }, [linkToken, ready, open, error]);
 
   // Initiate Plaid Link flow
-  const handleContinueToPlaid = async (accountId: string) => {
-    if (isPlaidLoading) return;
-    setIsPlaidLoading(true);
-    setPlaidAccountId(accountId);
-    try {
-      isSubmitting(true);
-      const response = await plaidService.generateLinkToken();
-      if (response.status === "SUCCESS" && response?.data?.linkToken) {
-        handleInfo({ code: 100900 });
-        setLinkToken(response.data.linkToken);
-      } else {
-        handleInfo({ code: 100901 });
+  const handleContinueToPlaid = useCallback(
+    async (accountId: string) => {
+      if (isPlaidLoading || !isMounted.current) return;
+      setIsPlaidLoading(true);
+      setPlaidAccountId(accountId);
+      try {
+        isSubmitting(true);
+        const response = await plaidService.generateLinkToken();
+        if (response.status === "SUCCESS" && response?.data?.linkToken) {
+          handleInfo({ code: 100900 });
+          setLinkToken(response.data.linkToken);
+        } else {
+          handleInfo({ code: 100901 });
+          setIsPlaidLoading(false);
+        }
+      } catch (err) {
+        handleInfo({ code: 100902, error: err });
         setIsPlaidLoading(false);
+      } finally {
+        if (isMounted.current) {
+          isSubmitting(false);
+        }
       }
-    } catch (err) {
-      handleInfo({ code: 100902, error: err });
-      setIsPlaidLoading(false);
-    } finally {
-      isSubmitting(false);
-    }
-  };
+    },
+    [isPlaidLoading, isSubmitting]
+  );
 
   /**
    * Removes Plaid link from an account
    * @param {string} plaidAccountId - ID of the account to unlink from Plaid
    */
-  const handlePlaidLinkRemove = async (plaidAccountId: string) => {
-    try {
-      isSubmitting(true);
-      const response = await depositAccountService.setUpPlaid(plaidAccountId, {
-        hasPlaidLink: false,
-        publicToken: "",
-      });
-      if (response.status === "SUCCESS") {
-        handleInfo({ code: 100905 });
-        await fetchDepositAccounts();
-      } else {
-        handleInfo({ code: 100906 });
+  const handlePlaidLinkRemove = useCallback(
+    async (plaidAccountId: string) => {
+      if (!isMounted.current) return;
+      try {
+        isSubmitting(true);
+        const response = await depositAccountService.setUpPlaid(
+          plaidAccountId,
+          {
+            hasPlaidLink: false,
+            publicToken: "",
+          }
+        );
+        if (response.status === "SUCCESS") {
+          handleInfo({ code: 100905 });
+          await fetchDepositAccounts();
+        } else {
+          handleInfo({ code: 100906 });
+        }
+      } catch (err) {
+        handleInfo({ code: 100907, error: err });
+      } finally {
+        if (isMounted.current) {
+          isSubmitting(false);
+        }
       }
-    } catch (err) {
-      handleInfo({ code: 100907, error: err });
-    } finally {
-      isSubmitting(false);
-    }
-  };
+    },
+    [fetchDepositAccounts, isSubmitting]
+  );
 
   return (
     <>
@@ -321,5 +372,4 @@ const DepositAccountsCard: React.FC<DepositAccountsCardProps> = ({
     </>
   );
 };
-
 export default DepositAccountsCard;
