@@ -39,6 +39,14 @@ export const ENDPOINTS = {
     FETCH: {
       DEFAULT: "/api/v1/account",
       BY_ID: "/api/v1/account/%s",
+      USER: {
+        DEFAULT: "/api/v1/account/portfolio-user?attachPortfolio=%s",
+      },
+    },
+    ADD: {
+      USER: {
+        DEFAULT: "/api/v1/account/portfolio-user",
+      },
     },
     DELETE: {
       DEFAULT: "/api/v1/account/%s",
@@ -67,9 +75,6 @@ export const ENDPOINTS = {
       BY_ID: "/api/v1/portfolio/%s",
       BY_ACCOUNT_ID: "/api/v1/portfolio/account/%s",
       VENDORS: "/api/v1/portfolio/vendors",
-      USERS: "/api/v1/portfolio/users?attachPortfolio=%s",
-      USERS_BY_ACCOUNT_ID:
-        "/api/v1/portfolio/users/account/%s?attachPortfolio=%s",
     },
     UPDATE: {
       DEFAULT: "/api/v1/portfolio/%s",

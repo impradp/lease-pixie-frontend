@@ -10,6 +10,7 @@ import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import PortfolioUserCardContent from "@/components/dashboard/portfolio/PortfolioUserCardContent";
 import { Account } from "@/types/Account";
+import { accountService } from "@/lib/services/account";
 
 /**
  * Props for the PortfolioUsers component
@@ -96,19 +97,9 @@ const PortfolioUsersCard = ({
     }
     isSubmitting(true);
     try {
-      let response;
-      if (showAll) {
-        response = await portfolioService.getUsers({
-          attachPortfolio: true,
-        });
-      } else if (accountDetails?.id) {
-        response = await portfolioService.getUsersByAccoundId(
-          accountDetails.id,
-          {
-            attachPortfolio: true,
-          }
-        );
-      }
+      const response = await accountService.fetchPortfolioUsers({
+        attachPortfolio: true,
+      });
       if (response?.status === "SUCCESS") {
         setPortfolioUsers(response.data);
       } else {

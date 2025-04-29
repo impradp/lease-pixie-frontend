@@ -1,4 +1,5 @@
 "use client";
+import { cookieHandler } from "./services/cookieHandler";
 
 export class ApiService {
   private readonly baseUrl: string;
@@ -162,7 +163,8 @@ export class ApiService {
 
   clearToken(): void {
     this.token = null;
-    document.cookie = "auth_token=; path=/; max-age=0";
+    console.log("Attempting to clear token.");
+    cookieHandler.clearAuthToken();
   }
 
   get<T>(endpoint: string): Promise<T> {

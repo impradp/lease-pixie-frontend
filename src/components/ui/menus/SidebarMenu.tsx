@@ -1,10 +1,10 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import React, { useState, useContext } from "react";
-
 import { ChevronRight } from "lucide-react";
 import { MenuItem } from "@/types/menuItem";
 import handleInfo from "@/lib/utils/errorHandler";
-import { loginService } from "@/lib/services/login";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
@@ -17,21 +17,13 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    {
-      title: "List",
-      isExpanded: false,
-      subItems: ["Vendors"],
-    },
+    { title: "List", isExpanded: false, subItems: ["Vendors"] },
     {
       title: "Add",
       isExpanded: false,
       subItems: ["User", "Property", "Portfolio"],
     },
-    {
-      title: "Settings",
-      isExpanded: false,
-      subItems: ["User", "Portfolio"],
-    },
+    { title: "Settings", isExpanded: false, subItems: ["User", "Portfolio"] },
   ]);
 
   const toggleMenuItem = (index: number) => {
@@ -42,36 +34,29 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
     setMenuItems(updatedMenuItems);
   };
 
+  const handleNavigation = (url: string) => {
+    setLoading(true);
+    onClose();
+    setTimeout(() => {
+      router.push(url);
+    }, 300); // Match ClientLoadingWrapper delay
+  };
+
   const handleSubItemClick = (subItem: string) => {
     if (subItem === "Portfolio") {
-      setLoading(true); // Set loading true before navigation
-      router.push("/portfolio");
-      onClose(); // Optional: close the sidebar after navigation
+      handleNavigation("/portfolio");
     } else if (subItem === "Vendors") {
-      setLoading(true); // Set loading true before navigation
-      router.push("/vendors");
-      onClose(); // Optional: close the sidebar after navigation
+      handleNavigation("/vendors");
     } else if (subItem === "Property") {
-      setLoading(true); // Set loading true before navigation
-      router.push("/property");
-      onClose(); // Optional: close the sidebar after navigation
+      handleNavigation("/property");
     }
-    // Add more conditions here for other subItems if needed
   };
 
   const handleSignOut = async () => {
-    setLoading(true);
     try {
-      setLoading(true);
-      loginService.logout();
-      router.push("/login?msg=100303");
-      onClose();
+      handleNavigation("/logout?msg=100303");
     } catch (err) {
-      handleInfo({
-        code: 100302,
-        error: err,
-      });
-    } finally {
+      handleInfo({ code: 100302, error: err });
       setLoading(false);
     }
   };

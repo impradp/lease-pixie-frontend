@@ -97,6 +97,11 @@ function AccountContent() {
     handleToast(searchParams); // Display toast based on search params
     const id = searchParams.get("id") ?? undefined;
     fetchAccountDetails(id); // Fetch account details
+    if (searchParams.has("id")) {
+      router.replace("/account?" + id);
+    } else {
+      router.replace("/account");
+    }
   }, [searchParams, fetchAccountDetails]);
 
   // Breadcrumb navigation items

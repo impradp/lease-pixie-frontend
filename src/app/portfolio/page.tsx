@@ -12,16 +12,22 @@ import {
   emptyVendorOption,
   emptySecondaryUserOption,
 } from "@/data/users";
-import { Locale } from "@/locales";
-import { DropdownOption } from "@/types/user";
-import { getMessages } from "@/locales/locale";
+
 import {
   Portfolio,
   PortfolioUser,
   PortfolioVendorResponse,
 } from "@/types/Portfolio";
+import { Locale } from "@/locales";
+import handleToast from "@/lib/utils/toastr";
+import { DropdownOption } from "@/types/user";
+import { getMessages } from "@/locales/locale";
+import { hasRole } from "@/lib/utils/authUtils";
 import handleInfo from "@/lib/utils/errorHandler";
+import { getDefaultPage } from "@/config/roleAccess";
+import { accountService } from "@/lib/services/account";
 import { portfolioService } from "@/lib/services/portfolio";
+import { useRouter, useSearchParams } from "next/navigation";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
@@ -30,10 +36,6 @@ import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
-import { hasRole } from "@/lib/utils/authUtils";
-import handleToast from "@/lib/utils/toastr";
-import { useRouter, useSearchParams } from "next/navigation";
-import { getDefaultPage } from "@/config/roleAccess";
 
 /**
  * Renders the content for the portfolio page
@@ -183,7 +185,9 @@ function PortfolioContent() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await portfolioService.getUsers();
+      const response = await accountService.fetchPortfolioUsers({
+        attachPortfolio: false,
+      });
       if (response.status === "SUCCESS") {
         const fetchedUsers = response.data.map((user: PortfolioUser) => ({
           value: String(user.id),

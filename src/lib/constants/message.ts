@@ -134,6 +134,10 @@ const target = {
     type: "success",
     message: "Logout successful.",
   } as LeasePixieToastMsg,
+  100304: {
+    type: "info",
+    message: "Session expired. Please log in to continue.",
+  } as LeasePixieToastMsg,
 
   //100400 series for reset handle message
   100400: {

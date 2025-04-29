@@ -1,3 +1,4 @@
+// components/ClientLoadingWrapper.tsx
 "use client";
 
 import { useState, useEffect, createContext } from "react";
@@ -17,16 +18,17 @@ export default function ClientLoadingWrapper({
 }: {
   children: React.ReactNode;
 }) {
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true to cover initial load
+  const [isLoading, setIsLoading] = useState(true);
+  const [isManualLoading, setIsManualLoading] = useState(false); // Track manual loading
   const pathname = usePathname();
 
   useEffect(() => {
-    // Show loading state on pathname change (navigation starts)
-    setIsLoading(true);
+    // Only show loading if not manually set
+    if (!isManualLoading) {
+      setIsLoading(true);
+    }
 
-    // Simulate the end of the navigation by waiting for the page to be ready
     const handlePageReady = async () => {
-      // Wait for the DOM to be fully loaded (including hydration)
       await new Promise<void>((resolve) => {
         if (document.readyState === "complete") {
           resolve();
@@ -35,11 +37,12 @@ export default function ClientLoadingWrapper({
         }
       });
 
-      // Add a small delay to ensure React has finished rendering
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 300)); // Increased delay
 
-      // Clear loading state once the page is fully loaded
-      setIsLoading(false);
+      // Only clear loading if not manually set
+      if (!isManualLoading) {
+        setIsLoading(false);
+      }
     };
 
     handlePageReady();
@@ -68,8 +71,16 @@ export default function ClientLoadingWrapper({
     };
   }, []);
 
+  // Custom setLoading to track manual loading
+  const handleSetLoading = (loading: boolean) => {
+    setIsManualLoading(loading);
+    setIsLoading(loading);
+  };
+
   return (
-    <LoadingContext.Provider value={{ setLoading: setIsLoading, isLoading }}>
+    <LoadingContext.Provider
+      value={{ setLoading: handleSetLoading, isLoading }}
+    >
       {isLoading && <LoadingOverlay />}
       {children}
     </LoadingContext.Provider>

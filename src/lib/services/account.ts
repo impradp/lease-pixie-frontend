@@ -8,6 +8,8 @@ import {
   AccountResponse,
 } from "@/types/Account";
 import { interpolate } from "../utils/stringUtils";
+import { NewUserFormData, UserResponse } from "@/types/user";
+import { PortfolioUserListResponse } from "@/types/Portfolio";
 
 /**
  * Service class for managing account-related API operations
@@ -77,6 +79,34 @@ class AccountService {
   async fetchById(id: number): Promise<AccountDetailResponse> {
     return await apiService.get<AccountDetailResponse>(
       interpolate(ENDPOINTS.ACCOUNT.FETCH.BY_ID, id)
+    );
+  }
+
+  /**
+   * Fetches account portfolio user by associated account id
+   * @returns Promise resolving to the account data response
+   */
+
+  async fetchPortfolioUsers(
+    options: { attachPortfolio?: boolean } = { attachPortfolio: false }
+  ): Promise<PortfolioUserListResponse> {
+    const { attachPortfolio } = options;
+    return await apiService.get<PortfolioUserListResponse>(
+      interpolate(
+        ENDPOINTS.ACCOUNT.FETCH.USER.DEFAULT,
+        attachPortfolio ?? false
+      )
+    );
+  }
+
+  /**
+   * Add account portfolio user for associated account id
+   * @returns Promise resolving to the account's portfolio user data response
+   */
+  async addPortfolioUsers(user: NewUserFormData): Promise<UserResponse> {
+    return await apiService.post<UserResponse>(
+      ENDPOINTS.ACCOUNT.ADD.USER.DEFAULT,
+      user
     );
   }
 }

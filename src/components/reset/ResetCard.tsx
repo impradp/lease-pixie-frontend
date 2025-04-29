@@ -179,6 +179,8 @@ function ResetCard({
               placeholder="Enter your email"
               isEditing={true}
               containerClassName="h-[91px] w-[358px]"
+              type="email"
+              isRequired={true}
             />
 
             <CustomInput
@@ -189,6 +191,7 @@ function ResetCard({
               placeholder="800-555-1234"
               type="mobile"
               containerClassName="w-[358px]"
+              isRequired={true}
             />
 
             <div className="w-[358px] flex flex-col justify-center items-end ">

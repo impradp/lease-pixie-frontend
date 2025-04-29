@@ -1,7 +1,20 @@
 export interface User {
+  id?: string;
   name: string;
   email: string;
   isActive?: boolean;
+}
+
+export interface UserListResponse {
+  status: string;
+  data: NewUserFormData[];
+  message?: string;
+}
+
+export interface UserResponse {
+  status: string;
+  data: NewUserFormData;
+  message?: string;
 }
 
 export interface NewUserFormData {

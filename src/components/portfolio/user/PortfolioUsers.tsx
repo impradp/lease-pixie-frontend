@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import handleInfo from "@/lib/utils/errorHandler";
-import { portfolioService } from "@/lib/services/portfolio";
+import { accountService } from "@/lib/services/account";
+import { emptySecondaryUserOption } from "@/data/users";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { NewUserFormData, DropdownOption } from "@/types/user";
-import LinkButton from "@/components/ui/buttons/LinkButton";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
@@ -83,11 +84,11 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     setOriginalUser(selectedUser);
     setOriginalSecondaryUser(selectedSecondaryUser);
     setEditedUser(selectedUser);
-    setEditedSecondaryUser(selectedSecondaryUser);
+    setEditedSecondaryUser(emptySecondaryUserOption);
     setSecondarySampleUsers(
       secondaryUsers.filter((opt) => opt.value !== selectedUser.value)
     );
-  }, [selectedUser, selectedSecondaryUser, secondaryUsers]);
+  }, [selectedUser]);
 
   /**
    * Manages body overflow for modal
@@ -114,7 +115,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   ) => {
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const response = await portfolioService.addUser(userData);
+      const response = await accountService.addPortfolioUsers(userData);
       if (response?.status === "SUCCESS") {
         setShowNewUserModal(false);
         handleInfo({ code: 100507 });

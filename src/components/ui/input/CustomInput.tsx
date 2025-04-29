@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Eye, EyeClosed } from "lucide-react";
 
 /**
  * Props for the CustomInput component
@@ -13,7 +14,7 @@ interface CustomInputProps {
   containerClassName?: string; // Custom class for the container
   className?: string; // Custom class for the input
   labelClassName?: string; // Custom class for the label
-  type?: "text" | "email" | "mobile" | "money" | "number"; // Input type
+  type?: "text" | "email" | "mobile" | "money" | "number" | "password"; // Input type
   error?: string; // External error message
   disabled?: boolean; // Whether the input is disabled
   isRequired?: boolean; // Whether the input is required
@@ -40,6 +41,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   isRequired = false,
 }) => {
   const [internalError, setInternalError] = useState<string | null>(null); // State for internal validation errors
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Format initial value for mobile type
@@ -321,12 +323,20 @@ const CustomInput: React.FC<CustomInputProps> = ({
     }
   }, [value, type]);
 
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    if (!disabled && isEditing && !readOnly) {
+      setShowPassword(!showPassword);
+    }
+  };
+
   const displayError = externalError ?? internalError;
 
   // Determine the appropriate input type attribute
   const getInputTypeAttribute = () => {
     if (type === "mobile") return "tel";
     if (type === "money" || type === "number") return "text"; // Using text for better control
+    if (type === "password") return showPassword ? "text" : "password";
     return type;
   };
 
@@ -366,10 +376,28 @@ const CustomInput: React.FC<CustomInputProps> = ({
           onSelect={handleSelect}
           readOnly={!isEditing || readOnly}
           disabled={disabled}
-          className={`w-full ${className} font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist ${
+          className={`flex-1 ${className} font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist ${
             disabled ? "cursor-not-allowed" : ""
           }`}
         />
+        {type === "password" && (
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className={`ml-2 p-1 ${
+              disabled || !isEditing || readOnly
+                ? "cursor-not-allowed opacity-50"
+                : "cursor-pointer"
+            }`}
+            disabled={disabled || !isEditing || readOnly}
+          >
+            {showPassword ? (
+              <Eye className="h-4 w-4 text-gray-500" />
+            ) : (
+              <EyeClosed className="h-4 w-4 text-gray-500" />
+            )}
+          </button>
+        )}
       </div>
       {displayError && <span className="input-error">{displayError}</span>}
     </div>

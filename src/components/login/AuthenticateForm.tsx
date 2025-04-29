@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import PasscodeInput from "@/components/ui/input/PasscodeInput";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
 
+/**
+ * Props for the AuthenticateForm component
+ * @interface AuthenticateFormProps
+ */
 interface AuthenticateFormProps {
   readonly onClose?: () => void;
   readonly onSubmitCode?: (authCode: string) => void;
@@ -16,7 +20,12 @@ interface AuthenticateFormProps {
   subLabel?: string;
 }
 
-export default function AuthenticateForm({
+/**
+ * A form component for entering a 6-digit authentication code with auto-submit functionality
+ * @param {AuthenticateFormProps} props - Component properties
+ * @returns {JSX.Element} The rendered authentication form
+ */
+function AuthenticateForm({
   onClose,
   onSubmitCode,
   initialCode = ["", "", "", "", "", ""],
@@ -25,31 +34,84 @@ export default function AuthenticateForm({
   label = "Authentication code",
   subLabel,
 }: AuthenticateFormProps) {
-  const { setLoading, isLoading } = useContext(LoadingContext);
-  const [code, setCode] = useState(initialCode);
-  const [error, setError] = useState("");
-  const [attempts, setAttempts] = useState(0);
+  const { setLoading, isLoading } = useContext(LoadingContext); // Access loading state from context
+  const [code, setCode] = useState(initialCode); // State for the 6-digit code
+  const [error, setError] = useState(""); // State for error messages
+  const [attempts, setAttempts] = useState(0); // State for tracking submission attempts
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true); // Set loading immediately
-    // Force a synchronous UI update by delaying the async call slightly
-    requestAnimationFrame(() => {
-      const authCode = code.join("");
-      if (onSubmitCode) {
-        onSubmitCode(authCode);
-        setCode(initialCode);
-      }
-    });
+  // Ref to track if we should auto-submit
+  const shouldAutoSubmitRef = useRef(false);
+
+  /**
+   * Effect to handle auto-submission when code is complete
+   */
+  useEffect(() => {
+    // Check if all digits are filled and auto-submit flag is true
+    if (
+      code.every((digit) => digit !== "") &&
+      shouldAutoSubmitRef.current &&
+      !isLoading
+    ) {
+      // Reset the auto-submit flag
+      shouldAutoSubmitRef.current = false;
+      // Submit after state updates are complete
+      handleSubmit();
+    }
+  }, [code, isLoading]);
+
+  /**
+   * Handles form submission, either triggered manually or automatically
+   * @param {React.FormEvent<HTMLFormElement>} [e] - Optional form event
+   */
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    // Prevent default form submission if event is provided
+    if (e) e.preventDefault();
+
+    // Get the current code value
+    const authCode = code.join("");
+
+    // Validate the code is complete before proceeding
+    if (authCode.length !== 6) {
+      setError("Please enter all 6 digits");
+      return;
+    }
+
+    // Set loading state to true to show loading indicator
+    setLoading(true);
+
+    // Call the provided onSubmitCode callback with the auth code
+    if (onSubmitCode) {
+      onSubmitCode(authCode);
+      // Reset code to initial state after submission
+      setCode(initialCode);
+    }
   };
 
+  /**
+   * Handles changes to the passcode input
+   * @param {string[]} newCode - The updated code array
+   */
   const handleCodeChange = (newCode: string[]) => {
+    // Update the code state with new values
     setCode(newCode);
+
+    // Clear error message if all digits are filled
     if (error && newCode.every((digit) => digit !== "")) setError("");
+
+    // Set flag to auto-submit when all digits are filled
+    if (newCode.every((digit) => digit !== "")) {
+      shouldAutoSubmitRef.current = true;
+    }
   };
 
+  /**
+   * Handles form closure and resets state
+   */
   const handleClose = () => {
+    // Reset code to initial state
     setCode(initialCode);
+
+    // Call the provided onClose callback if it exists
     if (onClose) onClose();
   };
 
@@ -58,6 +120,7 @@ export default function AuthenticateForm({
       className={`w-full min-h-[264px] min-w-[358px] bg-white rounded-xl shadow-lg flex flex-col items-start p-8 absolute z-50 ${className}`}
       style={style}
     >
+      {/* Close button section */}
       <div className="w-full relative mb-6">
         <button
           onClick={handleClose}
@@ -68,12 +131,15 @@ export default function AuthenticateForm({
           <X className="w-6 h-6 text-secondary-button" />
         </button>
       </div>
+
+      {/* Form title section */}
       <div className="w-full relative mb-6">
         <div className="text-tertiary-deepNavy text-xl font-semibold font-['Inter'] text-center w-full">
           {label}
         </div>
       </div>
 
+      {/* Optional sub-label section */}
       {subLabel && (
         <div className="w-full relative mb-6">
           <div className="self-stretch text-center justify-start text-[#0f1728] text-sm font-normal font-['Inter'] leading-[30px]">
@@ -82,6 +148,7 @@ export default function AuthenticateForm({
         </div>
       )}
 
+      {/* Form with passcode input and submit button */}
       <form
         onSubmit={handleSubmit}
         className="w-full flex flex-col justify-center items-center gap-4"
@@ -93,6 +160,7 @@ export default function AuthenticateForm({
           error={error}
           attempts={attempts}
           onReset={() => {
+            // Reset form state when PasscodeInput requests a reset
             setCode(["", "", "", "", "", ""]);
             setAttempts(0);
             setError("");
@@ -100,6 +168,14 @@ export default function AuthenticateForm({
           disabled={isLoading}
         />
 
+        {/* Error message display */}
+        {error && (
+          <div id="error-message" className="text-red-500 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Submit button section */}
         <div className="w-full flex flex-col">
           <PixieButton
             label={"Submit"}
@@ -114,3 +190,5 @@ export default function AuthenticateForm({
     </div>
   );
 }
+
+export default AuthenticateForm;

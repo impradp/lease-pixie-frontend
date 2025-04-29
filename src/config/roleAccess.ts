@@ -56,6 +56,7 @@ export const defaultPages: Record<string, string> = {
 export const publicRoutes = [
   // Routes accessible without authentication
   "/reset",
+  "/logout",
   "/forgot-password",
   "/reset-password",
   "/api/login",
