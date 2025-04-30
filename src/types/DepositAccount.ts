@@ -13,6 +13,7 @@ export interface DepositAccount {
   consentChecked: boolean;
   isPaymentProcessingOn: boolean;
   plaidLink: string;
+  properties: [];
 }
 
 export interface DepositAccountResponse {

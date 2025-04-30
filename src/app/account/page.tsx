@@ -14,6 +14,7 @@ import { Account } from "@/types/Account";
 import handleToast from "@/lib/utils/toastr";
 import { hasRole } from "@/lib/utils/authUtils";
 import { getDefaultPage } from "@/config/roleAccess";
+import { sanitizeUrl } from "@/lib/utils/browserUtils";
 import { accountService } from "@/lib/services/account";
 import { propertyApprovalData } from "@/data/propertyApproval";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
@@ -65,7 +66,7 @@ function AccountContent() {
               window.location.pathname + window.location.search !==
               currentUrl
             ) {
-              router.replace(currentUrl);
+              sanitizeUrl(currentUrl, undefined);
             }
           } else {
             router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
@@ -76,7 +77,7 @@ function AccountContent() {
             setSelectedAccount(accountDetails?.data[0]); // Set first account as default
             // Only replace if the URL doesn't already match
             if (window.location.pathname !== "/account") {
-              router.replace("/account");
+              sanitizeUrl("/account", undefined);
             }
           } else {
             router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
@@ -97,11 +98,7 @@ function AccountContent() {
     handleToast(searchParams); // Display toast based on search params
     const id = searchParams.get("id") ?? undefined;
     fetchAccountDetails(id); // Fetch account details
-    if (searchParams.has("id")) {
-      router.replace("/account?" + id);
-    } else {
-      router.replace("/account");
-    }
+    sanitizeUrl("/account", searchParams); //Sanitize the url
   }, [searchParams, fetchAccountDetails]);
 
   // Breadcrumb navigation items

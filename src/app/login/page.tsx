@@ -11,6 +11,7 @@ import { loginService } from "@/lib/services/login";
 import LoginCard from "@/components/login/LoginCard";
 import { getDefaultPage } from "@/config/roleAccess";
 import ResetCard from "@/components/reset/ResetCard";
+import { sanitizeUrl } from "@/lib/utils/browserUtils";
 import { cookieHandler } from "@/lib/services/cookieHandler";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
@@ -53,8 +54,7 @@ function LoginContent() {
   useEffect(() => {
     // Display toast messages based on query parameters
     handleToast(searchParams);
-    // Remove query parameters from URL
-    router.replace("/login");
+    sanitizeUrl("/login", searchParams);
   }, [searchParams, router]);
 
   /**

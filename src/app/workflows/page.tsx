@@ -10,6 +10,7 @@ import WelcomeCard from "@/components/welcome/WelcomeCard";
 import { workflows as WorkflowList } from "@/data/workflows";
 import WorkflowCard from "@/components/workflows/WorkflowCard";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
+import { sanitizeUrl } from "@/lib/utils/browserUtils";
 
 function WorkflowPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ function WorkflowPage() {
 
   useEffect(() => {
     handleToast(searchParams);
-    router.replace("/workflows");
+    sanitizeUrl("/workflows", searchParams);
   }, [searchParams, router]);
 
   const breadcrumbItems = [

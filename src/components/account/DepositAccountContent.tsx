@@ -15,6 +15,8 @@ import {
 } from "@/data/servicePills";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import PlaidPaymentSetup from "@/components/ui/PlaidPaymentSetup";
+import PreConfirmationDialog from "../ui/dialog/PreConfirmationDialog";
+import { hasRole } from "@/lib/utils/authUtils";
 
 /**
  * Props for the DepositAccountContent component
@@ -36,6 +38,7 @@ interface DepositAccountContentProps {
   onBoardingClick?: (value: string) => void;
   onPlaidContinueClick?: (value: string) => void;
   onPlaidLinkRemove?: (value: string) => void;
+  onDelete?: (value: string) => void;
 }
 
 /**
@@ -50,6 +53,7 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
   onBoardingClick,
   onPlaidContinueClick,
   onPlaidLinkRemove,
+  onDelete,
 }) => {
   const [isDepositAccountOpen, setIsDepositAccountOpen] = useState(false);
   const [isPaymentProcessingOn, setIsPaymentProcessingOn] = useState(
@@ -66,6 +70,10 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
   const selectedPlaidPill = isPlaidActivated
     ? activePlaidPill
     : inActivePlaidPill;
+  const [showPreConfirmationDeleteDialog, setShowPreConfirmationDeleteDialog] =
+    useState(false);
+
+  const hasAccountPermission = hasRole("ACCOUNTUSER") ?? false;
 
   /**
    * Syncs local payment processing state with account props
@@ -115,7 +123,6 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
 
   /**
    * Handles downloading onboarding details
-   * @todo Implement download functionality
    */
   const downloadOnboardingDetails = () => {
     if (onBoardingClick && account?.id) {
@@ -161,6 +168,14 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
     if (onPlaidLinkRemove && account?.id) {
       closePlaidSetup();
       onPlaidLinkRemove(account?.id);
+    }
+  };
+
+  //Initiate deposit account deletion
+  const initiateDelete = () => {
+    setShowPreConfirmationDeleteDialog(false);
+    if (onDelete && account?.id) {
+      onDelete(account.id);
     }
   };
 
@@ -252,7 +267,8 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
             </div>
             <div className="w-1/2 flex justify-end items-center gap-3">
               <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                Off {/* Display toggle status */}
+                {isPaymentProcessingOn ? "On" : "Off"}
+                {/* Display toggle status */}
               </div>
               <ToggleSwitch
                 isOn={isPaymentProcessingOn}
@@ -295,6 +311,18 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
             </div>
           )}
         </div>
+        {!account.isPaymentProcessingOn &&
+          hasAccountPermission &&
+          !account.properties && (
+            <div className="flex justify-center items-center w-full">
+              <LinkButton
+                className="text-primary-button text-sm font-semibold font-['Inter'] underline leading-tight"
+                label="Delete"
+                onClick={() => setShowPreConfirmationDeleteDialog(true)}
+                disabled={!isEditable}
+              />
+            </div>
+          )}
       </div>
       {showPlaidLinkDialog && (
         <PlaidPaymentSetup
@@ -304,6 +332,15 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
           canRemoveLink={isPlaidActivated}
         />
       )}
+
+      <PreConfirmationDialog
+        isOpen={showPreConfirmationDeleteDialog}
+        onClose={() => setShowPreConfirmationDeleteDialog(false)}
+        onConfirm={initiateDelete}
+        title="Confirm Delete"
+        message="Delete deposit account. This action will archive the deposit account and cannot be undone."
+        confirmButtonLabel="Delete"
+      />
     </>
   );
 };

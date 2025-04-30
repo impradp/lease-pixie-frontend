@@ -7,10 +7,10 @@ import handleInfo from "@/lib/utils/errorHandler";
 import { defaultData } from "@/data/depositAccount";
 import { plaidService } from "@/lib/services/plaid";
 import { DepositAccount } from "@/types/DepositAccount";
-import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { depositAccountService } from "@/lib/services/depositAccount";
 import DepositAccountForm from "@/components/account/DepositAccountForm";
+import PlaidLinkInitializer from "@/components/plaid/PlaidLinkInitializer";
 import DepositAccountContent from "@/components/account/DepositAccountContent";
 
 /**
@@ -41,6 +41,7 @@ const DepositAccountsCard = ({
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [plaidAccountId, setPlaidAccountId] = useState<string | null>(null);
   const [isPlaidLoading, setIsPlaidLoading] = useState(false);
+  const [showSandbox, setShowSandbox] = useState(false);
   const hasDepositSectionEditAcess = hasRole("ACCOUNTUSER");
 
   // Ref to track if component is mounted
@@ -205,64 +206,6 @@ const DepositAccountsCard = ({
     [fetchDepositAccounts, isSubmitting]
   );
 
-  // Handle Plaid Link success
-  const onPlaidSuccess = useCallback<PlaidLinkOnSuccess>(
-    async (publicToken) => {
-      if (!isMounted.current) return;
-      if (plaidAccountId && publicToken) {
-        isSubmitting(true);
-        try {
-          const response = await depositAccountService.setUpPlaid(
-            plaidAccountId,
-            {
-              hasPlaidLink: true,
-              publicToken: publicToken,
-            }
-          );
-          if (response.status === "SUCCESS") {
-            handleInfo({ code: 100904 });
-            await fetchDepositAccounts();
-          } else {
-            handleInfo({ code: 100901 });
-          }
-        } catch (err) {
-          console.error("Error setting up Plaid:", err);
-          handleInfo({ code: 100901, error: err });
-        } finally {
-          if (isMounted.current) {
-            isSubmitting(false);
-          }
-        }
-      } else {
-        handleInfo({ code: 100901 });
-      }
-      setLinkToken(null);
-      setPlaidAccountId(null);
-      setIsPlaidLoading(false);
-    },
-    [plaidAccountId, isSubmitting, fetchDepositAccounts]
-  );
-
-  // Configure Plaid Link
-  const { open, ready, error } = usePlaidLink({
-    token: linkToken,
-    onSuccess: onPlaidSuccess,
-    onExit: (err) => {
-      setLinkToken(null);
-      setPlaidAccountId(null);
-      setIsPlaidLoading(false);
-      handleInfo({ code: 100903, error: err });
-    },
-  });
-
-  // Automatically open Plaid Link when linkToken is set and ready
-  useEffect(() => {
-    if (linkToken && ready) {
-      open();
-    }
-  }, [linkToken, ready, open, error]);
-
-  // Initiate Plaid Link flow
   const handleContinueToPlaid = useCallback(
     async (accountId: string) => {
       if (isPlaidLoading || !isMounted.current) return;
@@ -272,7 +215,8 @@ const DepositAccountsCard = ({
         isSubmitting(true);
         const response = await plaidService.generateLinkToken();
         if (response.status === "SUCCESS" && response?.data?.linkToken) {
-          handleInfo({ code: 100900 });
+          // handleInfo({ code: 100900 });
+          setShowSandbox(true); // Show sandbox background immediately after token generation
           setLinkToken(response.data.linkToken);
         } else {
           handleInfo({ code: 100901 });
@@ -323,6 +267,60 @@ const DepositAccountsCard = ({
     [fetchDepositAccounts, isSubmitting]
   );
 
+  // Handle Plaid Link success
+  const handlePlaidSuccess = useCallback(
+    async (publicToken: string) => {
+      if (!isMounted.current || !plaidAccountId) return;
+      isSubmitting(true);
+      try {
+        const response = await depositAccountService.setUpPlaid(
+          plaidAccountId,
+          {
+            hasPlaidLink: true,
+            publicToken: publicToken,
+          }
+        );
+        if (response.status === "SUCCESS") {
+          handleInfo({ code: 100904 });
+          await fetchDepositAccounts();
+        } else {
+          handleInfo({ code: 100901 });
+        }
+      } catch (err) {
+        console.error("Error setting up Plaid:", err);
+        handleInfo({ code: 100901, error: err });
+      } finally {
+        if (isMounted.current) {
+          isSubmitting(false);
+          setLinkToken(null);
+          setPlaidAccountId(null);
+          setIsPlaidLoading(false);
+          setShowSandbox(false);
+        }
+      }
+    },
+    [plaidAccountId, isSubmitting, fetchDepositAccounts]
+  );
+
+  //Deletes deposit account
+  const handleDelete = async (accountId: string) => {
+    try {
+      isSubmitting(true);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const response = await depositAccountService.delete(accountId);
+      if (response?.status === "SUCCESS") {
+        handleInfo({ code: 100712 });
+        await fetchDepositAccounts();
+      } else {
+        handleInfo({ code: 100713 });
+      }
+    } catch (err) {
+      handleInfo({ code: 100714, error: err });
+    } finally {
+      isSubmitting(false);
+    }
+  };
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -342,6 +340,7 @@ const DepositAccountsCard = ({
               onBoardingClick={handleOnboarding}
               onPlaidContinueClick={handleContinueToPlaid}
               onPlaidLinkRemove={handlePlaidLinkRemove}
+              onDelete={handleDelete}
             />
           ))}
         </div>
@@ -369,7 +368,22 @@ const DepositAccountsCard = ({
           />
         </div>
       )}
+      {linkToken && plaidAccountId && (
+        <PlaidLinkInitializer
+          linkToken={linkToken}
+          onSuccess={handlePlaidSuccess}
+          onExit={() => {
+            setLinkToken(null);
+            setPlaidAccountId(null);
+            setIsPlaidLoading(false);
+            setShowSandbox(false);
+            handleInfo({ code: 100903 });
+          }}
+          showSandbox={showSandbox}
+        />
+      )}
     </>
   );
 };
+
 export default DepositAccountsCard;

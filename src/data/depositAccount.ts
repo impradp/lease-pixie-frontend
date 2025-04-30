@@ -15,4 +15,5 @@ export const defaultData: DepositAccount = {
   isPaymentProcessingOn: false,
   id: "",
   plaidLink: "",
+  properties: [],
 };

@@ -29,6 +29,18 @@ class DepositAccountService {
   }
 
   /**
+   * Deletes the deposit account by id.
+   *
+   * @param accountId The unique identifier of deposit account
+   * @returns The confirmation object indicating deletion of deposit account
+   */
+  async delete(accountId: string): Promise<DepositAccountResponse> {
+    return await apiService.delete<DepositAccountResponse>(
+      interpolate(ENDPOINTS.DEPOSIT_ACCOUNT.EDIT.DEFAULT, accountId)
+    );
+  }
+
+  /**
    * Fetches deposit account data
    * @returns Promise resolving to the deposit account data response
    */

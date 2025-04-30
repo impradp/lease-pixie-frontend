@@ -1,86 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { publicRoutes, hasAccess, getDefaultPage } from "@/config/roleAccess";
-
-// Token payload interface for better type safety
-interface TokenPayload {
-  role: string;
-  exp: number;
-  [key: string]: string | number;
-}
-
-/**
- * Decodes and verifies JWT token
- * @param token - The JWT token string
- * @returns The decoded payload or null if invalid
- */
-function decodeToken(token: string | undefined): TokenPayload | null {
-  if (!token) return null;
-
-  try {
-    const payloadEncoded = token.split(".")[1];
-    if (!payloadEncoded) return null;
-
-    const payload = JSON.parse(
-      Buffer.from(payloadEncoded, "base64").toString("utf-8")
-    );
-
-    // Validate essential fields
-    if (!payload.role) {
-      console.warn("Token missing role field");
-      return null;
-    }
-
-    return payload as TokenPayload;
-  } catch (error) {
-    console.error("Token decode error", { error });
-    return null;
-  }
-}
-
-/**
- * Checks if token is valid (has required fields and not expired)
- * @param token - The JWT auth token
- * @returns boolean indicating if token is valid
- */
-function isTokenValid(token: string | undefined): boolean {
-  if (!token) return false;
-
-  const payload = decodeToken(token);
-  if (!payload) return false;
-
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  return Boolean(payload.exp && currentTimestamp < payload.exp);
-}
-
-/**
- * Handles routing for the login path based on authentication status
- * @param request - The incoming request object
- * @param authToken - The authentication token from cookies
- * @returns NextResponse - The response for the login path
- */
-function handleLoginPath(
-  request: NextRequest,
-  authToken: string | undefined
-): NextResponse {
-  if (!authToken) {
-    console.debug("No auth token present for login path");
-    return NextResponse.next();
-  }
-
-  const payload = decodeToken(authToken);
-  if (!payload) {
-    console.warn("Invalid token on login path, clearing auth cookie");
-    return NextResponse.redirect(new URL("/logout?msg=100304", request.url));
-  }
-
-  const defaultPage = getDefaultPage(authToken);
-  console.info("Redirecting authenticated user from login to default page", {
-    role: payload.role,
-    defaultPage,
-  });
-
-  return NextResponse.redirect(new URL(defaultPage, request.url));
-}
+import { executeAPIMiddleware } from "./lib/middleware/api";
+import { executeAuthMiddleware } from "./lib/middleware/auth";
+import { decodeToken, isTokenValid } from "./lib/utils/tokenUtils";
 
 /**
  * Core middleware function to handle authentication and authorization
@@ -101,25 +23,12 @@ export function middleware(request: NextRequest): NextResponse {
 
   // Special handling for login path
   if (pathname.startsWith("/login")) {
-    return handleLoginPath(request, authToken);
+    return executeAuthMiddleware(request, authToken);
   }
 
   // API request handling
   if (pathname.startsWith("/api/")) {
-    // For API routes, we validate the token only if it exists
-    // and pass it in headers regardless
-    if (authToken) {
-      try {
-        const requestHeaders = new Headers(request.headers);
-        requestHeaders.set("Authorization", `Bearer ${authToken}`);
-        console.debug("Added auth token to API request headers", { pathname });
-        return NextResponse.next({ request: { headers: requestHeaders } });
-      } catch (error) {
-        console.error("Error setting API request headers", { error, pathname });
-      }
-    }
-    // Allow API request to proceed - actual endpoints will handle auth failure
-    return NextResponse.next();
+    return executeAPIMiddleware(request, authToken);
   }
 
   // Main application routes: validate token for all non-public routes
@@ -159,7 +68,7 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 /**
- * Configuration for middleware matching - unchanged
+ * Configuration for middleware matching
  */
 export const config = {
   matcher: [

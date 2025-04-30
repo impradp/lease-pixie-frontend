@@ -36,6 +36,7 @@ import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
 import { PortfolioUsers } from "@/components/portfolio/user/PortfolioUsers";
 import { PortfolioVendors } from "@/components/portfolio/vendor/PortfolioVendors";
 import { PortfolioAutomationSync } from "@/components/portfolio/PortfolioAutomationSync";
+import { sanitizeUrl } from "@/lib/utils/browserUtils";
 
 /**
  * Renders the content for the portfolio page
@@ -155,7 +156,7 @@ function PortfolioContent() {
               window.location.pathname + window.location.search !==
               currentUrl
             ) {
-              router.replace(currentUrl);
+              sanitizeUrl(currentUrl, undefined);
             }
           } else {
             router.push(getDefaultPage() + "?msg=100101");

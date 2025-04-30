@@ -22,6 +22,7 @@ import PropertyUsersCard from "@/components/dashboard/property/PropertyUsersCard
 import PortfolioUsersCard from "@/components/dashboard/portfolio/PortfolioUsersCard";
 import PropertyApprovalCard from "@/components/dashboard/property/PropertyApprovalCard";
 import PropertyAndPortfolioCard from "@/components/dashboard/property/PropertyAndPortfolioCard";
+import { sanitizeUrl } from "@/lib/utils/browserUtils";
 
 /**
  * Renders the admin dashboard page with cards, filtering, and navigation
@@ -49,7 +50,7 @@ function DashboardContent() {
 
   useEffect(() => {
     handleToast(searchParams);
-    router.replace("/dashboard");
+    sanitizeUrl("/dashboard", searchParams);
   }, [searchParams, router]);
 
   const breadcrumbItems = [

@@ -332,6 +332,18 @@ const target = {
     type: "error",
     message: "Exception occured onboarding merchant.",
   } as LeasePixieToastMsg,
+  100712: {
+    type: "info",
+    message: "Deposit Account deleted successfully.",
+  } as LeasePixieToastMsg,
+  100713: {
+    type: "error",
+    message: "Error deleting deposit account.",
+  } as LeasePixieToastMsg,
+  100714: {
+    type: "error",
+    message: "Exception occured deleting deposit account.",
+  } as LeasePixieToastMsg,
 
   //100800 series for deposit account handle message
   100800: {
