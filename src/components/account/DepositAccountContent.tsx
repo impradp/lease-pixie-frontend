@@ -184,12 +184,16 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
       <div className="w-full p-3 bg-secondary-fill rounded-xl inline-flex flex-col justify-start items-start gap-3">
         <div className="self-stretch flex flex-col justify-start items-start gap-2">
           <div className="justify-start text-tertiary-offBlack text-sm font-bold font-['Inter'] leading-tight">
-            Deposit Account Description
+            {account.accountHolderName}
           </div>
           <div className="flex w-full items-center">
             <div className="flex-1 text-tertiary-offBlack text-xs font-normal font-['Inter']">
-              {account.accountHolderName + " x" + account.lastFourDigits}{" "}
-              {/* Display account holder and last four digits */}
+              {account.description}
+            </div>
+          </div>
+          <div className="flex w-full items-center">
+            <div className="flex-1 text-tertiary-offBlack text-xs font-normal font-['Inter']">
+              {"Bank of America x9091"}
             </div>
             <div className="flex-none text-tertiary-offBlack text-xs font-normal font-['Inter']">
               $

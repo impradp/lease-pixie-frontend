@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useId } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ListFilter } from "lucide-react";
 import { DropdownOption } from "@/types/user";
 
 /**
@@ -34,6 +34,7 @@ interface PixieDropdownProps {
   containerClassName?: string;
   customInputClassName?: string;
   type?: "large" | "default" | "small";
+  showFilterIcon?: boolean;
 }
 
 /**
@@ -57,6 +58,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   containerClassName,
   customInputClassName,
   type = "small",
+  showFilterIcon = false,
 }) => {
   // Track if dropdown menu is open
   const [isOpen, setIsOpen] = useState(false);
@@ -88,10 +90,10 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
       "self-stretch flex flex-col justify-start items-start gap-1.5";
     sizeCustomInputClassName =
       customInputClassName ??
-      "h-11 px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]  outline-none text-tertiary-light text-base font-normal font-['Inter'] leading-normal";
+      "h-11 px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline-none text-tertiary-light text-base font-normal font-['Inter'] leading-normal";
     dropdownPosition = "top-[calc(100%+0.375rem)]";
     optionItemClassName =
-      "py-2.5 text-tertiary-light text-base font-normal font-['Inter'] leading-normal cursor-pointer"; // Matches input text size and height
+      "py-2.5 text-tertiary-light text-base font-normal font-['Inter'] leading-normal cursor-pointer";
   } else if (type === "default") {
     sizeClassName = className ?? "xs:w-[200px]";
     sizeLabelClassName =
@@ -101,7 +103,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     sizeCustomInputClassName = customInputClassName ?? "h-10";
     dropdownPosition = "top-[50px]";
     optionItemClassName =
-      "py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight hover:bg-tertiary-space cursor-pointer"; // Default for other sizes
+      "py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight hover:bg-tertiary-space cursor-pointer";
   } else {
     // "small" - uses original defaults
     sizeClassName = className ?? "xs:w-[153px]";
@@ -112,7 +114,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     sizeCustomInputClassName = customInputClassName ?? "h-9";
     dropdownPosition = "top-[42px]";
     optionItemClassName =
-      " py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight cursor-pointer"; // Default for small
+      "py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight cursor-pointer";
   }
 
   // Ensure options are properly formatted with value and label properties
@@ -214,7 +216,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
       {label && (
         <div
           className={`${sizeLabelClassName} font-['Inter'] ${
-            isEditing ? "opacity-50" : ""
+            isEditing ? "" : "opacity-50"
           }`}
         >
           {label}
@@ -241,25 +243,28 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
           aria-disabled={!isEditing}
         >
           <div
-            className={`grow shrink basis-0 h-5 justify-between items-center flex `}
+            className={`grow shrink basis-0 h-5 justify-between items-center flex`}
           >
             <div className="justify-start items-center gap-2 flex">
               {/* Display selected option label or placeholder */}
               <div
-                className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight${
-                  isEditing ? "opacity-50" : ""
+                className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight ${
+                  isEditing ? "" : "opacity-50"
                 }`}
               >
                 {selectedOption.label}
               </div>
             </div>
             {/* Render dropdown chevron icon if editable */}
-            {isEditing && !isLocked && (
+            {isEditing && !isLocked && !showFilterIcon && (
               <ChevronRight
                 className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
                   isOpen && !isLocked ? "rotate-90" : ""
                 }`}
               />
+            )}
+            {isEditing && !isLocked && showFilterIcon && (
+              <ListFilter className="w-[20px] h-[20px] stroke-secondary-button" />
             )}
           </div>
         </div>
@@ -291,7 +296,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
                 onClick={() => handleOptionClick(option)}
                 onKeyDown={(e) => handleOptionKeyDown(e, option)}
                 tabIndex={0}
-                className={`${optionItemClassName} px-4  ${
+                className={`${optionItemClassName} px-4 ${
                   isSelected ? "bg-tertiary-space" : ""
                 } ${!isLast ? "border-b border-tertiary-stroke" : ""}`}
               >

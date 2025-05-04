@@ -274,20 +274,13 @@ function PortfolioContent() {
 
       const response = await portfolioService.create(formData);
       if (response.status === "SUCCESS") {
-        handleInfo({ code: 100500 });
-        setPortfolioName("");
-        setPrimaryUser(emptyUserOption);
-        setSecondaryUser(emptySecondaryUserOption);
-        setPrimaryVendor(emptyVendorOption);
-        setSecondaryVendor(emptyVendorOption);
-        setTertiaryVendor(emptyVendorOption);
-        setEditingSection(null);
+        router.push(getDefaultPage() + "?msg=100500");
       } else {
         handleInfo({ code: 100505 });
+        setLoading(false);
       }
     } catch (err) {
-      handleInfo({ code: 100505, error: err });
-    } finally {
+      handleInfo({ code: 100506, error: err });
       setLoading(false);
     }
   };
@@ -319,13 +312,13 @@ function PortfolioContent() {
 
       const response = await portfolioService.update(portfolioId, formData);
       if (response.status === "SUCCESS") {
-        handleInfo({ code: 100521 });
+        router.push(getDefaultPage() + "?msg=100521");
       } else {
         handleInfo({ code: 100522 });
+        setLoading(false);
       }
     } catch (err) {
       handleInfo({ code: 100523, error: err });
-    } finally {
       setLoading(false);
     }
   };

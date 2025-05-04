@@ -7,6 +7,7 @@ import handleInfo from "@/lib/utils/errorHandler";
 import { defaultData } from "@/data/depositAccount";
 import { plaidService } from "@/lib/services/plaid";
 import { DepositAccount } from "@/types/DepositAccount";
+import AuthenticateForm from "@/components/login/AuthenticateForm";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import { depositAccountService } from "@/lib/services/depositAccount";
 import DepositAccountForm from "@/components/account/DepositAccountForm";
@@ -42,6 +43,13 @@ const DepositAccountsCard = ({
   const [plaidAccountId, setPlaidAccountId] = useState<string | null>(null);
   const [isPlaidLoading, setIsPlaidLoading] = useState(false);
   const [showSandbox, setShowSandbox] = useState(false);
+  const [showAuthForm, setShowAuthForm] = useState<boolean>(false);
+  const [authCode, setAuthCode] = useState<string[]>(["", "", "", "", "", ""]);
+  const [pendingAccountId, setPendingAccountId] = useState<string | null>(null);
+  const [pendingPaymentState, setPendingPaymentState] = useState<
+    boolean | null
+  >(null);
+
   const hasDepositSectionEditAcess = hasRole("ACCOUNTUSER");
 
   // Ref to track if component is mounted
@@ -96,7 +104,7 @@ const DepositAccountsCard = ({
     async (data: DepositAccount) => {
       try {
         setShowDepositAccountForm(false);
-        await new Promise((resolve) => requestAnimationFrame(resolve)); // Ensure UI updates before API call
+        await new Promise((resolve) => requestAnimationFrame(resolve));
         const response = await depositAccountService.create(data);
         if (response?.status === "SUCCESS") {
           handleInfo({ code: 100700 });
@@ -127,6 +135,21 @@ const DepositAccountsCard = ({
     setShowDepositAccountForm(true);
   }, []);
 
+  //Initiates the payment processing
+  const initiatePaymentProcessing = async (
+    accountId: string,
+    isPaymentProcessingOn: boolean
+  ): Promise<boolean> => {
+    if (isPaymentProcessingOn) {
+      return await handlePaymentProcessing(accountId, true);
+    } else {
+      setPendingAccountId(accountId);
+      setPendingPaymentState(isPaymentProcessingOn);
+      setShowAuthForm(true);
+      return false;
+    }
+  };
+
   /**
    * Toggles payment processing for an account
    * @param {string} accountId - ID of the account to update
@@ -140,7 +163,7 @@ const DepositAccountsCard = ({
     ): Promise<boolean> => {
       if (!isMounted.current) return false;
       isSubmitting(true);
-      const previousAccounts = [...depositAccounts]; // Store for rollback
+      const previousAccounts = [...depositAccounts];
       try {
         // Optimistic update
         setDepositAccounts((prev) =>
@@ -162,12 +185,12 @@ const DepositAccountsCard = ({
           handleInfo({ code: isPaymentProcessingOn ? 100705 : 100706 });
           return true;
         } else {
-          setDepositAccounts(previousAccounts); // Rollback on error
+          setDepositAccounts(previousAccounts);
           handleInfo({ code: 100707 });
           return false;
         }
       } catch (err) {
-        setDepositAccounts(previousAccounts); // Rollback on error
+        setDepositAccounts(previousAccounts);
         handleInfo({ code: 100708, error: err });
         return false;
       } finally {
@@ -206,6 +229,7 @@ const DepositAccountsCard = ({
     [fetchDepositAccounts, isSubmitting]
   );
 
+  // Handles continue to plaid
   const handleContinueToPlaid = useCallback(
     async (accountId: string) => {
       if (isPlaidLoading || !isMounted.current) return;
@@ -215,7 +239,6 @@ const DepositAccountsCard = ({
         isSubmitting(true);
         const response = await plaidService.generateLinkToken();
         if (response.status === "SUCCESS" && response?.data?.linkToken) {
-          // handleInfo({ code: 100900 });
           setShowSandbox(true); // Show sandbox background immediately after token generation
           setLinkToken(response.data.linkToken);
         } else {
@@ -321,6 +344,28 @@ const DepositAccountsCard = ({
     }
   };
 
+  //initiates the authentication for payment processing disable
+  const handleAuthCodeSubmit = useCallback(
+    async (authCode: string) => {
+      setShowAuthForm(false);
+      isSubmitting(true);
+      setAuthCode(authCode.split(""));
+      setAuthCode(["", "", "", "", "", ""]);
+      if (pendingAccountId && pendingPaymentState !== null) {
+        const success = await handlePaymentProcessing(
+          pendingAccountId,
+          pendingPaymentState
+        );
+        if (success) {
+          setPendingAccountId(null);
+          setPendingPaymentState(null);
+        }
+      }
+      isSubmitting(false);
+    },
+    [pendingAccountId, pendingPaymentState, handlePaymentProcessing]
+  );
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -335,7 +380,7 @@ const DepositAccountsCard = ({
             <DepositAccountContent
               key={account.id ?? `account-${index}`}
               account={account}
-              onTogglePaymentProcessing={handlePaymentProcessing}
+              onTogglePaymentProcessing={initiatePaymentProcessing}
               isEditable={hasDepositSectionEditAcess && isEditable}
               onBoardingClick={handleOnboarding}
               onPlaidContinueClick={handleContinueToPlaid}
@@ -381,6 +426,23 @@ const DepositAccountsCard = ({
           }}
           showSandbox={showSandbox}
         />
+      )}
+      {showAuthForm && (
+        <div className="absolute top-40 left-0 right-0 flex justify-center z-50">
+          <AuthenticateForm
+            label="Disable ACH Payments for Account x3432"
+            subLabel="Authentication code"
+            onClose={() => {
+              setShowAuthForm(false);
+              setPendingAccountId(null);
+              setPendingPaymentState(null);
+            }}
+            onSubmitCode={handleAuthCodeSubmit}
+            initialCode={authCode}
+            className="w-full max-w-[358px] min-w-[280px]"
+            showCancelButton={true}
+          />
+        </div>
       )}
     </>
   );

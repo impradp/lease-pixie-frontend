@@ -17,8 +17,13 @@ import VendorCard from "@/components/vendor/VendorCard";
 import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import { NewVendor } from "@/components/portfolio/vendor/NewVendor";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import { FilterConfig } from "@/types/Filter";
+import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
+import { DropdownOption } from "@/types/user";
+
+const defaultFilter: DropdownOption[] = [
+  { value: "true", label: "Active" },
+  { value: "false", label: "Inactive" },
+];
 
 /**
  * Renders the content for the vendors page
@@ -30,10 +35,8 @@ const VendorsContent: React.FC = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState("");
   const [showNewVendorForm, setShowNewVendorForm] = useState(false);
-  // Initialize selectedFilters with default "Active" status
-  const [selectedFilters, setSelectedFilters] = useState<{
-    [key: string]: string[] | string | null;
-  }>({ Status: "true" });
+  const [selectedFilterValue, setSelectedFilterValue] =
+    useState<string>("true");
 
   // Fetch vendors from the API
   const fetchVendors = async () => {
@@ -170,13 +173,6 @@ const VendorsContent: React.FC = () => {
     setSearchValue(e.target.value);
   };
 
-  // Handle filter changes
-  const handleFilterChange = (filters: {
-    [key: string]: string[] | string | null;
-  }) => {
-    setSelectedFilters(filters);
-  };
-
   // Filter vendors based on search term and status
   const filteredVendors = useMemo(() => {
     handleSectionClose();
@@ -185,24 +181,12 @@ const VendorsContent: React.FC = () => {
         ?.toLowerCase()
         .includes(searchValue.toLowerCase());
       const matchesStatus =
-        selectedFilters.Status === null ||
-        (selectedFilters.Status === "true" && !vendor.isDeleted) ||
-        (selectedFilters.Status === "false" && vendor.isDeleted);
+        selectedFilterValue === "all" ||
+        (selectedFilterValue === "true" && !vendor.isDeleted) ||
+        (selectedFilterValue === "false" && vendor.isDeleted);
       return matchesSearch && matchesStatus;
     });
-  }, [vendors, searchValue, selectedFilters]);
-
-  // Configure the filter for Status
-  const filters: FilterConfig[] = [
-    {
-      filterLabel: "Status",
-      filterType: "radio",
-      options: [
-        { id: "true", name: "Active" },
-        { id: "false", name: "Inactive" },
-      ],
-    },
-  ];
+  }, [vendors, searchValue, selectedFilterValue]);
 
   const breadcrumbItems = [
     { href: "/account", label: "Account Dashboard" },
@@ -232,11 +216,16 @@ const VendorsContent: React.FC = () => {
             </div>
           </div>
           <div className="relative w-[287px]">
-            <FilterDropdown
-              label="Select Status"
-              filters={filters}
-              initialFilters={{ Status: "true" }} // Set default to Active
-              onFilterChange={handleFilterChange}
+            <PixieDropdown
+              options={defaultFilter}
+              value={selectedFilterValue}
+              isEditing={true}
+              className="w-full"
+              containerClassName="w-full"
+              type="large"
+              labelClassName="hidden"
+              showFilterIcon={true}
+              onChange={(value) => setSelectedFilterValue(value)}
             />
           </div>
           <button
@@ -244,7 +233,7 @@ const VendorsContent: React.FC = () => {
             aria-label="Add vendor"
             onClick={() => setShowNewVendorForm(true)}
           >
-            <CirclePlus className="w-8 h-8 stroke-white hover:stroke-secondary-button" />
+            <CirclePlus className="w-8 h-8 stroke-primary-button hover:stroke-white" />
           </button>
         </div>
       </div>

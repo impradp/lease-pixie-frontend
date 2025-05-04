@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import PasscodeInput from "@/components/ui/input/PasscodeInput";
 import { LoadingContext } from "@/components/ClientLoadingWrapper";
+import LinkButton from "../ui/buttons/LinkButton";
 
 /**
  * Props for the AuthenticateForm component
@@ -18,6 +19,7 @@ interface AuthenticateFormProps {
   style?: React.CSSProperties;
   label?: string;
   subLabel?: string;
+  showCancelButton?: boolean;
 }
 
 /**
@@ -33,6 +35,7 @@ function AuthenticateForm({
   style,
   label = "Authentication code",
   subLabel,
+  showCancelButton = false,
 }: AuthenticateFormProps) {
   const { setLoading, isLoading } = useContext(LoadingContext); // Access loading state from context
   const [code, setCode] = useState(initialCode); // State for the 6-digit code
@@ -185,7 +188,11 @@ function AuthenticateForm({
             className="bg-black text-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-inner border-2 border-white/10"
           />
         </div>
-        <div className="text-gray-600 text-sm"></div>
+        {showCancelButton && (
+          <div className="flex justify-center">
+            <LinkButton onClick={handleClose} disabled={isLoading} />
+          </div>
+        )}
       </form>
     </div>
   );
