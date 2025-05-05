@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import handleInfo from "@/lib/utils/errorHandler";
 import { accountService } from "@/lib/services/account";
-import { emptySecondaryUserOption } from "@/data/users";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import { NewUserFormData, DropdownOption } from "@/types/user";
@@ -34,6 +33,7 @@ interface PortfolioUsersProps {
   isSecondaryUserLocked?: boolean;
   isLoading?: boolean;
   refreshUserList: () => void;
+  onClickUpdate?: () => void;
 }
 
 /**
@@ -60,6 +60,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   isSecondaryUserLocked = false,
   isLoading = false,
   refreshUserList,
+  onClickUpdate,
 }) => {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -84,7 +85,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     setOriginalUser(selectedUser);
     setOriginalSecondaryUser(selectedSecondaryUser);
     setEditedUser(selectedUser);
-    setEditedSecondaryUser(emptySecondaryUserOption);
+    setEditedSecondaryUser(selectedSecondaryUser);
     setSecondarySampleUsers(
       secondaryUsers.filter((opt) => opt.value !== selectedUser.value)
     );
@@ -168,6 +169,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     if (onSecondaryUserChange && editedSecondaryUser) {
       onSecondaryUserChange(editedSecondaryUser);
     }
+    onClickUpdate?.();
     onSectionClose();
   };
 

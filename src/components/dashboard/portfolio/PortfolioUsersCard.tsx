@@ -97,9 +97,10 @@ const PortfolioUsersCard = ({
     }
     isSubmitting(true);
     try {
-      const response = await accountService.fetchPortfolioUsers({
-        attachPortfolio: true,
-      });
+      const response = await accountService.fetchPortfolioUsers(
+        accountDetails?.id ?? "",
+        true
+      );
       if (response?.status === "SUCCESS") {
         setPortfolioUsers(response.data);
       } else {

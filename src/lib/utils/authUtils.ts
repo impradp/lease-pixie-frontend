@@ -5,7 +5,7 @@ import { cookieHandler } from "@/lib/services/cookieHandler";
 import { hasAccess } from "@/config/roleAccess";
 
 interface JWTPayload {
-  role?: string;
+  roles?: string[];
   permissions?: string[];
   [key: string]: unknown;
 }
@@ -34,7 +34,7 @@ export function parseToken(token: string | undefined): JWTPayload | null {
  */
 export function getUserRole(token?: string): string | null {
   const payload = parseToken(token);
-  return payload?.role ? payload.role.toUpperCase() : null;
+  return payload?.roles ? payload.roles[0].toUpperCase() : null;
 }
 
 /**

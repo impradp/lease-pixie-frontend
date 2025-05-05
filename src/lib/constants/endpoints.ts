@@ -12,6 +12,9 @@ export const ENDPOINTS = {
       DEFAULT: "/api/v1/admin",
       DELETE: "/api/v1/admin/%s",
     },
+    VERIFY: {
+      TOTP: "/api/v1/verify-totp",
+    },
   },
 
   VENDOR: {
@@ -40,7 +43,8 @@ export const ENDPOINTS = {
       DEFAULT: "/api/v1/account",
       BY_ID: "/api/v1/account/%s",
       USER: {
-        DEFAULT: "/api/v1/account/portfolio-user?attachPortfolio=%s",
+        DEFAULT:
+          "/api/v1/account/portfolio-user?accountId=%s&attachPortfolio=%s",
       },
     },
     ADD: {
@@ -59,6 +63,7 @@ export const ENDPOINTS = {
       SETUP_MERCHANT: "/api/v1/deposit-account/%s/setup/merchant",
       SETUP_PLAID: "/api/v1/deposit-account/%s/setup/plaid",
     },
+    FETCH: "/api/v1/deposit-account?accountId=%s",
   },
   PLAID: {
     LINK_TOKEN: "/api/v1/plaid/create/link-token",

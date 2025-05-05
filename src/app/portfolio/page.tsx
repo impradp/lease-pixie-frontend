@@ -71,6 +71,7 @@ function PortfolioContent() {
   const [isReadonly, setIsReadonly] = useState(false);
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio>();
   const [isVendorListLoaded, setIsVendorListLoaded] = useState(false);
+  const [isUpdatePending, setIsUpdatePending] = useState(false);
 
   /**
    * Fetches portfolio details by ID
@@ -102,15 +103,14 @@ function PortfolioContent() {
             }
 
             if (portfolio?.secondaryUser) {
-              const secondary = {
+              setSecondaryUser({
                 label:
                   portfolio?.secondaryUser?.firstName +
                   " " +
                   portfolio?.secondaryUser?.lastName,
                 value: String(portfolio?.secondaryUser?.id),
                 subLabel: portfolio?.secondaryUser?.email,
-              };
-              setSecondaryUser(secondary);
+              });
             } else {
               setSecondaryUser(emptySecondaryUserOption);
             }
@@ -186,9 +186,7 @@ function PortfolioContent() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await accountService.fetchPortfolioUsers({
-        attachPortfolio: false,
-      });
+      const response = await accountService.fetchPortfolioUsers("", false);
       if (response.status === "SUCCESS") {
         const fetchedUsers = response.data.map((user: PortfolioUser) => ({
           value: String(user.id),
@@ -285,6 +283,13 @@ function PortfolioContent() {
     }
   };
 
+  useEffect(() => {
+    if (isUpdatePending && selectedPortfolio?.id) {
+      handleUpdate(selectedPortfolio?.id);
+      setIsUpdatePending(false); // Clear pending update
+    }
+  }, [isUpdatePending]);
+
   const handleUpdate = async (portfolioId: number) => {
     if (!validateForm()) {
       handleInfo({ code: 100000 });
@@ -312,13 +317,13 @@ function PortfolioContent() {
 
       const response = await portfolioService.update(portfolioId, formData);
       if (response.status === "SUCCESS") {
-        router.push(getDefaultPage() + "?msg=100521");
+        handleInfo({ code: 100521 });
       } else {
         handleInfo({ code: 100522 });
-        setLoading(false);
       }
     } catch (err) {
       handleInfo({ code: 100523, error: err });
+    } finally {
       setLoading(false);
     }
   };
@@ -357,12 +362,12 @@ function PortfolioContent() {
         <div className="space-y-8">
           <PortfolioCard
             portfolioName={portfolioName}
-            onEdit={() => {}}
             sectionId="portfolioCard"
             editingSection={editingSection}
             onSectionEdit={toggleEditingSection}
             onSectionClose={() => toggleEditingSection(null)}
             onNameChange={setPortfolioName}
+            onClickUpdate={() => setIsUpdatePending(true)}
           />
           <PortfolioUsers
             label={messages?.portfolio?.users?.title}
@@ -382,6 +387,7 @@ function PortfolioContent() {
             ]}
             isSecondaryUserLocked={isSecondaryUserLocked}
             refreshUserList={fetchUsers}
+            onClickUpdate={() => setIsUpdatePending(true)}
           />
           <PortfolioVendors
             label={messages?.portfolio?.vendors?.title}
@@ -410,6 +416,7 @@ function PortfolioContent() {
               messages?.portfolio?.vendors.tertiaryInfo,
             ]}
             refreshVendors={fetchVendors}
+            onClickUpdate={() => setIsUpdatePending(true)}
           />
           <PortfolioAutomationSync
             label={messages?.portfolio?.automation?.title}
@@ -419,20 +426,11 @@ function PortfolioContent() {
             editingSection={editingSection}
             onSectionEdit={toggleEditingSection}
             onSectionClose={() => toggleEditingSection(null)}
+            onClickUpdate={() => setIsUpdatePending(true)}
           />
         </div>
         <div className="pt-8 flex justify-center">
-          {selectedPortfolio?.id ? (
-            <PixieButton
-              label={"Update Portfolio"}
-              disabled={isLoading || isReadonly}
-              onClick={() =>
-                selectedPortfolio?.id && handleUpdate(selectedPortfolio?.id)
-              }
-              className="w-2/3"
-              isLoading={isLoading}
-            />
-          ) : (
+          {!selectedPortfolio?.id && (
             <PixieButton
               label={messages?.portfolio?.button?.label}
               disabled={isLoading || isReadonly}

@@ -9,6 +9,9 @@ interface PlaidPaymentSetupProps {
   onRemoveLink?: () => void;
   onSubmit: (setLoading: (loading: boolean) => void) => Promise<void>;
   canRemoveLink?: boolean;
+  title?: string;
+  contents?: string[];
+  guidelines?: string[];
 }
 
 const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
@@ -16,6 +19,16 @@ const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
   onSubmit,
   canRemoveLink = false,
   onRemoveLink,
+  title = "Set Payment Method",
+  contents = [
+    "We use Plaid services to communicate with your bank to retrieve your checking and routing numbers without the need for us to store that information for added security. Plaid is a separate third-party service with separate",
+  ],
+  guidelines = [
+    "Verify your bank account access via Plaid link.",
+    "Select an account to retrieve its account and routing number to make payments from your dashboard.",
+    "After your account and routing numbers are shared, you can select an optional auto-pay feature to automatically start to process your payment three days prior to your due date to avoid ate fees.",
+    "Alternatively, you may manually process payments by pressing the “Pay Now” button from your invoice page.",
+  ],
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,12 +59,8 @@ const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[360px] h-[608px] max-w-lg mx-4 p-6 flex flex-col gap-4">
-        <SectionHeader
-          title="Set Payment Method"
-          showCloseButton={true}
-          onClose={onClose}
-        />
+      <div className="bg-white rounded-xl w-[360px] h-[574px] max-w-lg mx-4 p-6 flex flex-col gap-4">
+        <SectionHeader title={title} showCloseButton={true} onClose={onClose} />
 
         <div className="bg-[#f4f5f7] rounded-lg p-3 outline outline-1 outline-[#cfd4dc] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]">
           <div className="flex items-center gap-2 mb-1">
@@ -62,29 +71,15 @@ const PlaidPaymentSetup: React.FC<PlaidPaymentSetupProps> = ({
           </div>
           <div className="text-[#0f1728] text-xs font-normal font-['Inter'] leading-[18px]">
             <p className="mb-2">
-              We use Plaid services to communicate with your bank to retrieve
-              your checking and routing numbers without the need for us to store
-              that information for added security. Plaid is a separate
-              third-party service with separate{" "}
+              {contents[0] + " "}
               <span className="underline">Terms of Service</span> and{" "}
-              <span className="underline">Privacy Policy</span>.
+              <span className="underline">Privacy Policy</span>.{" "}
+              {contents.length === 2 && contents[1]}
             </p>
             <ul className="list-disc pl-4 space-y-1">
-              <li>Verify your bank account access via Plaid link.</li>
-              <li>
-                Select an account to retrieve its account and routing number to
-                make payments from your dashboard.
-              </li>
-              <li>
-                After your account and routing numbers are shared, you can
-                select an optional auto-pay feature to automatically start to
-                process your payment three days prior to your due date to avoid
-                late fees.
-              </li>
-              <li>
-                Alternatively, you may manually process payments by pressing the
-                “Pay Now” button from your invoice page.
-              </li>
+              {guidelines.map((guideline, index) => (
+                <li key={index}>{guideline}</li>
+              ))}
             </ul>
           </div>
         </div>

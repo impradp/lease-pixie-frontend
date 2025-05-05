@@ -17,6 +17,7 @@ import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import PlaidPaymentSetup from "@/components/ui/PlaidPaymentSetup";
 import PreConfirmationDialog from "../ui/dialog/PreConfirmationDialog";
 import { hasRole } from "@/lib/utils/authUtils";
+import { ellipseCharacter } from "@/lib/utils/stringUtils";
 
 /**
  * Props for the DepositAccountContent component
@@ -184,11 +185,11 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
       <div className="w-full p-3 bg-secondary-fill rounded-xl inline-flex flex-col justify-start items-start gap-3">
         <div className="self-stretch flex flex-col justify-start items-start gap-2">
           <div className="justify-start text-tertiary-offBlack text-sm font-bold font-['Inter'] leading-tight">
-            {account.accountHolderName}
+            {ellipseCharacter(account.accountHolderName, 58)}
           </div>
           <div className="flex w-full items-center">
             <div className="flex-1 text-tertiary-offBlack text-xs font-normal font-['Inter']">
-              {account.description}
+              {ellipseCharacter(account.description, 58)}
             </div>
           </div>
           <div className="flex w-full items-center">
@@ -334,6 +335,17 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
           onSubmit={initiatePlaidSetup}
           onClose={closePlaidSetup}
           canRemoveLink={isPlaidActivated}
+          title="Link Deposit Account"
+          guidelines={[
+            "Verify your bank account access via Plaid link.",
+            "Select an account to share its information.",
+            "Please ensure the ACH payments you would like to reconcile with your invoices are being deposited into this account.",
+            "You can easily end this sharing at anytime by deleting the Plaid Link under the Edit Plaid function.",
+          ]}
+          contents={[
+            "We use Plaid services to communicate with your bank to retrieve your checking number, routing number, and transactions for reconciliations without the need for us to store that sensitive information for your added security.  Plaid is a separate third-party service with separate",
+            "You will be temporarily leaving the current website to complete this task.",
+          ]}
         />
       )}
 

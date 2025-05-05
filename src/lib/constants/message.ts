@@ -138,6 +138,10 @@ const target = {
     type: "info",
     message: "Session expired. Please log in to continue.",
   } as LeasePixieToastMsg,
+  100305: {
+    type: "error",
+    message: "TOTP verification failed.",
+  } as LeasePixieToastMsg,
 
   //100400 series for reset handle message
   100400: {

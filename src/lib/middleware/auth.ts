@@ -25,7 +25,7 @@ export function executeAuthMiddleware(
 
   const defaultPage = getDefaultPage(authToken);
   console.info("Redirecting authenticated user from login to default page", {
-    role: payload.role,
+    role: payload.roles[0],
     defaultPage,
   });
 

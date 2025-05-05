@@ -32,3 +32,13 @@ export interface DropdownOption {
   subLabel?: string;
   value: string;
 }
+
+export interface TotpRequest {
+  totp: string;
+}
+
+export interface TotpResponse {
+  status: string;
+  data: { isValid: boolean };
+  message?: string;
+}

@@ -36,6 +36,7 @@ interface PortfolioVendorsProps {
   onSectionClose: () => void;
   subLabels: string[];
   refreshVendors: () => void;
+  onClickUpdate?: () => void;
 }
 
 /**
@@ -63,6 +64,7 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
   onSectionClose,
   subLabels = ["Selected Vendor 1", "Selected Vendor 2", "Selected Vendor 3"],
   refreshVendors,
+  onClickUpdate,
 }) => {
   const [showNewVendorModal, setShowNewVendorModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -198,6 +200,7 @@ export const PortfolioVendors: React.FC<PortfolioVendorsProps> = ({
     if (onTertiaryVendorChange && editedTertiaryVendor) {
       onTertiaryVendorChange(editedTertiaryVendor);
     }
+    onClickUpdate?.();
     onSectionClose();
   };
 

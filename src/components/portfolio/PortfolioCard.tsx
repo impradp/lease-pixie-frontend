@@ -8,22 +8,22 @@ import { SectionHeader } from "@/components/ui/header/SectionHeader";
 
 interface PortfolioCardProps {
   portfolioName: string;
-  onEdit?: () => void;
   onNameChange?: (name: string) => void;
   sectionId: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
   onSectionClose: () => void;
+  onClickUpdate?: () => void;
 }
 
 export const PortfolioCard: React.FC<PortfolioCardProps> = ({
   portfolioName,
-  onEdit,
   onNameChange,
   sectionId,
   editingSection,
   onSectionEdit,
   onSectionClose,
+  onClickUpdate,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalName, setOriginalName] = useState(portfolioName);
@@ -43,7 +43,6 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
-      if (onEdit) onEdit();
     }
   };
 
@@ -53,11 +52,15 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
     onSectionClose();
   };
 
-  const handleTextUpdate = () => {
+  const handleTextUpdate = async () => {
     setIsEditMode(false);
     if (onNameChange && editedName) {
-      onNameChange(editedName);
+      await new Promise((resolve) => {
+        onNameChange(editedName);
+        resolve(true);
+      });
     }
+    onClickUpdate?.();
     onSectionClose();
   };
 

@@ -42,11 +42,13 @@ class DepositAccountService {
 
   /**
    * Fetches deposit account data
+   *
+   * @param accountId The unique identifier of the account.
    * @returns Promise resolving to the deposit account data response
    */
-  async fetch(): Promise<DepositAccountListResponse> {
+  async fetch(accountId: string): Promise<DepositAccountListResponse> {
     return await apiService.get<DepositAccountListResponse>(
-      ENDPOINTS.DEPOSIT_ACCOUNT.DEFAULT
+      interpolate(ENDPOINTS.DEPOSIT_ACCOUNT.FETCH, accountId)
     );
   }
 

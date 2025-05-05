@@ -88,12 +88,13 @@ class AccountService {
    */
 
   async fetchPortfolioUsers(
-    options: { attachPortfolio?: boolean } = { attachPortfolio: false }
+    accountId: string,
+    attachPortfolio: boolean
   ): Promise<PortfolioUserListResponse> {
-    const { attachPortfolio } = options;
     return await apiService.get<PortfolioUserListResponse>(
       interpolate(
         ENDPOINTS.ACCOUNT.FETCH.USER.DEFAULT,
+        accountId,
         attachPortfolio ?? false
       )
     );

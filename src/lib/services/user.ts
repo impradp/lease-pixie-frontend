@@ -8,6 +8,7 @@ import {
   ReadOnlyAdminUsersResponse,
 } from "@/types/ReadOnlyAdminUser";
 import { interpolate } from "../utils/stringUtils";
+import { TotpRequest, TotpResponse } from "@/types/user";
 
 interface UserResponse {
   id: number;
@@ -28,6 +29,13 @@ class UserService {
     return await apiService.post<ReadOnlyAdminUserResponse>(
       ENDPOINTS.USER.ADMIN.DEFAULT,
       userData
+    );
+  }
+
+  async verifyTOTP(request: TotpRequest): Promise<TotpResponse> {
+    return await apiService.post<TotpResponse>(
+      ENDPOINTS.USER.VERIFY.TOTP,
+      request
     );
   }
 

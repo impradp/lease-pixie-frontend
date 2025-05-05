@@ -27,6 +27,7 @@ interface PortfolioAutomationSyncProps {
   label?: string;
   title?: string;
   info?: string;
+  onClickUpdate?: () => void;
 }
 
 interface FormData {
@@ -75,6 +76,7 @@ export const PortfolioAutomationSync: React.FC<
   label,
   title,
   info,
+  onClickUpdate,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -207,6 +209,7 @@ export const PortfolioAutomationSync: React.FC<
     e.preventDefault();
     setFormData({ ...tempFormData });
     setIsEditing(false);
+    onClickUpdate?.();
     onSectionClose();
   };
 

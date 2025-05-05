@@ -27,7 +27,8 @@ export const roleAccessMap: Record<string, string[]> = {
     "/property",
     "/vendors",
   ],
-  PORTFOLIO: ["/portfolio", "/portfolio/view", "/portfolio/reports"],
+  PORTFOLIOUSER: ["/portfolio", "/portfolio/view", "/portfolio/reports"],
+  PLATFORMUSER: ["/portfolio", "/portfolio/view", "/portfolio/reports"],
   WORKFLOW: [
     "/workflow",
     "/workflow/tasks",
@@ -112,12 +113,12 @@ export function getDefaultPage(token?: string): string {
       Buffer.from(payloadEncoded, "base64").toString("utf-8")
     );
 
-    const userRole = payload.role?.toUpperCase();
-    if (!userRole || !defaultPages[userRole]) {
+    const userRoles = payload.roles;
+    if (!userRoles || !defaultPages[userRoles[0].toUpperCase()]) {
       return FALLBACK_DEFAULT_PAGE;
     }
 
-    return defaultPages[userRole];
+    return defaultPages[userRoles[0].toUpperCase()];
   } catch {
     // Returns fallback page on error
     return FALLBACK_DEFAULT_PAGE;

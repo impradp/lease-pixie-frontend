@@ -51,11 +51,11 @@ export function middleware(request: NextRequest): NextResponse {
 
   // Check role-based access
   const payload = decodeToken(authToken)!; // We know it's valid at this point
-  const userRole = payload.role.toUpperCase();
+  const userRoles = payload.roles;
 
-  if (!hasAccess(userRole, pathname)) {
+  if (!hasAccess(userRoles[0].toUpperCase(), pathname)) {
     console.warn("User lacks permission for route", {
-      role: userRole,
+      role: userRoles[0].toUpperCase(),
       pathname,
     });
     return NextResponse.redirect(
@@ -63,7 +63,7 @@ export function middleware(request: NextRequest): NextResponse {
     );
   }
 
-  console.debug("Access granted", { role: userRole, pathname });
+  console.debug("Access granted", { role: userRoles[0], pathname });
   return NextResponse.next();
 }
 
@@ -73,6 +73,6 @@ export function middleware(request: NextRequest): NextResponse {
 export const config = {
   matcher: [
     "/api/:path*",
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|css|js|svg|ico|woff|woff2|ttf|eot)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.well-known/|.*\\.(?:png|jpg|jpeg|gif|css|js|svg|ico|woff|woff2|ttf|eot)$).*)",
   ],
 };

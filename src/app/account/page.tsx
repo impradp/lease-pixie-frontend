@@ -57,6 +57,7 @@ function AccountContent() {
       setLoading(true); // Set loading state to true
       try {
         if (id) {
+          //This is intended for admin
           const accountDetails = await accountService.fetchById(Number(id));
           if (accountDetails?.status === "SUCCESS") {
             setSelectedAccount(accountDetails?.data); // Update state with fetched account
@@ -72,6 +73,7 @@ function AccountContent() {
             router.push(getDefaultPage() + "?msg=100101"); // Redirect on failure
           }
         } else {
+          //This will be used only by account user
           const accountDetails = await accountService.fetch();
           if (accountDetails?.status === "SUCCESS") {
             setSelectedAccount(accountDetails?.data[0]); // Set first account as default
@@ -141,6 +143,7 @@ function AccountContent() {
           <DepositAccountsCard
             isEditable={!isLoading && !isReadonly}
             isSubmitting={isSubmitting}
+            accountDetails={memoizedAccount}
           />
           <PortfolioUsersCard
             isEditable={!isLoading && !isReadonly}

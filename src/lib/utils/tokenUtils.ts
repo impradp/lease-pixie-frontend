@@ -1,8 +1,8 @@
 // Token payload interface for better type safety
 interface TokenPayload {
-  role: string;
+  roles: string[];
   exp: number;
-  [key: string]: string | number;
+  [key: string]: string[] | number | string;
 }
 
 /**
@@ -22,7 +22,7 @@ export function decodeToken(token: string | undefined): TokenPayload | null {
     );
 
     // Validate essential fields
-    if (!payload.role) {
+    if (!payload.roles && !payload.roles[0]) {
       console.warn("Token missing role field");
       return null;
     }

@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 
+import { Account } from "@/types/Account";
 import { hasRole } from "@/lib/utils/authUtils";
+import { userService } from "@/lib/services/user";
 import handleInfo from "@/lib/utils/errorHandler";
 import { defaultData } from "@/data/depositAccount";
 import { plaidService } from "@/lib/services/plaid";
@@ -19,10 +21,12 @@ import DepositAccountContent from "@/components/account/DepositAccountContent";
  * @interface DepositAccountsCardProps
  * @property {boolean} [isEditable=false] - Controls whether deposit accounts can be edited
  * @property {function} isSubmitting - Callback function to update parent component's loading state
+ * @property {Account} [accountDetails] - Account details passed from parent
  */
 interface DepositAccountsCardProps {
   isEditable?: boolean;
   isSubmitting: (value: boolean) => void;
+  accountDetails?: Account;
 }
 
 /**
@@ -33,6 +37,7 @@ interface DepositAccountsCardProps {
 const DepositAccountsCard = ({
   isEditable = false,
   isSubmitting,
+  accountDetails,
 }: DepositAccountsCardProps) => {
   const [displayEditFeature, setDisplayEditFeature] = useState(false);
   const [selectedDepositAccount, setSelectedDepositAccount] =
@@ -66,21 +71,15 @@ const DepositAccountsCard = ({
   }, []);
 
   /**
-   * Loads deposit accounts from the API on component mount
-   */
-  useEffect(() => {
-    fetchDepositAccounts();
-  }, []);
-
-  /**
    * Fetches deposit accounts from the service
    */
   const fetchDepositAccounts = useCallback(async () => {
-    if (isFetching.current || !isMounted.current) return;
+    console.log(accountDetails);
+    if (isFetching.current || !isMounted.current || !accountDetails?.id) return;
     isFetching.current = true;
     isSubmitting(true);
     try {
-      const response = await depositAccountService.fetch();
+      const response = await depositAccountService.fetch(accountDetails.id);
       if (response.status === "SUCCESS" && isMounted.current) {
         setDepositAccounts(response?.data);
       } else {
@@ -94,7 +93,7 @@ const DepositAccountsCard = ({
         isFetching.current = false;
       }
     }
-  }, [isSubmitting]);
+  }, [isSubmitting, accountDetails]);
 
   /**
    * Creates a new deposit account
@@ -135,7 +134,7 @@ const DepositAccountsCard = ({
     setShowDepositAccountForm(true);
   }, []);
 
-  //Initiates the payment processing
+  // Initiates the payment processing
   const initiatePaymentProcessing = async (
     accountId: string,
     isPaymentProcessingOn: boolean
@@ -325,7 +324,7 @@ const DepositAccountsCard = ({
     [plaidAccountId, isSubmitting, fetchDepositAccounts]
   );
 
-  //Deletes deposit account
+  // Deletes deposit account
   const handleDelete = async (accountId: string) => {
     try {
       isSubmitting(true);
@@ -344,27 +343,40 @@ const DepositAccountsCard = ({
     }
   };
 
-  //initiates the authentication for payment processing disable
+  // Initiates the authentication for payment processing disable
   const handleAuthCodeSubmit = useCallback(
     async (authCode: string) => {
-      setShowAuthForm(false);
       isSubmitting(true);
-      setAuthCode(authCode.split(""));
-      setAuthCode(["", "", "", "", "", ""]);
-      if (pendingAccountId && pendingPaymentState !== null) {
-        const success = await handlePaymentProcessing(
-          pendingAccountId,
-          pendingPaymentState
-        );
-        if (success) {
-          setPendingAccountId(null);
-          setPendingPaymentState(null);
+      try {
+        const response = await userService.verifyTOTP({ totp: authCode });
+        if (response.status === "SUCCESS" && response.data?.isValid) {
+          setShowAuthForm(false);
+          if (pendingAccountId && pendingPaymentState !== null) {
+            const success = await handlePaymentProcessing(
+              pendingAccountId,
+              pendingPaymentState
+            );
+            if (success) {
+              setPendingAccountId(null);
+              setPendingPaymentState(null);
+            }
+          }
+        } else {
+          handleInfo({ code: 100305 });
         }
+      } catch (err) {
+        handleInfo({ code: 100708, error: err });
+      } finally {
+        setAuthCode(["", "", "", "", "", ""]);
+        isSubmitting(false);
       }
-      isSubmitting(false);
     },
     [pendingAccountId, pendingPaymentState, handlePaymentProcessing]
   );
+
+  useEffect(() => {
+    fetchDepositAccounts();
+  }, [fetchDepositAccounts]);
 
   return (
     <>
