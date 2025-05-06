@@ -11,6 +11,7 @@ export const roleAccessMap: Record<string, string[]> = {
     "/account",
     "/vendors",
     "/property",
+    "/settings",
   ],
   READONLYADMINUSER: [
     "/admin",
@@ -18,6 +19,7 @@ export const roleAccessMap: Record<string, string[]> = {
     "/workflows",
     "/portfolio",
     "/account",
+    "/settings",
   ],
   ACCOUNTUSER: [
     "/account",

@@ -23,7 +23,11 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       isExpanded: false,
       subItems: ["User", "Property", "Portfolio"],
     },
-    { title: "Settings", isExpanded: false, subItems: ["User", "Portfolio"] },
+    {
+      title: "Settings",
+      isExpanded: false,
+      subItems: ["User", "Portfolio", "System Tables"],
+    },
   ]);
 
   const toggleMenuItem = (index: number) => {
@@ -49,6 +53,8 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
       handleNavigation("/vendors");
     } else if (subItem === "Property") {
       handleNavigation("/property");
+    } else if (subItem === "System Tables") {
+      handleNavigation("/settings/system-tables");
     }
   };
 
