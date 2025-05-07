@@ -313,21 +313,21 @@ export const DepositAccountContent: React.FC<DepositAccountContentProps> = ({
                   </div>
                 </div>
               </div>
+              {!account.isPaymentProcessingOn &&
+                hasAccountPermission &&
+                !account.properties &&
+                !account.plaidLink && (
+                  <div className="flex justify-center items-center w-full">
+                    <LinkButton
+                      label="Delete"
+                      onClick={() => setShowPreConfirmationDeleteDialog(true)}
+                      disabled={!isEditable}
+                    />
+                  </div>
+                )}
             </div>
           )}
         </div>
-        {!account.isPaymentProcessingOn &&
-          hasAccountPermission &&
-          !account.properties && (
-            <div className="flex justify-center items-center w-full">
-              <LinkButton
-                className="text-primary-button text-sm font-semibold font-['Inter'] underline leading-tight"
-                label="Delete"
-                onClick={() => setShowPreConfirmationDeleteDialog(true)}
-                disabled={!isEditable}
-              />
-            </div>
-          )}
       </div>
       {showPlaidLinkDialog && (
         <PlaidPaymentSetup

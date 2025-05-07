@@ -14,7 +14,7 @@ interface LinkButtonProps {
 
 const LinkButton: React.FC<LinkButtonProps> = ({
   onClick,
-  className = "",
+  className = "text-secondary-button text-sm font-semibold underline leading-[1.43]",
   disabled = false,
   isLoading = false,
   label = "Cancel",
@@ -35,9 +35,7 @@ const LinkButton: React.FC<LinkButtonProps> = ({
       onClick={handleClick}
       type="button"
       disabled={isButtonDisabled}
-      className={`text-secondary-button text-sm font-semibold underline leading-[1.43] ${
-        hidden ? "hidden" : "flex"
-      } ${
+      className={` ${hidden ? "hidden" : "flex"} ${
         isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
     >

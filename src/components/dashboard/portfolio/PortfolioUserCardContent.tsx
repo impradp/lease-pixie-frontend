@@ -9,15 +9,20 @@ interface PortfolioUserCardContentProps {
   user: PortfolioUser;
   onDelete?: (user: PortfolioUser) => void;
   isEditable?: boolean;
+  onNameClick?: (portfolioId: number) => void;
 }
 
 export const PortfolioUserCardContent: React.FC<
   PortfolioUserCardContentProps
-> = ({ user, onDelete, isEditable = false }) => {
+> = ({ user, onDelete, isEditable = false, onNameClick }) => {
   const [isPortfoliosOpen, setIsPortfoliosOpen] = useState(false); // Initially collapsed
 
   const togglePortfolios = () => {
     setIsPortfoliosOpen(!isPortfoliosOpen);
+  };
+
+  const onClickName = async (portfolioId: number) => {
+    onNameClick?.(portfolioId);
   };
 
   return (
@@ -29,11 +34,6 @@ export const PortfolioUserCardContent: React.FC<
               <div className="justify-start text-secondary-light text-sm font-bold font-['Inter'] leading-[18px]">
                 {user.firstName + " " + user.lastName}
               </div>
-              <LinkButton
-                label="Delete"
-                hidden={!isEditable || user?.portfolioList?.length !== 0}
-                onClick={() => user.id && onDelete && onDelete(user)} // Trigger onDelete callback if provided
-              />
             </div>
             <div className="justify-start text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
               {user?.email}
@@ -79,23 +79,39 @@ export const PortfolioUserCardContent: React.FC<
                         </div>
                       </div>
                     </div>
-                    <div className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px]">
-                      {portfolio.name}
-                    </div>
+                    <LinkButton
+                      label={portfolio.name}
+                      onClick={() =>
+                        portfolio?.id && onClickName(portfolio?.id)
+                      }
+                      className="justify-start text-tertiary-light text-xs font-normal font-['Inter'] underline leading-[18px]"
+                      disabled={!isEditable}
+                    />
                   </div>
                 ))}
                 {user?.portfolioList?.length === 0 && (
-                  <div className="self-stretch p-2 bg-gray-50 rounded-md inline-flex flex-col justify-start items-start gap-1 overflow-hidden">
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                  <>
+                    <div className="self-stretch p-2 bg-gray-50 rounded-md inline-flex flex-col justify-start items-start gap-1 overflow-hidden">
                       <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                        <div className="self-stretch inline-flex justify-start items-center gap-2">
-                          <div className="flex-1 justify-start text-dropdown-regular text-xs font-normal font-['Inter'] leading-[18px]">
-                            No associated portfolio available
+                        <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                          <div className="self-stretch inline-flex justify-start items-center gap-2">
+                            <div className="flex-1 justify-start text-dropdown-regular text-xs font-normal font-['Inter'] leading-[18px]">
+                              No associated portfolio available
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                    <div className="flex justify-center items-center w-full">
+                      <LinkButton
+                        label="Delete"
+                        hidden={
+                          !isEditable || user?.portfolioList?.length !== 0
+                        }
+                        onClick={() => user.id && onDelete && onDelete(user)} // Trigger onDelete callback if provided
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             )}

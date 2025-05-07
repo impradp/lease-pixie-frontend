@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import handleInfo from "@/lib/utils/errorHandler";
 import { accountService } from "@/lib/services/account";
 import LinkButton from "@/components/ui/buttons/LinkButton";
@@ -67,12 +67,16 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
   const [editedUser, setEditedUser] = useState<DropdownOption>(selectedUser);
   const [editedSecondaryUser, setEditedSecondaryUser] =
     useState<DropdownOption>(selectedSecondaryUser);
-  const [originalUser, setOriginalUser] =
-    useState<DropdownOption>(selectedUser);
-  const [originalSecondaryUser, setOriginalSecondaryUser] =
-    useState<DropdownOption>(selectedSecondaryUser);
+  const originalUserRef = useRef<DropdownOption>(selectedUser);
+  const originalSecondaryUserRef = useRef<DropdownOption>(
+    selectedSecondaryUser
+  );
   const [secondarySampleUsers, setSecondarySampleUsers] =
     useState<DropdownOption[]>(secondaryUsers);
+  const [localUsers, setLocalUsers] = useState<DropdownOption[]>(users);
+  const [localSecondaryUsers, setLocalSecondaryUsers] =
+    useState<DropdownOption[]>(secondaryUsers);
+  const [triggeredBy, setTriggeredBy] = useState<string | null>(null);
 
   const isEditing = isEditMode;
   const isSecondaryUnlocked =
@@ -82,14 +86,16 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
    * Syncs state with props when selected users change
    */
   useEffect(() => {
-    setOriginalUser(selectedUser);
-    setOriginalSecondaryUser(selectedSecondaryUser);
-    setEditedUser(selectedUser);
-    setEditedSecondaryUser(selectedSecondaryUser);
+    setLocalUsers(users);
+    setLocalSecondaryUsers(secondaryUsers);
     setSecondarySampleUsers(
-      secondaryUsers.filter((opt) => opt.value !== selectedUser.value)
+      localSecondaryUsers.filter((opt) => opt.value !== editedUser.value)
     );
-  }, [selectedUser]);
+    if (!isEditMode) {
+      setEditedUser({ ...selectedUser });
+      setEditedSecondaryUser({ ...selectedSecondaryUser });
+    }
+  }, [users, secondaryUsers, selectedUser, selectedSecondaryUser, isEditMode]);
 
   /**
    * Manages body overflow for modal
@@ -120,7 +126,35 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
       if (response?.status === "SUCCESS") {
         setShowNewUserModal(false);
         handleInfo({ code: 100507 });
-        refreshUserList();
+
+        const newUser: DropdownOption = {
+          value: String(response.data.id),
+          label: `${response.data.firstName} ${response.data.lastName}`,
+          subLabel: response.data.email,
+        };
+
+        setLocalUsers((prev) => [...prev, newUser]);
+        setLocalSecondaryUsers((prev) => [...prev, newUser]);
+
+        if (
+          triggeredBy === "primary" ||
+          (triggeredBy === "secondary" && !editedUser.value)
+        ) {
+          setEditedUser(newUser);
+          if (editedSecondaryUser.value === newUser.value) {
+            setEditedSecondaryUser({ value: "", label: "", subLabel: "" });
+          }
+          setSecondarySampleUsers(
+            localSecondaryUsers.filter((opt) => opt.value !== newUser.value)
+          );
+        } else if (triggeredBy === "secondary" && editedUser.value) {
+          setEditedSecondaryUser(newUser);
+          setSecondarySampleUsers(
+            localSecondaryUsers.filter((opt) => opt.value !== editedUser.value)
+          );
+        }
+
+        await refreshUserList();
       } else {
         handleInfo({ code: 100508 });
       }
@@ -128,6 +162,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
       handleInfo({ code: 100509, error: err });
     } finally {
       setLoading(false);
+      setTriggeredBy(null);
     }
   };
 
@@ -145,16 +180,25 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
       onSectionEdit(sectionId);
+      setEditedUser({ ...selectedUser });
+      setEditedSecondaryUser({ ...selectedSecondaryUser });
+      setSecondarySampleUsers(
+        localSecondaryUsers.filter((opt) => opt.value !== selectedUser.value)
+      );
     }
   };
-
   /**
    * Cancels edit mode and reverts changes
    */
   const handleTextClose = () => {
     setIsEditMode(false);
-    setEditedUser(originalUser);
-    setEditedSecondaryUser(originalSecondaryUser);
+    setEditedUser({ ...originalUserRef.current });
+    setEditedSecondaryUser({ ...originalSecondaryUserRef.current });
+    setSecondarySampleUsers(
+      localSecondaryUsers.filter(
+        (opt) => opt.value !== originalUserRef.current.value
+      )
+    );
     onSectionClose();
   };
 
@@ -169,6 +213,8 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
     if (onSecondaryUserChange && editedSecondaryUser) {
       onSecondaryUserChange(editedSecondaryUser);
     }
+    originalUserRef.current = { ...editedUser };
+    originalSecondaryUserRef.current = { ...editedSecondaryUser };
     onClickUpdate?.();
     onSectionClose();
   };
@@ -179,17 +225,23 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
    */
   const handleUserChange = (user: DropdownOption) => {
     setEditedUser(user);
-    setSecondarySampleUsers(
-      secondaryUsers.filter((opt) => opt.value !== user.value)
-    );
+    if (editedSecondaryUser.value === user.value) {
+      setEditedSecondaryUser({ value: "", label: "", subLabel: "" });
+    }
   };
 
-  /**
-   * Updates secondary user
-   * @param user - Selected secondary user
-   */
   const handleSecondaryUserChange = (user: DropdownOption) => {
     setEditedSecondaryUser(user);
+  };
+
+  const handlePrimaryAddUserClick = () => {
+    setShowNewUserModal(true);
+    setTriggeredBy("primary");
+  };
+
+  const handleSecondaryAddUserClick = () => {
+    setShowNewUserModal(true);
+    setTriggeredBy("secondary");
   };
 
   const isEditDisabled =
@@ -213,8 +265,10 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
           editDisabled={isEditDisabled}
         />
         <CustomDropdown
-          options={users}
-          value={editedUser?.value || ""}
+          options={localUsers}
+          value={
+            isEditMode ? editedUser?.value || "" : selectedUser?.value || ""
+          }
           onChange={isEditing ? handleUserChange : undefined}
           readOnly={!isEditing}
           isEditing={isEditing}
@@ -224,7 +278,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
         {isEditMode && (
           <IconLinkButton
             label={`Add ${userType}`}
-            onClick={() => setShowNewUserModal(true)}
+            onClick={handlePrimaryAddUserClick}
           />
         )}
         <CustomDropdown
@@ -241,7 +295,7 @@ export const PortfolioUsers: React.FC<PortfolioUsersProps> = ({
           <>
             <IconLinkButton
               label={`Add ${userType}`}
-              onClick={() => setShowNewUserModal(true)}
+              onClick={handleSecondaryAddUserClick}
             />
             <div className="flex flex-col gap-3">
               <PixieButton

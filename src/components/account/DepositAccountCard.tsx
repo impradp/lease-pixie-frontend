@@ -74,7 +74,6 @@ const DepositAccountsCard = ({
    * Fetches deposit accounts from the service
    */
   const fetchDepositAccounts = useCallback(async () => {
-    console.log(accountDetails);
     if (isFetching.current || !isMounted.current || !accountDetails?.id) return;
     isFetching.current = true;
     isSubmitting(true);

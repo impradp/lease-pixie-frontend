@@ -218,7 +218,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             aria-activedescendant={
               selectedValue ? `option-${selectedValue}` : undefined
             }
-            className="absolute z-10 w-full mt-1 bg-dropdown-fill rounded-lg shadow-lg border border-dropdown-stroke max-h-60 overflow-auto p-0 m-0 list-none"
+            className="absolute z-10 w-full mt-1 bg-dropdown-fill rounded-lg shadow-lg border border-dropdown-stroke max-h-[490px] overflow-auto p-0 m-0 list-none"
           >
             {options.map((option, index) => {
               const isSelected = option.value === selectedValue;

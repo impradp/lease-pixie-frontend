@@ -6,12 +6,14 @@ import { Account } from "@/types/Account";
 import { useRouter } from "next/navigation";
 import { Property } from "@/types/Property";
 import { Portfolio } from "@/types/Portfolio";
+import { hasRole } from "@/lib/utils/authUtils";
 import handleInfo from "@/lib/utils/errorHandler";
 import PixieTab from "@/components/ui/tab/PixieTab";
 import { interpolate } from "@/lib/utils/stringUtils";
 import { propertyService } from "@/lib/services/property";
 import { portfolioService } from "@/lib/services/portfolio";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
+import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import PropertyAndPortfolioTab from "@/components/dashboard/property/PropertyAndPortfolioTab";
 
 /**
@@ -41,9 +43,13 @@ const PropertyAndPortfolioCard = ({
   const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
+  const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
+    useState<boolean>(false);
   const [activeTab, setActiveTab] = useState("portfolios");
 
   const router = useRouter();
+
+  const hasCreateAccess = hasRole("AccountUser") ?? false;
 
   // Update searchTerm when defaultSearchTerm prop changes
   useEffect(() => {
@@ -174,34 +180,58 @@ const PropertyAndPortfolioCard = ({
     router.push(interpolate("/portfolio?id=%s", portfolioId));
   };
 
+  // Confirm to continue to portfolio creation
+  const handleAdd = () => {
+    setShowPreConfirmationDialog(true);
+  };
+
+  // Refirect account user to portfolio creation page
+  const handleCreatePortfolio = () => {
+    setShowPreConfirmationDialog(false);
+    isSubmitting(true);
+    router.push("/portfolio");
+  };
+
   return (
-    <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
-      <PixieCardHeader
-        label="Properties and Portfolios"
-        isEditable={isEditable}
-        onSearchChange={onSearchChange}
-        globalSearchValue={searchTerm} // Pass current search value to header
-        showSearchFeat={true}
-        showRefreshIcon={true}
-        onRefreshClick={onRefreshClick}
-        isRefreshClicked={isRefreshClicked}
-        showSearchIcon={true}
-      />
-      <div className="flex flex-col gap-4">
-        <PixieTab
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabClick={handleTabClick}
-        />
-        <PropertyAndPortfolioTab
-          activeTab={activeTab}
-          portfolios={filteredPortfolios}
-          properties={filteredProperties}
+    <>
+      <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
+        <PixieCardHeader
+          label="Properties and Portfolios"
           isEditable={isEditable}
-          onEditClick={handleEditClick}
+          onSearchChange={onSearchChange}
+          globalSearchValue={searchTerm} // Pass current search value to header
+          showSearchFeat={true}
+          showRefreshIcon={true}
+          onRefreshClick={onRefreshClick}
+          isRefreshClicked={isRefreshClicked}
+          showSearchIcon={true}
+          showAddIcon={hasCreateAccess && isEditable}
+          onAddClick={handleAdd}
         />
+        <div className="flex flex-col gap-4">
+          <PixieTab
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabClick={handleTabClick}
+          />
+          <PropertyAndPortfolioTab
+            activeTab={activeTab}
+            portfolios={filteredPortfolios}
+            properties={filteredProperties}
+            isEditable={isEditable}
+            onEditClick={handleEditClick}
+          />
+        </div>
       </div>
-    </div>
+      <PreConfirmationDialog
+        isOpen={showPreConfirmationDialog}
+        onClose={() => setShowPreConfirmationDialog(false)}
+        onConfirm={handleCreatePortfolio}
+        title="Confirm Portfolio Creation"
+        message="Continue to portfolio creation. This action will redirect you to the portfolio creation page."
+        confirmButtonLabel="Continue"
+      />
+    </>
   );
 };
 

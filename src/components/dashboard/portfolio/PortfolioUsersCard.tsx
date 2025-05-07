@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
+import { useRouter } from "next/navigation";
+
 import { hasRole } from "@/lib/utils/authUtils";
 import { PortfolioUser } from "@/types/Portfolio";
 import handleInfo from "@/lib/utils/errorHandler";
@@ -11,6 +13,7 @@ import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog"
 import PortfolioUserCardContent from "@/components/dashboard/portfolio/PortfolioUserCardContent";
 import { Account } from "@/types/Account";
 import { accountService } from "@/lib/services/account";
+import { interpolate } from "@/lib/utils/stringUtils";
 
 /**
  * Props for the PortfolioUsers component
@@ -34,6 +37,7 @@ const PortfolioUsersCard = ({
   accountDetails,
   showAll = false,
 }: PortfolioUsersCardProps) => {
+  const router = useRouter();
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
   const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolioUsers, setPortfolioUsers] = useState<PortfolioUser[]>([]);
@@ -164,6 +168,12 @@ const PortfolioUsersCard = ({
     }
   }, [selectedPortfolioUser?.id, fetchPortfolioUsers, isSubmitting]);
 
+  //Redirects the user to definite portfolio edit page
+  const handlePortfolioClick = (portfolioId: number) => {
+    isSubmitting(true);
+    router.push(interpolate("/portfolio?id=%s", portfolioId));
+  };
+
   return (
     <>
       <div className="relative w-[408px] bg-tertiary-offWhite rounded-[10px] flex flex-col p-5 box-border max-w-full">
@@ -199,6 +209,7 @@ const PortfolioUsersCard = ({
               user={user}
               isEditable={hasAccountPermission}
               onDelete={onClickDelete}
+              onNameClick={handlePortfolioClick}
             />
           ))}
         </div>

@@ -56,7 +56,7 @@ function AccountContent() {
     async (id?: string) => {
       setLoading(true); // Set loading state to true
       try {
-        if (id) {
+        if (hasRole("AdminUser") && id) {
           //This is intended for admin
           const accountDetails = await accountService.fetchById(Number(id));
           if (accountDetails?.status === "SUCCESS") {
