@@ -1,4 +1,5 @@
 import {
+  AICosts,
   AISettings,
   BankingBaseContext,
   BaseContext,
@@ -53,3 +54,32 @@ export const sampleAISettings: AISettings = {
   tenant: baseContext,
   banking: bankingBaseContext,
 };
+
+export const sampleAICosts: AICosts = {
+  id: "",
+  ach: "",
+  gptO1: {
+    input: "",
+    output: "",
+  },
+  gptO3Mini: {
+    input: "",
+    output: "",
+  },
+  gpt4OMini: { input: "", output: "" },
+  form1099: "",
+  w9: "",
+  customForm: "",
+  plaid: {
+    auth: "",
+    balance: "",
+    monthlyTransactions: "",
+  },
+};
+
+export const reasoningOptions = [
+  { label: "N/A", value: "" },
+  { label: "Low", value: "Low" },
+  { label: "Medium", value: "Medium" },
+  { label: "High", value: "High" },
+];

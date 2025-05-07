@@ -13,3 +13,9 @@ export const sampleClientPaymentProcessor: ClientPaymentProcessor = {
   thirdProcessorUUID: "",
   thirdProcessorEmail: "",
 };
+
+export const processorOptions = [
+  { label: "PaidYet", value: "PaidYet" },
+  { label: "Stripe", value: "Stripe" },
+  { label: "Square", value: "Square" },
+];

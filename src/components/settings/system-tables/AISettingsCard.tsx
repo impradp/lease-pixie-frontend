@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { AISettings } from "@/types/AISettings";
-import { sampleAISettings } from "@/data/aiSettings";
+import { reasoningOptions, sampleAISettings } from "@/data/aiSettings";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
+import PixieTextArea from "@/components/ui/input/PixieTextArea";
+import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 
 interface AISettingsCardProps {
   sectionName: string;
@@ -130,25 +132,36 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
-          label="Lease: Values reasoning"
-          value={formData.lease.values.reasoning}
-          onChange={(value) =>
-            setFormData((prev) => ({
-              ...prev,
-              lease: {
-                ...prev.lease,
-                values: {
-                  ...prev.lease.values,
-                  reasoning: value,
+        <div className="self-stretch flex flex-col justify-center items-start gap-1">
+          <div
+            className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+          >
+            Lease: Values reasoning
+          </div>
+          <PixieDropdown
+            options={reasoningOptions}
+            value={formData.lease.values.reasoning}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                lease: {
+                  ...prev.lease,
+                  values: {
+                    ...prev.lease.values,
+                    reasoning: value,
+                  },
                 },
-              },
-            }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
+              }))
+            }
+            isEditing={isEditMode}
+            placeholder="Select reasoning"
+            className="w-full"
+            containerClassName="w-full"
+            type="large"
+            labelClassName="hidden"
+          />
+        </div>
+        <PixieTextArea
           label="Lease: Values instructions"
           value={formData.lease.values.instructions}
           onChange={(value) =>
@@ -184,25 +197,36 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
-          label="Lease: Pages reasoning"
-          value={formData.lease.pages.reasoning}
-          onChange={(value) =>
-            setFormData((prev) => ({
-              ...prev,
-              lease: {
-                ...prev.lease,
-                pages: {
-                  ...prev.lease.pages,
-                  reasoning: value,
+        <div className="self-stretch flex flex-col justify-center items-start gap-1">
+          <div
+            className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+          >
+            Lease: Pages reasoning
+          </div>
+          <PixieDropdown
+            options={reasoningOptions}
+            value={formData.lease.pages.reasoning}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                lease: {
+                  ...prev.lease,
+                  pages: {
+                    ...prev.lease.pages,
+                    reasoning: value,
+                  },
                 },
-              },
-            }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
+              }))
+            }
+            isEditing={isEditMode}
+            placeholder="Select reasoning"
+            className="w-full"
+            containerClassName="w-full"
+            type="large"
+            labelClassName="hidden"
+          />
+        </div>
+        <PixieTextArea
           label="Lease: Pages instructions"
           value={formData.lease.pages.instructions}
           onChange={(value) =>
@@ -238,25 +262,36 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
-          label="Lease: Sentences reasoning"
-          value={formData.lease.sentences.reasoning}
-          onChange={(value) =>
-            setFormData((prev) => ({
-              ...prev,
-              lease: {
-                ...prev.lease,
-                sentences: {
-                  ...prev.lease.sentences,
-                  reasoning: value,
+        <div className="self-stretch flex flex-col justify-center items-start gap-1">
+          <div
+            className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+          >
+            Lease: Sentences reasoning
+          </div>
+          <PixieDropdown
+            options={reasoningOptions}
+            value={formData.lease.sentences.reasoning}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                lease: {
+                  ...prev.lease,
+                  sentences: {
+                    ...prev.lease.sentences,
+                    reasoning: value,
+                  },
                 },
-              },
-            }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
+              }))
+            }
+            isEditing={isEditMode}
+            placeholder="Select reasoning"
+            className="w-full"
+            containerClassName="w-full"
+            type="large"
+            labelClassName="hidden"
+          />
+        </div>
+        <PixieTextArea
           label="Lease: Sentences instructions"
           value={formData.lease.sentences.instructions}
           onChange={(value) =>
@@ -292,26 +327,36 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
-          label="Lease: Summary reasoning"
-          value={formData.lease.summary.reasoning}
-          onChange={(value) =>
-            setFormData((prev) => ({
-              ...prev,
-              lease: {
-                ...prev.lease,
-                summary: {
-                  ...prev.lease.summary,
-                  reasoning: value,
+        <div className="self-stretch flex flex-col justify-center items-start gap-1">
+          <div
+            className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+          >
+            Lease: Summary reasoning
+          </div>
+          <PixieDropdown
+            options={reasoningOptions}
+            value={formData.lease.summary.reasoning}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                lease: {
+                  ...prev.lease,
+                  summary: {
+                    ...prev.lease.summary,
+                    reasoning: value,
+                  },
                 },
-              },
-            }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-
-        <CustomInput
+              }))
+            }
+            isEditing={isEditMode}
+            placeholder="Select reasoning"
+            className="w-full"
+            containerClassName="w-full"
+            type="large"
+            labelClassName="hidden"
+          />
+        </div>
+        <PixieTextArea
           label="Lease: Summary instructions"
           value={formData.lease.summary.instructions}
           onChange={(value) =>
@@ -353,7 +398,7 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
+        <PixieTextArea
           label="Workflow: Instructions"
           value={formData.workflow.instructions}
           onChange={(value) =>
@@ -476,7 +521,7 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
+        <PixieTextArea
           label="Vendor: Instructions"
           value={formData.vendor.instructions}
           onChange={(value) =>
@@ -512,7 +557,7 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
+        <PixieTextArea
           label="Tenant: Instructions"
           value={formData.tenant.instructions}
           onChange={(value) =>
@@ -561,7 +606,7 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           isEditing={isEditMode}
           disabled={!isEditable}
         />
-        <CustomInput
+        <PixieTextArea
           label="Banking: Instructions"
           value={formData.banking.instructions}
           onChange={(value) =>

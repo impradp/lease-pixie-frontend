@@ -4,7 +4,11 @@ import PixieButton from "@/components/ui/buttons/PixieButton";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { ClientPaymentProcessor } from "@/types/ClientPaymentProcessor";
-import { sampleClientPaymentProcessor } from "@/data/clientPaymentProcessors";
+import {
+  processorOptions,
+  sampleClientPaymentProcessor,
+} from "@/data/clientPaymentProcessors";
+import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 
 interface ClientPaymentProcessorCardProps {
   sectionName: string;
@@ -15,6 +19,18 @@ interface ClientPaymentProcessorCardProps {
   isEditable: boolean;
 }
 
+/**
+ * A React component that renders a card for managing client payment processor information.
+ * Supports viewing and editing modes with form inputs for processor details.
+ *
+ * @param props - The properties for the component.
+ * @param props.sectionName - The name of the section this card represents.
+ * @param props.editingSection - The currently active editing section, or null if none.
+ * @param props.onSectionEdit - Callback to handle edit mode activation for a section.
+ * @param props.onSectionClose - Callback to handle closing the edit mode.
+ * @param props.isSubmitting - Callback to indicate form submission status.
+ * @param props.isEditable - Flag to determine if the form fields are editable.
+ */
 const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
   sectionName,
   editingSection,
@@ -30,12 +46,18 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
   const [initialFormData, setInitialFormData] =
     useState<ClientPaymentProcessor>(sampleClientPaymentProcessor);
 
+  /**
+   * Syncs form data with the sample client payment processor data on mount or update.
+   */
   useEffect(() => {
     setInitialFormData(sampleClientPaymentProcessor);
     setFormData(sampleClientPaymentProcessor);
   }, [sampleClientPaymentProcessor]);
 
-  // Handle edit button click
+  /**
+   * Handles the edit button click to enable edit mode.
+   * Only activates if no other section is being edited or if this section is the target.
+   */
   const handleEdit = () => {
     if (editingSection === null || editingSection === sectionName) {
       onSectionEdit(sectionName);
@@ -43,14 +65,20 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
     }
   };
 
-  // Handle cancel button click
+  /**
+   * Handles the cancel button click to revert form data and exit edit mode.
+   */
   const handleTextClose = () => {
     setFormData(initialFormData); // Revert to initial values
     setIsEditMode(false);
     onSectionClose();
   };
 
-  // Handle form submission
+  /**
+   * Handles form submission, triggers submission status, and exits edit mode.
+   *
+   * @param e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     isSubmitting(true);
@@ -82,20 +110,30 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           editDisabled={isEditDisabled}
           closeLabel="Close"
         />
-
-        <CustomInput
-          label="Default processor ID"
-          value={formData.defaultProcessorId}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, defaultProcessorId: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
+        <div className="self-stretch flex flex-col justify-center items-start gap-1">
+          <div
+            className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+          >
+            Default processor ID
+          </div>
+          <PixieDropdown
+            options={processorOptions}
+            value={formData.defaultProcessorId}
+            onChange={(value) =>
+              setFormData((prev) => ({ ...prev, defaultProcessorId: value }))
+            }
+            isEditing={isEditMode}
+            placeholder="Select processor"
+            className="w-full"
+            containerClassName="w-full"
+            type="large"
+            labelClassName="hidden"
+          />
+        </div>
 
         <CustomInput
           label="First processor ID"
-          value={formData.firstProcessorEmail}
+          value={formData.firstProcessorId}
           onChange={(value) =>
             setFormData((prev) => ({ ...prev, firstProcessorId: value }))
           }
@@ -110,6 +148,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="number"
         />
         <CustomInput
           label="First processor email"
@@ -119,6 +158,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="email"
         />
         <CustomInput
           label="Second processor ID"
@@ -137,6 +177,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="number"
         />
         <CustomInput
           label="Second processor email"
@@ -146,6 +187,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="email"
         />
         <CustomInput
           label="Third processor ID"
@@ -164,6 +206,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="number"
         />
         <CustomInput
           label="Third processor email"
@@ -173,6 +216,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="email"
         />
 
         {/* Show buttons only in edit mode */}

@@ -46,3 +46,26 @@ export interface AISettings {
   tenant: BaseContext;
   banking: BankingBaseContext;
 }
+
+interface AIModelContext {
+  input: string;
+  output: string;
+}
+
+interface PlaidContext {
+  auth: string;
+  balance: string;
+  monthlyTransactions: string;
+}
+
+export interface AICosts {
+  id?: string;
+  ach: string;
+  gptO1: AIModelContext;
+  gptO3Mini: AIModelContext;
+  gpt4OMini: AIModelContext;
+  form1099: string;
+  w9: string;
+  customForm: string;
+  plaid: PlaidContext;
+}

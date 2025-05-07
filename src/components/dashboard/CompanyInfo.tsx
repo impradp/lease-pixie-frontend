@@ -156,13 +156,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
             <span className="flex-1 text-sm font-bold text-secondary-light">
               {details.companyName}
             </span>
-            <LinkButton
-              label="Delete"
-              hidden={
-                !hasDeletePermission || (details.portfolios?.length ?? 0) > 0
-              }
-              onClick={() => onDelete?.(details)}
-            />
           </div>
           <div className="flex items-center justify-between h-5">
             <div className="flex items-center gap-2.5">
@@ -308,87 +301,110 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
           </div>
           {isPortfoliosOpen && (
             <div className="flex flex-col gap-1">
-              {details.portfolios?.map((portfolio, index) => (
-                <div
-                  key={`${portfolio.code}-${index}`}
-                  className="p-2 bg-gray-50 rounded-md flex flex-col gap-3"
-                >
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-secondary-light">
-                      {portfolio.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="text-xs text-tertiary-light underline cursor-pointer hover:text-tertiary-midnightBlue hover:font-medium bg-transparent border-0 p-0"
-                        onClick={(e) => setPortfolioSearch(e, portfolio.code)}
+              {details.portfolios?.length ? (
+                details.portfolios?.map((portfolio, index) => (
+                  <div
+                    key={`${portfolio.code}-${index}`}
+                    className="p-2 bg-gray-50 rounded-md flex flex-col gap-3"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-secondary-light">
+                        {portfolio.name}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="text-xs text-tertiary-light underline cursor-pointer hover:text-tertiary-midnightBlue hover:font-medium bg-transparent border-0 p-0"
+                          onClick={(e) => setPortfolioSearch(e, portfolio.code)}
+                          onKeyDown={(e) =>
+                            e.key === "Enter" &&
+                            setPortfolioSearch(e, portfolio.code)
+                          }
+                        >
+                          {portfolio.code}
+                        </button>
+                        {portfolio.totalProperties && (
+                          <>
+                            <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
+                            <span className="text-xs text-tertiary-light">
+                              {portfolio.totalProperties}
+                            </span>
+                          </>
+                        )}
+                        {portfolio.squareFootage && (
+                          <>
+                            <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
+                            <span className="text-xs text-tertiary-light">
+                              {portfolio.squareFootage}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="h-px bg-tertiary-stroke" />
+                    <div className="flex flex-col gap-1">
+                      <div
+                        className="flex items-center justify-between cursor-pointer"
+                        onClick={() => togglePortfolioCost(portfolio.name)}
+                        role="button"
+                        tabIndex={0}
                         onKeyDown={(e) =>
                           e.key === "Enter" &&
-                          setPortfolioSearch(e, portfolio.code)
+                          togglePortfolioCost(portfolio.name)
                         }
                       >
-                        {portfolio.code}
-                      </button>
-                      {portfolio.totalProperties && (
-                        <>
-                          <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
-                          <span className="text-xs text-tertiary-light">
-                            {portfolio.totalProperties}
-                          </span>
-                        </>
-                      )}
-                      {portfolio.squareFootage && (
-                        <>
-                          <div className="w-2 h-2 bg-tertiary-charcoalBlue rounded-full" />
-                          <span className="text-xs text-tertiary-light">
-                            {portfolio.squareFootage}
-                          </span>
-                        </>
+                        <span className="text-xs font-bold text-secondary-light">
+                          Cost (Margins)
+                        </span>
+                        <div className="flex items-center justify-center w-5 h-5">
+                          <ChevronRight
+                            className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
+                              portfolioCostOpen[portfolio.name]
+                                ? "rotate-90"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      </div>
+                      {portfolioCostOpen[portfolio.name] && (
+                        <div className="flex flex-col gap-1">
+                          {portfolio.costMargins?.map((cost, idx) => (
+                            <div
+                              key={`${cost.month}-${cost.year}-${idx}`}
+                              className="flex items-start gap-1"
+                            >
+                              <span className="w-[54px] text-xs text-tertiary-midnightBlue">
+                                {cost.month} {cost.year}
+                              </span>
+                              <span className="text-xs text-secondary-light">
+                                {cost.cost} ({cost.margin})
+                                {cost.isHighlighted && " *"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
-                  <div className="h-px bg-tertiary-stroke" />
-                  <div className="flex flex-col gap-1">
-                    <div
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => togglePortfolioCost(portfolio.name)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && togglePortfolioCost(portfolio.name)
+                ))
+              ) : (
+                <>
+                  <div className="p-2 bg-gray-50 rounded-md flex flex-col gap-1">
+                    <span className="text-xs text-dropdown-regular">
+                      No portfolio available.
+                    </span>
+                  </div>
+                  <div className="flex justify-center items-center w-full">
+                    <LinkButton
+                      label="Delete"
+                      hidden={
+                        !hasDeletePermission ||
+                        (details.portfolios?.length ?? 0) > 0
                       }
-                    >
-                      <span className="text-xs font-bold text-secondary-light">
-                        Cost (Margins)
-                      </span>
-                      <div className="flex items-center justify-center w-5 h-5">
-                        <ChevronRight
-                          className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
-                            portfolioCostOpen[portfolio.name] ? "rotate-90" : ""
-                          }`}
-                        />
-                      </div>
-                    </div>
-                    {portfolioCostOpen[portfolio.name] && (
-                      <div className="flex flex-col gap-1">
-                        {portfolio.costMargins?.map((cost, idx) => (
-                          <div
-                            key={`${cost.month}-${cost.year}-${idx}`}
-                            className="flex items-start gap-1"
-                          >
-                            <span className="w-[54px] text-xs text-tertiary-midnightBlue">
-                              {cost.month} {cost.year}
-                            </span>
-                            <span className="text-xs text-secondary-light">
-                              {cost.cost} ({cost.margin})
-                              {cost.isHighlighted && " *"}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                      onClick={() => onDelete?.(details)}
+                    />
                   </div>
-                </div>
-              ))}
+                </>
+              )}
             </div>
           )}
         </div>

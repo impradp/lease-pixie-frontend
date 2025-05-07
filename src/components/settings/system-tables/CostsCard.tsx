@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
+
+import { AICosts } from "@/types/AISettings";
+import { sampleAICosts } from "@/data/aiSettings";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
-import { PlatformInvoicing } from "@/types/PlatformInvoicing";
-import { samplePlatformInvoicing } from "@/data/platformInvoicing";
 
 /**
- * Props interface for the PlatformInvoicingCard component.
+ * Props interface for the CostsCard component.
  *
- * @interface PlatformInvoicingCardProps
+ * @interface CostsCardProps
  * @property {string} sectionName - The name of the section this card represents.
  * @property {string | null} editingSection - The currently active editing section, or null if none.
  * @property {(section: string) => void} onSectionEdit - Callback to handle edit mode activation for a section.
@@ -17,7 +18,7 @@ import { samplePlatformInvoicing } from "@/data/platformInvoicing";
  * @property {(value: boolean) => void} isSubmitting - Callback to indicate form submission status.
  * @property {boolean} isEditable - Flag to determine if the form fields are editable.
  */
-interface PlatformInvoicingCardProps {
+interface CostsCardProps {
   sectionName: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
@@ -27,8 +28,8 @@ interface PlatformInvoicingCardProps {
 }
 
 /**
- * A React component that renders a card for managing platform invoicing information.
- * Supports viewing and editing modes with form inputs for invoicing details.
+ * A React component that renders a card for managing AI cost settings.
+ * Supports viewing and editing modes with form inputs for cost details.
  *
  * @param props - The properties for the component.
  * @param props.sectionName - The name of the section this card represents.
@@ -38,7 +39,7 @@ interface PlatformInvoicingCardProps {
  * @param props.isSubmitting - Callback to indicate form submission status.
  * @param props.isEditable - Flag to determine if the form fields are editable.
  */
-const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
+const CostsCard: React.FC<CostsCardProps> = ({
   sectionName,
   editingSection,
   onSectionEdit,
@@ -47,20 +48,17 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
   isEditable,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<PlatformInvoicing>(
-    samplePlatformInvoicing
-  );
-  const [initialFormData, setInitialFormData] = useState<PlatformInvoicing>(
-    samplePlatformInvoicing
-  );
+  const [formData, setFormData] = useState<AICosts>(sampleAICosts);
+  const [initialFormData, setInitialFormData] =
+    useState<AICosts>(sampleAICosts);
 
   /**
-   * Syncs form data with the sample platform invoicing data on mount or update.
+   * Syncs form data with the sample AI costs data on mount or update.
    */
   useEffect(() => {
-    setInitialFormData(samplePlatformInvoicing);
-    setFormData(samplePlatformInvoicing);
-  }, [samplePlatformInvoicing]);
+    setInitialFormData(sampleAICosts);
+    setFormData(sampleAICosts);
+  }, [sampleAICosts]);
 
   /**
    * Handles the edit button click to enable edit mode.
@@ -109,7 +107,7 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
         className="flex flex-col gap-4"
       >
         <SectionHeader
-          title={"Platform Invoicing"}
+          title={"Costs"}
           editLabel={"View"}
           onEdit={handleEdit}
           onTextCancel={handleTextClose}
@@ -120,102 +118,177 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
         />
 
         <CustomInput
-          label="Payment processor UUID"
-          value={formData.paymentProcessorUUID}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, paymentProcessorUUID: value }))
-          }
+          label="ACH"
+          value={formData.ach}
+          onChange={(value) => setFormData((prev) => ({ ...prev, ach: value }))}
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="number"
         />
 
         <CustomInput
-          label="Billing ID"
-          value={formData.billingId}
+          label="o1: Input"
+          value={formData.gptO1.input}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, billingId: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="Entity"
-          value={formData.entity}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, entity: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="Street"
-          value={formData.street}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, street: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="City"
-          value={formData.city}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, city: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="State"
-          value={formData.state}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, state: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="Zip code"
-          value={formData.zipCode}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, zipCode: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="Office phone"
-          value={formData.officePhone}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, officePhone: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="E-mail address"
-          value={formData.emailAddress}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, emailAddress: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-        <CustomInput
-          label="Retail Base"
-          value={formData.retailBase}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, retailBase: value }))
+            setFormData((prev) => ({
+              ...prev,
+              gptO1: { ...prev.gptO1, input: value },
+            }))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
           type="number"
         />
         <CustomInput
-          label="Industrial Base"
-          value={formData.industrialBase}
+          label="o1: Output"
+          value={formData.gptO1.output}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, industrialBase: value }))
+            setFormData((prev) => ({
+              ...prev,
+              gptO1: { ...prev.gptO1, output: value },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="o3-mini: Input"
+          value={formData.gptO3Mini.input}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              gptO3Mini: {
+                ...prev.gptO3Mini,
+                input: value,
+              },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="o3-mini: Output"
+          value={formData.gptO3Mini.output}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              gptO3Mini: {
+                ...prev.gptO3Mini,
+                output: value,
+              },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="4o-mini: Input"
+          value={formData.gpt4OMini.input}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              gpt4OMini: {
+                ...prev.gpt4OMini,
+                input: value,
+              },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="4o-mini: Output"
+          value={formData.gpt4OMini.output}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              gpt4OMini: {
+                ...prev.gpt4OMini,
+                output: value,
+              },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="1099"
+          value={formData.form1099}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              form1099: value,
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="W-9"
+          value={formData.w9}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              w9: value,
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="Custom Form"
+          value={formData.customForm}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              customForm: value,
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="Plaid: Auth"
+          value={formData.plaid.auth}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              plaid: { ...prev.plaid, auth: value },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="Plaid: Balance"
+          value={formData.plaid.balance}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              plaid: { ...prev.plaid, balance: value },
+            }))
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable}
+          type="number"
+        />
+        <CustomInput
+          label="Plaid: Transactions (monthly)"
+          value={formData.plaid.monthlyTransactions}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              plaid: { ...prev.plaid, monthlyTransactions: value },
+            }))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
@@ -243,4 +316,4 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
   );
 };
 
-export default PlatformInvoicingCard;
+export default CostsCard;
