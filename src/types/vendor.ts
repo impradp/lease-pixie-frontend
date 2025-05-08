@@ -3,6 +3,7 @@ import { Portfolio } from "./Portfolio";
 export interface NewVendorFormData {
   id?: number;
   companyName: string;
+  folderName?: string;
   serviceDescription: string;
   companyAddress: string;
   officePhoneNumber: string;
@@ -10,6 +11,7 @@ export interface NewVendorFormData {
   contactLastName: string;
   emailAddress: string;
   mobileNumber: string;
+  memo: string;
   requestW9: boolean;
   send1099: boolean;
   getInsuranceCert: boolean;

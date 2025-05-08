@@ -1,6 +1,8 @@
 import { NewVendorFormData } from "@/types/vendor";
 
 export const defaultData: NewVendorFormData = {
+  memo: "",
+  folderName: "",
   companyName: "",
   serviceDescription: "",
   companyAddress: "",

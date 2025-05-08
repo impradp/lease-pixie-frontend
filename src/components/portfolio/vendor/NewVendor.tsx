@@ -80,11 +80,10 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
     // Only check if required fields are empty, don't store specific errors
     const isValid =
       formData.companyName.trim() &&
-      formData.contactFirstName.trim() &&
-      formData.contactLastName.trim() &&
-      formData.mobileNumber.trim() &&
-      formData.emailAddress.trim;
-
+      formData.serviceDescription.trim() &&
+      formData.officePhoneNumber.trim() &&
+      formData.folderName?.trim() &&
+      formData.emailAddress.trim();
     return !!isValid;
   };
 
@@ -126,6 +125,18 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
             />
 
             <CustomInput
+              label="Folder Name (10 characters)"
+              value={formData.folderName ?? ""}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, folderName: value }))
+              }
+              isEditing={true}
+              disabled={isLoading}
+              isRequired={true}
+              maxCharLength={10}
+            />
+
+            <CustomInput
               label="Service description (40 character limit)"
               value={formData.serviceDescription}
               onChange={(value) =>
@@ -134,6 +145,8 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               isEditing={true}
               placeholder="i.e. Electrician"
               disabled={isLoading}
+              isRequired={true}
+              maxCharLength={40}
             />
 
             <AddressAutocompleteInput
@@ -158,6 +171,7 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               placeholder="800-555-1234"
               type="mobile"
               disabled={isLoading}
+              isRequired={true}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,7 +184,6 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 isEditing={true}
                 placeholder="First"
                 disabled={isLoading}
-                isRequired={true}
               />
 
               <CustomInput
@@ -182,7 +195,6 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
                 isEditing={true}
                 placeholder="Last"
                 disabled={isLoading}
-                isRequired={true}
               />
             </div>
 
@@ -207,7 +219,6 @@ export const NewVendor: React.FC<NewVendorProps> = ({ onClose, onSubmit }) => {
               placeholder="800-555-1234"
               type="mobile"
               disabled={isLoading}
-              isRequired={true}
             />
 
             <div className="space-y-4 pt-2">

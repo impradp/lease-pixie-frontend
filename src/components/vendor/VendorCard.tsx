@@ -15,15 +15,17 @@
  */
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+
 import toastr from "@/lib/func/toastr";
 import { NewVendorFormData } from "@/types/vendor";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import LinkButton from "@/components/ui/buttons/LinkButton";
+import PixieTextArea from "@/components/ui/input/PixieTextArea";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
-import ConfirmationDialog from "../ui/dialog/ConfirmationDialog";
-import PreConfirmationDialog from "../ui/dialog/PreConfirmationDialog";
+import ConfirmationDialog from "@/components/ui/dialog/ConfirmationDialog";
+import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 
 const AddressAutocompleteInput = dynamic(
   () =>
@@ -121,10 +123,11 @@ const VendorCard: React.FC<VendorCardProps> = ({
   const validateForm = (): boolean => {
     const isValid =
       formData.companyName.trim() &&
-      formData.contactFirstName.trim() &&
-      formData.contactLastName.trim() &&
-      formData.mobileNumber.trim() &&
-      formData.emailAddress.trim;
+      formData.serviceDescription.trim() &&
+      formData.officePhoneNumber.trim() &&
+      formData.folderName?.trim() &&
+      formData.memo?.trim() &&
+      formData.emailAddress.trim();
     return !!isValid;
   };
 
@@ -214,6 +217,14 @@ const VendorCard: React.FC<VendorCardProps> = ({
     setShowPreConfirmationDialog(false);
   };
 
+  const handleDocumentLog = () => {
+    //Document log
+  };
+
+  const handleEditLog = () => {
+    //edit log
+  };
+
   return (
     <>
       <div
@@ -249,6 +260,19 @@ const VendorCard: React.FC<VendorCardProps> = ({
               isRequired={true}
             />
           )}
+          {isEditMode && (
+            <CustomInput
+              label="Folder Name (10 characters)"
+              value={formData.folderName ?? ""}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, folderName: value }))
+              }
+              isEditing={isEditMode}
+              disabled={isLoading}
+              isRequired={true}
+              maxCharLength={10}
+            />
+          )}
           {/* Always show service description */}
           <CustomInput
             label="Service description (40 character limit)"
@@ -259,6 +283,8 @@ const VendorCard: React.FC<VendorCardProps> = ({
             isEditing={isEditMode}
             placeholder="i.e. Electrician"
             disabled={isLoading}
+            isRequired={true}
+            maxCharLength={40}
           />
 
           {/* Show additional fields only in edit mode */}
@@ -285,6 +311,7 @@ const VendorCard: React.FC<VendorCardProps> = ({
                 placeholder="800-555-1234"
                 type="mobile"
                 disabled={isLoading}
+                isRequired={true}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <CustomInput
@@ -299,7 +326,6 @@ const VendorCard: React.FC<VendorCardProps> = ({
                   isEditing={true}
                   placeholder="First"
                   disabled={isLoading}
-                  isRequired={true}
                 />
                 <CustomInput
                   label="Vendor contact last name"
@@ -310,7 +336,6 @@ const VendorCard: React.FC<VendorCardProps> = ({
                   isEditing={true}
                   placeholder="Last"
                   disabled={isLoading}
-                  isRequired={true}
                 />
               </div>
               <CustomInput
@@ -333,7 +358,6 @@ const VendorCard: React.FC<VendorCardProps> = ({
                 placeholder="800-555-1234"
                 type="mobile"
                 disabled={isLoading}
-                isRequired={true}
               />
               <div className="space-y-4 pt-2">
                 <CustomCheckbox
@@ -357,13 +381,22 @@ const VendorCard: React.FC<VendorCardProps> = ({
                   checked={formData.getInsuranceCert}
                   onChange={() => handleCheckboxChange("getInsuranceCert")}
                   label="Get insurance certificate"
-                  isEditing={true}
+                  isEditing={isEditMode}
                   // disabled={isLoading}
+                />
+                <div className="w-[752px] h-px bg-tertiary-stroke" />
+                <PixieTextArea
+                  label="Provide a memo for your edits"
+                  value={formData.memo ?? ""}
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, memo: value }))
+                  }
+                  isEditing={isEditMode}
+                  isRequired={true}
                 />
                 {defaultData.portfolios &&
                   defaultData.portfolios.length > 0 && (
                     <>
-                      <div className="w-[752px] h-px bg-[#cfd4dc]" />
                       <div className="w-[752px] self-stretch inline-flex justify-start items-start gap-4">
                         <div className="w-[752px] inline-flex flex-col justify-start items-start gap-2.5">
                           {defaultData.portfolios.map((portfolio) => (
@@ -375,13 +408,13 @@ const VendorCard: React.FC<VendorCardProps> = ({
                                 <div className="inline-flex justify-start items-center gap-2">
                                   <div className="h-[33px] inline-flex flex-col justify-center items-start gap-0.5">
                                     <div className="justify-start">
-                                      <span className="text-[#0b111d] text-base font-semibold font-['Inter'] underline leading-normal">
+                                      <span className="text-secondary-light text-base font-semibold font-['Inter'] underline leading-normal">
                                         {portfolio.name}
                                       </span>
-                                      <span className="text-[#0b111d] text-base font-semibold font-['Inter'] leading-normal">
+                                      <span className="text-secondary-light text-base font-semibold font-['Inter'] leading-normal">
                                         :{" "}
                                       </span>
-                                      <span className="text-[#0b111d] text-base font-normal font-['Inter'] leading-normal">
+                                      <span className="text-secondary-light text-base font-normal font-['Inter'] leading-normal">
                                         {getSeatType(portfolio)}
                                       </span>
                                     </div>
@@ -394,6 +427,29 @@ const VendorCard: React.FC<VendorCardProps> = ({
                       </div>
                     </>
                   )}
+
+                <div className="w-full flex flex-col items-end">
+                  <div className="inline-flex items-center">
+                    <LinkButton
+                      label="edit log"
+                      onClick={handleEditLog}
+                      disabled={!isEditMode}
+                      iconType="download"
+                      showIcon={true}
+                      className="text-secondary-light text-xs font-normal font-['Inter'] underline leading-[18px]"
+                    />
+                  </div>
+                  <div className="inline-flex items-center">
+                    <LinkButton
+                      label="document log"
+                      onClick={handleDocumentLog}
+                      disabled={!isEditMode}
+                      iconType="download"
+                      showIcon={true}
+                      className="text-secondary-light text-xs font-normal font-['Inter'] underline leading-[18px]"
+                    />
+                  </div>
+                </div>
               </div>
             </>
           )}

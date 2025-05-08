@@ -5,6 +5,7 @@ import { Eye, EyeClosed } from "lucide-react";
  * Props for the CustomInput component
  */
 interface CustomInputProps {
+  maxCharLength?: number;
   label?: string; // Input label
   value: string; // Input value
   onChange?: (value: string) => void; // Callback for value changes
@@ -39,6 +40,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   error: externalError,
   disabled = false,
   isRequired = false,
+  maxCharLength,
 }) => {
   const [internalError, setInternalError] = useState<string | null>(null); // State for internal validation errors
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
@@ -376,6 +378,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
           onSelect={handleSelect}
           readOnly={!isEditing || readOnly}
           disabled={disabled}
+          maxLength={maxCharLength || undefined}
           className={`flex-1 ${className} font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist ${
             disabled ? "cursor-not-allowed" : ""
           }`}

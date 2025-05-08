@@ -199,6 +199,7 @@ const DepositAccountForm: React.FC<DepositAccountFormProps> = ({
                 disabled={isFormDisabled}
                 isRequired={true}
                 type="number"
+                maxCharLength={4}
               />
               <CustomInput
                 label="Plaid link Account Number"
