@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
+import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import {
   DatePicker as MUIDatePicker,
   PickersCalendarHeaderProps,
 } from "@mui/x-date-pickers";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import dayjs, { Dayjs } from "dayjs";
 
 interface PixieMonthPickerProps {
   label?: string;
@@ -20,15 +21,15 @@ interface PixieMonthPickerProps {
 
 // Custom calendar header component that only shows month name without year
 // but keeps the month selection capability
-const CustomCalendarHeader = (props: PickersCalendarHeaderProps<Dayjs>) => {
+const CustomCalendarHeader = (props: PickersCalendarHeaderProps) => {
   const { currentMonth, onMonthChange, views, onViewChange } = props;
 
   const handlePrevMonth = () => {
-    onMonthChange(currentMonth.subtract(1, "month"), "left");
+    onMonthChange(currentMonth.subtract(1, "month"));
   };
 
   const handleNextMonth = () => {
-    onMonthChange(currentMonth.add(1, "month"), "right");
+    onMonthChange(currentMonth.add(1, "month"));
   };
 
   // Format to show only the month name
@@ -165,44 +166,44 @@ const PixieMonthPicker: React.FC<PixieMonthPickerProps> = ({
               textField: {
                 variant: "standard",
                 sx: {
-                  "& .MuiInputBase-root": {
+                  "& .MuiPickersInputBase-root": {
                     width: "100%",
                     height: "36px",
                     padding: "0 14px",
                     backgroundColor: "white",
                     borderRadius: "8px",
                     border: "1px solid #cfd4dc",
-                    "&:hover": {
-                      borderColor: "#cfd4dc",
-                    },
+                    cursor: "default",
+                    pointerEvents: "unset",
+                    userSelect: "none",
                   },
-                  "& .MuiInputLabel-root": {
-                    display: "none",
-                  },
-                  "& .MuiInputBase-input": {
-                    paddingRight: "32px",
-                    color: "#475467",
-                    fontSize: 14,
-                    fontFamily: "Inter",
-                  },
-                  "& .MuiInput-underline": {
-                    "&:before": {
-                      borderBottomColor: "transparent",
+                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root:hover:not(.Mui-disabled, .Mui-error):before":
+                    {
+                      borderBottom: "none",
                     },
-                    "&:hover:not(.Mui-disabled):before": {
-                      borderBottomColor: "transparent",
+                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root.Mui-focused:after":
+                    {
+                      WebkitTransform: "none",
                     },
-                    "&:after": {
-                      borderBottomColor: "rgba(71, 84, 102, 1)",
+                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root.Mui-focused:before":
+                    {
+                      WebkitTransform: "none",
                     },
-                  },
-                  "& .MuiInputBase-colorPrimary": {
-                    "&.Mui-focused": {
-                      "& .MuiInput-underline:after": {
-                        borderBottomColor: "transparent",
-                      },
+                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root::after":
+                    {
+                      borderBottom: "none",
                     },
-                  },
+                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root::before":
+                    {
+                      borderBottom: "none",
+                    },
+                  "& .css-h5nb1c-MuiPickersSectionList-root-MuiPickersInputBase-sectionsContainer":
+                    {
+                      paddingRight: "32px",
+                      color: "#475467",
+                      fontSize: 14,
+                      fontFamily: "Inter",
+                    },
                 },
                 InputProps: {
                   endAdornment: (
@@ -216,9 +217,6 @@ const PixieMonthPicker: React.FC<PixieMonthPickerProps> = ({
                       <Calendar className="w-5 h-5 stroke-secondary-icon cursor-pointer absolute right-2 top-1/2 transform -translate-y-1/2" />
                     </div>
                   ),
-                },
-                onClick: () => {
-                  if (isEditing && !readOnly) setOpen(true);
                 },
               },
               popper: {
