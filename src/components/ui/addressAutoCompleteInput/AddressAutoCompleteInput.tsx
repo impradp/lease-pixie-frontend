@@ -217,7 +217,7 @@ const AddressAutocompleteInput: React.FC<AddressAutocompleteInputProps> = ({
             disabled={disabled}
             className={`w-full text-base text-tertiary-light font-normal font-['Inter'] leading-normal outline-none bg-transparent ${
               disabled ? "cursor-not-allowed" : ""
-            }`}
+            } ${isEditing ? "" : "cursor-default"}`}
           />
         </div>
         {suggestions.length > 0 && !disabled && (

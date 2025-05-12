@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 import { DropdownOption } from "@/types/user";
+import { hasRole } from "@/lib/utils/authUtils";
 import { PropertyInfoData } from "@/types/PropertyInfo";
-import PixieButton from "@/components/ui/buttons/PixieButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import LinkButton from "@/components/ui/buttons/LinkButton";
+import PixieButton from "@/components/ui/buttons/PixieButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
-import { PixieDatePicker } from "../ui/datePicker/PixieDatePicker";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
 
@@ -27,16 +27,10 @@ interface PropertyInfoCardProps {
   onSectionEdit: (section: string) => void;
   handlePropertyInfoUpdate: () => void;
   onSectionClose: () => void;
-  portfolioOptions: DropdownOption[];
   existingPropertyInfoData?: PropertyInfoData;
-  largestMonthlyInvoiceOptions: DropdownOption[];
   categoryOptions: DropdownOption[];
   floorPlanOptions: DropdownOption[];
   elevatorPlanOptions: DropdownOption[];
-  buildingStructureOptions: DropdownOption[];
-  roofStructureOptions: DropdownOption[];
-  sprinklerSystemOptions: DropdownOption[];
-  firePanelsOptions: DropdownOption[];
 }
 
 const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
@@ -46,19 +40,23 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
   onSectionEdit,
   onSectionClose,
   handlePropertyInfoUpdate,
-  portfolioOptions,
   existingPropertyInfoData,
-  largestMonthlyInvoiceOptions,
   categoryOptions,
   floorPlanOptions,
   elevatorPlanOptions,
-  buildingStructureOptions,
-  roofStructureOptions,
-  sprinklerSystemOptions,
-  firePanelsOptions,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const isEditing = isEditMode;
+  const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
+
+  const hasAccountUserAccess = hasRole("AccountUser");
+
+  // Move the access check into useEffect to avoid infinite renders
+  useEffect(() => {
+    // TODO: Check with the API whether settings card is accessible for edit
+    // For now, setting a default value that won't cause infinite renders
+    setPortfolioUserAccess(false);
+  }, []); // Empty dependency array means this runs once on mount
 
   const [formData, setFormData] = useState<PropertyInfoData>(
     existingPropertyInfoData || {
@@ -72,15 +70,10 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
       requestedCategory: "",
       propertyManagementLegalEntity: "",
       propertyManagementOfficePhoneNumber: "",
-      payableRemittanceAddress: "",
+      propertyManagementemailAddress: "",
+      vendorPayableRemittanceAddress: "",
       floorPlan: "",
       elvatorPlan: "",
-      buildingStructure: "",
-      roofStructure: "",
-      constructionYear: "",
-      propertyExpirationDate: "",
-      firePanels: "",
-      sprinklerSystem: "",
     }
   );
 
@@ -96,15 +89,10 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
       requestedCategory: "",
       propertyManagementLegalEntity: "",
       propertyManagementOfficePhoneNumber: "",
-      payableRemittanceAddress: "",
+      propertyManagementemailAddress: "",
+      vendorPayableRemittanceAddress: "",
       floorPlan: "",
       elvatorPlan: "",
-      buildingStructure: "",
-      roofStructure: "",
-      constructionYear: "",
-      propertyExpirationDate: "",
-      firePanels: "",
-      sprinklerSystem: "",
     }
   );
 
@@ -121,15 +109,10 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
       requestedCategory: "",
       propertyManagementLegalEntity: "",
       propertyManagementOfficePhoneNumber: "",
-      payableRemittanceAddress: "",
+      propertyManagementemailAddress: "",
+      vendorPayableRemittanceAddress: "",
       floorPlan: "",
       elvatorPlan: "",
-      buildingStructure: "",
-      roofStructure: "",
-      constructionYear: "",
-      propertyExpirationDate: "",
-      firePanels: "",
-      sprinklerSystem: "",
     };
     setInitialFormData(existingPropertyInfoData || defaultData);
     setFormData(existingPropertyInfoData || defaultData);
@@ -177,17 +160,9 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             showEditButton={!isEditMode}
             showTextCloseButton={isEditMode}
             editDisabled={isEditDisabled}
-          />
-
-          <PixieDropdown
-            label="Portfolio"
-            options={portfolioOptions}
-            value={formData.portfolioName}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, portfolioName: value }))
-            }
-            isEditing={isEditing}
-            type="large"
+            cardActionContent="Portfolio User %s Edit"
+            hasAccess={portfolioUserAccess}
+            showCardActionContent={hasAccountUserAccess}
           />
 
           <CustomInput
@@ -228,65 +203,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             inputId="physical-property-address-input"
           />
 
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <CustomInput
-              label="Requested building size (sq-ft)"
-              value={formData.requestedBuildingSize}
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  requestedBuildingSize: value,
-                }))
-              }
-              readOnly={!isEditing}
-              isEditing={isEditing}
-              labelClassName="text-tertiary-slateBlue text-sm font-medium"
-              containerClassName="w-full"
-            />
-
-            <PixieDropdown
-              label="Requested category"
-              options={categoryOptions}
-              value={formData.requestedCategory}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, requestedCategory: value }))
-              }
-              isEditing={isEditing}
-              type="large"
-            />
-          </div>
-
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <CustomInput
-              label="Estimated total monthly collections"
-              value={formData.estimatedMonthlyCollection}
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  estimatedMonthlyCollection: value,
-                }))
-              }
-              readOnly={!isEditing}
-              isEditing={isEditing}
-              labelClassName="text-tertiary-slateBlue text-sm font-medium"
-              containerClassName="w-full"
-            />
-
-            <PixieDropdown
-              label="Largest single monthly invoice"
-              options={largestMonthlyInvoiceOptions}
-              value={formData.largestMonthlyInvoice}
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  largestMonthlyInvoice: value,
-                }))
-              }
-              isEditing={isEditing}
-              type="large"
-            />
-          </div>
-
           <CustomInput
             label="Property management legal entity"
             value={formData.propertyManagementLegalEntity}
@@ -302,35 +218,54 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             containerClassName="w-full"
           />
 
-          <CustomInput
-            label="Property management office phone number"
-            value={formData.propertyManagementOfficePhoneNumber}
-            onChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                propertyManagementOfficePhoneNumber: value,
-              }))
-            }
-            readOnly={!isEditing}
-            isEditing={isEditing}
-            className="py-2.5 text-base text-tertiary-deepNavy"
-            labelClassName="text-tertiary-slateBlue text-sm font-medium"
-            placeholder="800-555-1234"
-            containerClassName="w-full"
-          />
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CustomInput
+              label="Property management office phone number"
+              value={formData.propertyManagementOfficePhoneNumber}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  propertyManagementOfficePhoneNumber: value,
+                }))
+              }
+              readOnly={!isEditing}
+              isEditing={isEditing}
+              className="py-2.5 text-base text-tertiary-deepNavy"
+              labelClassName="text-tertiary-slateBlue text-sm font-medium"
+              placeholder="800-555-1234"
+              type="mobile"
+              containerClassName="w-full"
+            />
+            <CustomInput
+              label="Property management email address"
+              value={formData.propertyManagementemailAddress}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  propertyManagementemailAddress: value,
+                }))
+              }
+              readOnly={!isEditing}
+              isEditing={isEditing}
+              className="py-2.5 text-base text-tertiary-deepNavy"
+              labelClassName="text-tertiary-slateBlue text-sm font-medium"
+              containerClassName="w-full"
+              type="email"
+            />
+          </div>
 
           <AddressAutocompleteInput
-            label="Address for payables remittance"
-            value={formData.payableRemittanceAddress}
+            label="Address for vendor payables remittance"
+            value={formData.vendorPayableRemittanceAddress}
             onChange={(value) =>
               setFormData((prev) => ({
                 ...prev,
-                payableRemittanceAddress: value,
+                vendorPayableRemittanceAddress: value,
               }))
             }
             isEditing={isEditing}
             placeholder="Start typing address..."
-            inputId="payable-remittances-address-input"
+            inputId="vendor-payable-remittances-address-input"
           />
 
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -358,76 +293,27 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
           </div>
 
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <PixieDropdown
-              label="Building structure"
-              options={buildingStructureOptions}
-              value={formData.buildingStructure}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, buildingStructure: value }))
-              }
-              isEditing={isEditing}
-              type="large"
-            />
-
-            <PixieDropdown
-              label="Roof structure"
-              options={roofStructureOptions}
-              value={formData.roofStructure}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, roofStructure: value }))
-              }
-              isEditing={isEditing}
-              type="large"
-            />
-          </div>
-
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <PixieDatePicker
-              label="Construction Year"
-              value={formData.constructionYear}
+            <CustomInput
+              label="Requested building size (sq-ft)"
+              value={formData.requestedBuildingSize}
               onChange={(value) =>
                 setFormData((prev) => ({
                   ...prev,
-                  constructionYear: value,
+                  requestedBuildingSize: value,
                 }))
               }
-              isEditing={isEditing}
               readOnly={!isEditing}
-              dateFormat={["year"]}
-            />
-
-            <PixieDatePicker
-              label="Property Fire and Liability Insurance Expiration Date"
-              value={formData.propertyExpirationDate}
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  propertyExpirationDate: value,
-                }))
-              }
               isEditing={isEditing}
-              readOnly={!isEditing}
-            />
-          </div>
-
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <PixieDropdown
-              label="Fire panels"
-              options={firePanelsOptions}
-              value={formData.firePanels}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, firePanels: value }))
-              }
-              isEditing={isEditing}
-              type="large"
+              labelClassName="text-tertiary-slateBlue text-sm font-medium"
+              containerClassName="w-full"
             />
 
             <PixieDropdown
-              label="Sprinkler system"
-              options={sprinklerSystemOptions}
-              value={formData.sprinklerSystem}
+              label="Requested category"
+              options={categoryOptions}
+              value={formData.requestedCategory}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, sprinklerSystem: value }))
+                setFormData((prev) => ({ ...prev, requestedCategory: value }))
               }
               isEditing={isEditing}
               type="large"

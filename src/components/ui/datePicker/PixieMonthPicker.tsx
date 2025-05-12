@@ -177,35 +177,15 @@ const PixieMonthPicker: React.FC<PixieMonthPickerProps> = ({
                     pointerEvents: "unset",
                     userSelect: "none",
                   },
-                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root:hover:not(.Mui-disabled, .Mui-error):before":
-                    {
-                      borderBottom: "none",
-                    },
-                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root.Mui-focused:after":
-                    {
-                      WebkitTransform: "none",
-                    },
-                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root.Mui-focused:before":
-                    {
-                      WebkitTransform: "none",
-                    },
-                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root::after":
-                    {
-                      borderBottom: "none",
-                    },
-                  "& .css-w2yxri-MuiPickersInputBase-root-MuiPickersInput-root::before":
-                    {
-                      borderBottom: "none",
-                    },
-                  "& .css-h5nb1c-MuiPickersSectionList-root-MuiPickersInputBase-sectionsContainer":
-                    {
-                      paddingRight: "32px",
-                      color: "#475467",
-                      fontSize: 14,
-                      fontFamily: "Inter",
-                    },
+                  "& .MuiPickersSectionList-root": {
+                    paddingRight: "32px",
+                    color: "#475467",
+                    fontSize: 14,
+                    fontFamily: "Inter",
+                  },
                 },
                 InputProps: {
+                  disableUnderline: true,
                   endAdornment: (
                     <div
                       role="button"

@@ -4,16 +4,20 @@ import { X, Info } from "lucide-react";
 interface SectionHeaderProps {
   title: string;
   onEdit?: () => void;
-  onClose?: () => void; // For the X button
-  onTextCancel?: () => void; // For the new text-based Close button
+  onClose?: () => void;
+  onTextCancel?: () => void;
+  onAccessToggle?: (newAccess: boolean) => void;
   showEditButton?: boolean;
-  showCloseButton?: boolean; // For the X button
-  showTextCloseButton?: boolean; // For the new text-based Close button
+  showCloseButton?: boolean;
+  showTextCloseButton?: boolean;
   showInfo?: boolean;
   infoContent?: string;
-  editDisabled?: boolean; // New prop to disable the Edit button
-  editLabel?: string; // Optional label for the Edit button
+  editDisabled?: boolean;
+  editLabel?: string;
   closeLabel?: string;
+  cardActionContent?: string;
+  hasAccess?: boolean;
+  showCardActionContent?: boolean;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -21,19 +25,25 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   onEdit,
   onClose,
   onTextCancel,
+  onAccessToggle,
   showEditButton = false,
   showCloseButton = false,
   showTextCloseButton = false,
   showInfo = false,
   infoContent = "",
-  editDisabled = false, // Default to false
-  editLabel = "Edit", // Default label for the Edit button
+  editDisabled = false,
+  editLabel = "Edit",
   closeLabel = "Cancel",
+  cardActionContent = "",
+  hasAccess = false,
+  showCardActionContent = false,
 }) => {
+  const [localAccess, setLocalAccess] = useState(hasAccess);
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<"left" | "right">(
     "left"
   );
+  const [isHovered, setIsHovered] = useState(false); // Track hover state
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -50,14 +60,26 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     return () => window.removeEventListener("resize", updatePosition);
   }, []);
 
+  const handleAccessClick = () => {
+    const newAccess = !localAccess;
+    setLocalAccess(newAccess);
+    onAccessToggle?.(newAccess);
+  };
+
+  // Split the cardActionContent to isolate "Can"/"Cannot"
+  const contentParts = cardActionContent.split("%s");
+  const beforeAccess = contentParts[0] || "";
+  const afterAccess = contentParts[1] || "";
+  const accessText = localAccess ? "Can" : "Cannot";
+
   return (
     <div className="flex items-center gap-4 w-full">
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         <div className="text-card-open-regular text-xl font-bold font-['Inter'] leading-[30px]">
           {title}
         </div>
         {showInfo && (
-          <div className="ml-4 relative">
+          <div className="relative">
             <button
               ref={buttonRef}
               className="text-gray-400 hover:text-gray-600 align-middle"
@@ -97,6 +119,36 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
               </div>
             )}
           </div>
+        )}
+        {!showEditButton && cardActionContent && showCardActionContent && (
+          <button
+            onClick={handleAccessClick}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="inline-flex justify-center items-center gap-1.5 overflow-hidden"
+            data-hierarchy="Link gray"
+            data-icon="Default"
+            data-size="sm"
+            data-state="Default"
+            data-icon-trailing="false"
+            data-icon-leading="false"
+          >
+            <div className="justify-start">
+              <span className="text-[#475466] text-sm font-semibold font-['Inter'] leading-tight">
+                {beforeAccess}
+              </span>
+              <span
+                className={`text-[#475466] text-sm font-semibold font-['Inter'] leading-tight ${
+                  isHovered ? "underline" : ""
+                }`}
+              >
+                {accessText}
+              </span>
+              <span className="text-[#475466] text-sm font-semibold font-['Inter'] leading-tight">
+                {afterAccess}
+              </span>
+            </div>
+          </button>
         )}
       </div>
       <div className="grow h-px bg-card-open-stroke" />

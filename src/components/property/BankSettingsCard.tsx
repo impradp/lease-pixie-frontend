@@ -10,6 +10,7 @@ import SectionHeader from "@/components/ui/header/SectionHeader";
 import { ToggleSwitch } from "@/components/ui/input/ToggleSwitch";
 import PlaidPaymentSetup from "@/components/ui/PlaidPaymentSetup";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
+import { hasRole } from "@/lib/utils/authUtils";
 
 /**
  * Props for the BankSettingsCard component
@@ -56,7 +57,14 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
   const [initialFormData, setInitialFormData] =
     useState<BankSettingsData>(initialBankData);
 
+  const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
+
+  const hasAccountUserAccess = hasRole("AccountUser");
+
   useEffect(() => {
+    // TODO: Check with the API whether settings card is accessible for edit
+    // For now, setting a default value that won't cause infinite renders
+    setPortfolioUserAccess(false);
     setFormData(initialBankData);
     setInitialFormData(initialBankData);
   }, []);
@@ -136,6 +144,9 @@ const BankSettingsCard: React.FC<BankSettingsCardProps> = ({
         editDisabled={isEditDisabled}
         showInfo={showInfo}
         infoContent={showInfoContent}
+        cardActionContent="Portfolio User %s Edit"
+        hasAccess={portfolioUserAccess}
+        showCardActionContent={hasAccountUserAccess}
       />
       <CustomDropdown
         label="Deposit and merchant bank account"

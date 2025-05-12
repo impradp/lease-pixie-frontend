@@ -10,6 +10,7 @@ import LinkButton from "@/components/ui/buttons/LinkButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import CustomTextArea from "@/components/ui/input/CustomTextArea";
 import { CustomCheckbox } from "@/components/ui/input/CustomCheckbox";
+import { hasRole } from "@/lib/utils/authUtils";
 
 const AddressAutocompleteInput = dynamic(
   () =>
@@ -52,10 +53,23 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
       phoneForInvoiceHeader: "",
       taxRateBaseRentFlag: false,
       taxRateBaseRent: "",
+      estimatedTotalMonthlyCollections: "",
+      largestSingleMonthlyInvoice: "",
       defaultNoticeBody: "",
       w9CompletedFile: "",
     }
   );
+  const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
+
+  const hasAccountUserAccess = hasRole("AccountUser");
+
+  // Move the access check into useEffect to avoid infinite renders
+  useEffect(() => {
+    // TODO: Check with the API whether settings card is accessible for edit
+    // For now, setting a default value that won't cause infinite renders
+    setPortfolioUserAccess(false);
+  }, []); // Empty dependency array means this runs once on mount
+
   const [initialFormData, setInitialFormData] = useState<InvoiceSettingsData>(
     existingInvoiceSettings || {
       entityForInvoiceHeader: "",
@@ -63,6 +77,8 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
       phoneForInvoiceHeader: "",
       taxRateBaseRentFlag: false,
       taxRateBaseRent: "",
+      estimatedTotalMonthlyCollections: "",
+      largestSingleMonthlyInvoice: "",
       defaultNoticeBody: "",
       w9CompletedFile: "",
     }
@@ -77,6 +93,8 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
         phoneForInvoiceHeader: "",
         taxRateBaseRentFlag: false,
         taxRateBaseRent: "",
+        estimatedTotalMonthlyCollections: "",
+        largestSingleMonthlyInvoice: "",
         defaultNoticeBody: "",
         w9CompletedFile: "",
       }
@@ -88,6 +106,8 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
         phoneForInvoiceHeader: "",
         taxRateBaseRentFlag: false,
         taxRateBaseRent: "",
+        estimatedTotalMonthlyCollections: "",
+        largestSingleMonthlyInvoice: "",
         defaultNoticeBody: "",
         w9CompletedFile: "",
       }
@@ -154,6 +174,9 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
           editDisabled={isEditDisabled}
           showInfo={showInfo}
           infoContent={infoContent}
+          cardActionContent="Portfolio User %s Edit"
+          hasAccess={portfolioUserAccess}
+          showCardActionContent={hasAccountUserAccess}
         />
 
         <CustomInput
@@ -172,7 +195,7 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
         />
 
         <AddressAutocompleteInput
-          label="Entity for invoice header"
+          label="Address for invoice header"
           value={formData.addressForInvoiceHeader}
           onChange={(value) =>
             setFormData((prev) => ({
@@ -229,6 +252,39 @@ const InvoiceSettingsCard: React.FC<InvoiceSettingsCardProps> = ({
           labelClassName="hidden"
           containerClassName="w-full"
         />
+
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomInput
+            label="Estimated total monthly collections"
+            value={formData.estimatedTotalMonthlyCollections}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                estimatedTotalMonthlyCollections: value,
+              }))
+            }
+            readOnly={!isEditMode}
+            isEditing={isEditMode}
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
+            containerClassName="w-full"
+            type="money"
+          />
+          <CustomInput
+            label="Largest single monthly invoice"
+            value={formData.largestSingleMonthlyInvoice}
+            onChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                largestSingleMonthlyInvoice: value,
+              }))
+            }
+            readOnly={!isEditMode}
+            isEditing={isEditMode}
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
+            containerClassName="w-full"
+            type="money"
+          />
+        </div>
 
         <CustomTextArea
           label="Default notice text body"

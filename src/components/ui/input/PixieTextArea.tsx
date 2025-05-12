@@ -111,7 +111,7 @@ const PixieTextArea: React.FC<PixieTextAreaProps> = ({
           maxLength={maxLength}
           className={`flex-1 ${className} font-normal font-['Inter'] leading-normal outline-none bg-transparent resize-none placeholder:text-tertiary-slateMist ${
             disabled ? "cursor-not-allowed" : ""
-          }`}
+          } ${isEditing ? "" : "cursor-default"}`}
         />
         {!disabled && !readOnly && isEditing && (
           <button
@@ -147,7 +147,7 @@ const PixieTextArea: React.FC<PixieTextAreaProps> = ({
               <PixieButton
                 label="Cancel"
                 onClick={handleCancel}
-                className="bg-gray-300 text-gray-700 hover:bg-gray-500"
+                className="text-gray-700 bg-gray-500"
               />
               <PixieButton label="Save" onClick={handleSave} />
             </div>

@@ -35,6 +35,7 @@ interface PixieDropdownProps {
   customInputClassName?: string;
   type?: "large" | "default" | "small";
   showFilterIcon?: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -59,19 +60,15 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   customInputClassName,
   type = "small",
   showFilterIcon = false,
+  disabled = false,
 }) => {
-  // Track if dropdown menu is open
   const [isOpen, setIsOpen] = useState(false);
-  // Track the currently selected value
   const [selectedValue, setSelectedValue] = useState<string>(value);
-  // Ref for the dropdown container element for click-outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
-  // Ref for the options list for focus management
   const listboxRef = useRef<HTMLUListElement>(null);
-  // Unique ID for associating label with input
+  const inputRef = useRef<HTMLDivElement>(null); // New ref for the input field
   const inputId = useId();
 
-  // Define size-based styling based on the type prop
   let sizeClassName: string;
   let sizeLabelClassName: string;
   let sizeContainerClassName: string;
@@ -79,7 +76,6 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   let dropdownPosition: string;
   let optionItemClassName: string;
 
-  // Set styling variables based on dropdown size type
   if (type === "large") {
     sizeClassName = className ?? "self-stretch";
     sizeLabelClassName =
@@ -87,49 +83,48 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
       "justify-start text-tertiary-slateBlue text-sm font-medium font-['Inter'] leading-tight";
     sizeContainerClassName =
       containerClassName ??
-      "self-stretch flex flex-col justify-start items-start gap-1.5";
+      "w-full flex flex-col justify-start items-start gap-1.5";
     sizeCustomInputClassName =
       customInputClassName ??
       "h-11 px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline-none text-tertiary-light text-base font-normal font-['Inter'] leading-normal";
     dropdownPosition = "top-[calc(100%+0.375rem)]";
-    optionItemClassName =
-      "py-2.5 text-tertiary-light text-base font-normal font-['Inter'] leading-normal cursor-pointer";
+    optionItemClassName = `py-2.5 text-tertiary-light text-base font-normal font-['Inter'] leading-normal ${
+      isEditing ? "cursor-pointer" : ""
+    }`;
   } else if (type === "default") {
-    sizeClassName = className ?? "xs:w-[200px]";
+    sizeClassName = className ?? "w-full xs:w-[200px]";
     sizeLabelClassName =
       labelClassName ?? "text-secondary-light text-sm font-bold leading-[20px]";
     sizeContainerClassName =
-      containerClassName ?? "xs:w-[500px] h-[50px] gap-2 items-center";
+      containerClassName ?? "w-full h-[50px] gap-2 items-center";
     sizeCustomInputClassName = customInputClassName ?? "h-10";
     dropdownPosition = "top-[50px]";
-    optionItemClassName =
-      "py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight hover:bg-tertiary-space cursor-pointer";
+    optionItemClassName = `py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight hover:bg-tertiary-space ${
+      isEditing ? "cursor-pointer" : ""
+    }`;
   } else {
-    // "small" - uses original defaults
-    sizeClassName = className ?? "xs:w-[153px]";
+    sizeClassName = className ?? "w-full xs:w-[153px]";
     sizeLabelClassName =
       labelClassName ?? "text-secondary-light text-xs font-bold leading-[18px]";
     sizeContainerClassName =
-      containerClassName ?? "xs:w-[460px] h-[42px] gap-2 items-center";
+      containerClassName ?? "w-full h-[42px] gap-2 items-center";
     sizeCustomInputClassName = customInputClassName ?? "h-9";
     dropdownPosition = "top-[42px]";
-    optionItemClassName =
-      "py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight cursor-pointer";
+    optionItemClassName = `py-2 text-tertiary-light text-sm font-normal font-['Inter'] leading-tight ${
+      isEditing ? "cursor-pointer" : ""
+    }`;
   }
 
-  // Ensure options are properly formatted with value and label properties
   const formattedOptions: DropdownOption[] = options.map((opt) =>
     typeof opt === "object" && "value" in opt && "label" in opt
       ? opt
       : { value: String(opt), label: String(opt) }
   );
 
-  // Update selectedValue when the value prop changes
   useEffect(() => {
     setSelectedValue(value);
   }, [value]);
 
-  // Get the currently selected option object or fallback to placeholder
   const selectedOption = isLocked
     ? { label: lockMessage ?? "Locked", value: "" }
     : formattedOptions.find((option) => option.value === selectedValue) || {
@@ -137,19 +132,12 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
         label: placeholder ?? "Select option",
       };
 
-  /**
-   * Toggles dropdown menu open/closed when clicked
-   */
   const handleClick = () => {
     if (isEditing) {
       setIsOpen(!isOpen);
     }
   };
 
-  /**
-   * Handles keyboard interactions with the dropdown field
-   * @param {React.KeyboardEvent} event - Keyboard event
-   */
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (isEditing) {
       if (event.key === "Enter" || event.key === " ") {
@@ -161,10 +149,6 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     }
   };
 
-  /**
-   * Handles selection of an option from the dropdown
-   * @param {DropdownOption} option - The selected option
-   */
   const handleOptionClick = (option: DropdownOption) => {
     setSelectedValue(option.value);
     if (onChange) {
@@ -173,11 +157,6 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     setIsOpen(false);
   };
 
-  /**
-   * Handles keyboard interactions for dropdown options
-   * @param {React.KeyboardEvent} event - Keyboard event
-   * @param {DropdownOption} option - The current option
-   */
   const handleOptionKeyDown = (
     event: React.KeyboardEvent,
     option: DropdownOption
@@ -188,12 +167,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     }
   };
 
-  // Add click-outside listener to close dropdown when clicking elsewhere
   useEffect(() => {
-    /**
-     * Closes dropdown when user clicks outside the component
-     * @param {MouseEvent} event - Mouse click event
-     */
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef?.current &&
@@ -207,34 +181,48 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Dynamically set dropdown width to match input field width
+  useEffect(() => {
+    if (!listboxRef.current || !inputRef.current || !isOpen) return;
+
+    const setDropdownWidth = () => {
+      const inputWidth = inputRef.current!.offsetWidth;
+      listboxRef.current!.style.width = `${inputWidth}px`;
+    };
+
+    const observer = new ResizeObserver(setDropdownWidth);
+    observer.observe(inputRef.current);
+
+    setDropdownWidth(); // Initial set
+
+    return () => observer.disconnect();
+  }, [isOpen]);
+
   return (
     <div
       className={`w-full justify-end ${sizeContainerClassName} inline-flex relative`}
       ref={dropdownRef}
     >
-      {/* Render label if provided */}
       {label && (
-        <div
+        <label
           className={`${sizeLabelClassName} font-['Inter'] ${
-            isEditing ? "" : "opacity-50"
+            disabled ? "opacity-50" : ""
           }`}
         >
           {label}
-        </div>
+        </label>
       )}
       <div
         className={`w-full ${sizeClassName} self-stretch justify-start items-center gap-2 flex`}
       >
-        {/* Main dropdown input field */}
         <div
+          ref={inputRef} // Attach ref to the input div
           id={inputId}
           tabIndex={isEditing ? 0 : -1}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           className={`w-full grow shrink basis-0 px-3.5 py-2.5 bg-white rounded-lg border border-tertiary-stroke justify-start items-center gap-2 flex overflow-hidden ${sizeCustomInputClassName} ${
-            isEditing && !isLocked
-              ? "cursor-pointer"
-              : "opacity-50 cursor-not-allowed"
+            isEditing && !isLocked ? "cursor-pointer" : ""
           }`}
           aria-label={label || "Dropdown selection"}
           aria-haspopup="listbox"
@@ -246,16 +234,12 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
             className={`grow shrink basis-0 h-5 justify-between items-center flex`}
           >
             <div className="justify-start items-center gap-2 flex">
-              {/* Display selected option label or placeholder */}
-              <div
-                className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight ${
-                  isEditing ? "" : "opacity-50"
-                }`}
+              <label
+                className={`text-tertiary-light ${optionItemClassName} font-normal font-['Inter'] leading-tight`}
               >
                 {selectedOption.label}
-              </div>
+              </label>
             </div>
-            {/* Render dropdown chevron icon if editable */}
             {isEditing && !isLocked && !showFilterIcon && (
               <ChevronRight
                 className={`w-4 h-4 text-tertiary-slateMist transition-transform duration-300 ${
@@ -270,7 +254,6 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
         </div>
       </div>
 
-      {/* Options dropdown menu */}
       {isOpen && !isLocked && (
         <ul
           id={`${inputId}-options`}
@@ -281,9 +264,8 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
           aria-activedescendant={
             selectedValue ? `option-${selectedValue}` : undefined
           }
-          className={`absolute z-10 right-0 ${dropdownPosition} w-full ${sizeClassName} bg-white rounded-lg shadow-lg border border-tertiary-stroke max-h-60 overflow-auto p-0 m-0 list-none`}
+          className={`absolute z-10 right-0 ${dropdownPosition} w-full bg-white rounded-lg shadow-lg border border-tertiary-stroke max-h-60 overflow-auto p-0 m-0 list-none`}
         >
-          {/* Render each option in the dropdown */}
           {formattedOptions.map((option, index) => {
             const isSelected = option.value === selectedValue;
             const isLast = index === formattedOptions.length - 1;

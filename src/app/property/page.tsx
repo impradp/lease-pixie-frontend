@@ -1,34 +1,44 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useContext, useCallback } from "react";
 import { Locale } from "@/locales";
 import toastr from "@/lib/func/toastr";
 import { getMessages } from "@/locales/locale";
-import { sampleStar, sampleSeats } from "@/data/workflowStars";
 import { sampleBankAccounts } from "@/data/accounts";
+import { sampleStar, sampleSeats } from "@/data/workflowStars";
+import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import LoadingOverlay from "@/components/ui/loader/LoadingOverlay";
 import PropertyInfoCard from "@/components/property/PropertyInfoCard";
 import BankSettingsCard from "@/components/property/BankSettingsCard";
-import Breadcrumbs from "@/components/ui/breadcrumbs/Breadcrumbs";
 import SpaceSettingsCard from "@/components/property/SpaceSettingsCard";
 import InvoiceSettingsCard from "@/components/property/InvoiceSettingsCard";
 import { WorkflowAutomationSync } from "@/components/property/WorkflowAutomationSync";
 import {
-  buildingStructureOptions,
   categoryOptions,
   elevatorPlanOptions,
   existingInvoiceSettingsData,
   existingPropertyInfoData,
-  firePanelsOptions,
   floorPlanOptions,
-  largestMonthlyInvoiceOptions,
-  portfolioOptions,
-  roofStructureOptions,
-  sprinklerSystemOptions,
 } from "@/data/Properties";
 import WorkflowStars from "@/components/property/WorkflowStars";
 import WorkflowSeats from "@/components/property/WorkflowSeats";
 import { sampleVendors } from "@/data/users";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
+import { useSearchParams } from "next/navigation";
+import handleToast from "@/lib/utils/toastr";
+import { hasRole } from "@/lib/utils/authUtils";
+import InsuranceCard from "@/components/property/InsuranceCard";
+import CreateSettingsCard from "@/components/property/CreateSettingsCard";
+import AmortizedExpensesCard from "@/components/property/AmortizedExpensesCard";
+import PropertyExpensesCard from "@/components/property/PropertyExpensesCard";
+import HVACUnitsCard from "@/components/property/HVACUnits";
+import MeteredUtilitiesCard from "@/components/property/MeteredUtilitiesCard";
+import MetersCard from "@/components/property/MetersCard";
+import AmortizationExpensesCard from "@/components/property/AmortizationExpensesCard";
+import CustomCategoriesCard from "@/components/property/CustomCategoriesCard";
+import VendorsCard from "@/components/property/VendorsCard";
+import RealEstateTaxesCard from "@/components/property/RealEstateTaxesCard";
+import ScheduledWorkCard from "@/components/property/ScheduledWorkCard";
 
 /**
  * Renders the content for the property page
@@ -37,8 +47,15 @@ import { sampleVendors } from "@/data/users";
 function PropertyContent() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
+  const searchParams = useSearchParams();
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, setLoading } = useContext(LoadingContext);
+  const [isReadonly, setIsReadonly] = useState(false);
+
+  const isSubmitting = useCallback(
+    (value: boolean) => setLoading(value),
+    [setLoading]
+  );
 
   const handleEdit = () => {};
 
@@ -114,8 +131,9 @@ function PropertyContent() {
   };
 
   useEffect(() => {
-    setIsLoading(false);
-  }, []);
+    setIsReadonly(hasRole("READONLYADMINUSER"));
+    handleToast(searchParams); // Display toast based on search params
+  }, [searchParams]);
 
   const emptyStarOption = sampleStar.find((opt) => opt.value === "");
   const emptySeatOption = sampleSeats.find((opt) => opt.value === "");
@@ -142,7 +160,7 @@ function PropertyContent() {
   });
 
   const breadcrumbItems = [
-    { href: "/admin", label: "Admin Dashboard" },
+    { href: "/account", label: "Account Dashboard" },
     { href: "#", label: "Add Property", isActive: true },
   ];
 
@@ -156,6 +174,14 @@ function PropertyContent() {
 
       <div className="max-w-[800px] mx-auto space-y-8 py-4">
         <div className="space-y-8">
+          <CreateSettingsCard
+            sectionName="create-settings"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+            isSubmitting={isSubmitting}
+            isEditable={!isLoading && !isReadonly}
+          />
           <SpaceSettingsCard
             onEdit={handleEdit}
             sectionId="propertySettingsCard"
@@ -177,16 +203,18 @@ function PropertyContent() {
             onSectionEdit={handleSectionEdit}
             onSectionClose={handleSectionClose}
             handlePropertyInfoUpdate={handlePropertyInfoUpdate}
-            portfolioOptions={portfolioOptions}
             existingPropertyInfoData={existingPropertyInfoData}
-            largestMonthlyInvoiceOptions={largestMonthlyInvoiceOptions}
             categoryOptions={categoryOptions}
             floorPlanOptions={floorPlanOptions}
             elevatorPlanOptions={elevatorPlanOptions}
-            buildingStructureOptions={buildingStructureOptions}
-            roofStructureOptions={roofStructureOptions}
-            sprinklerSystemOptions={sprinklerSystemOptions}
-            firePanelsOptions={firePanelsOptions}
+          />
+          <InsuranceCard
+            sectionName="insurance-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+            isSubmitting={isSubmitting}
+            isEditable={!isLoading && !isReadonly}
           />
           <InvoiceSettingsCard
             onEdit={handleEdit}
@@ -198,7 +226,7 @@ function PropertyContent() {
             existingInvoiceSettings={existingInvoiceSettingsData}
             showInfo={true}
             infoContent={
-              "Invoice Settings: This info is related to invoice settings."
+              "Invoice Settings: used to certify mail default letter to tenants, the letter will include a list of invoices wth associated amounts that are past due."
             }
           />
           <BankSettingsCard
@@ -213,7 +241,7 @@ function PropertyContent() {
             pendingAccountApproval={false}
             showInfo={true}
             showInfoContent={
-              "Bank Settings: This info is related to bank accounts."
+              "Deposit and Merchant Bank Account:  used for receivables payment processing, tenant pushed ACH payments, and tenant check deposits."
             }
           />
           <WorkflowAutomationSync
@@ -270,6 +298,75 @@ function PropertyContent() {
               "Leasing seat (Licensed broker or property owner only): Sample Info",
               "Attorney seat (Licensed attorney only): Sample Info",
             ]}
+          />
+
+          <AmortizedExpensesCard
+            sectionName="amortized-expenses-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <PropertyExpensesCard
+            sectionName="property-expenses-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <HVACUnitsCard
+            sectionName="hvac-units-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <MeteredUtilitiesCard
+            sectionName="metered-utilities-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <MetersCard
+            sectionName="meters-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <AmortizationExpensesCard
+            sectionName="amortization-expenses-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <CustomCategoriesCard
+            sectionName="custom-categories-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+          <VendorsCard
+            sectionName="vendors-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <RealEstateTaxesCard
+            sectionName="real-estate-taxes-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
+          />
+
+          <ScheduledWorkCard
+            sectionName="scheduled-work-card"
+            editingSection={editingSection}
+            onSectionEdit={handleSectionEdit}
+            onSectionClose={handleSectionClose}
           />
         </div>
       </div>

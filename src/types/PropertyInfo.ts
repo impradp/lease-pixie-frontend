@@ -9,13 +9,8 @@ export type PropertyInfoData = {
   largestMonthlyInvoice: string;
   propertyManagementLegalEntity: string;
   propertyManagementOfficePhoneNumber: string;
-  payableRemittanceAddress: string;
+  propertyManagementemailAddress: string;
+  vendorPayableRemittanceAddress: string;
   floorPlan: string;
   elvatorPlan: string;
-  buildingStructure: string;
-  roofStructure: string;
-  constructionYear: string;
-  propertyExpirationDate: string;
-  firePanels: string;
-  sprinklerSystem: string;
 };

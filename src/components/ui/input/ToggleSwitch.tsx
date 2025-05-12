@@ -17,7 +17,7 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
     <div
       className={`w-9 h-5 rounded-xl flex items-center p-0.5 overflow-hidden ${
         isOn ? "bg-secondary-space" : "bg-primary-space"
-      } ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"} ${className}`}
+      } ${isDisabled ? "cursor-default" : "cursor-pointer"} ${className}`}
       onClick={isDisabled ? undefined : onToggle}
       style={{ minWidth: "36px" }}
     >

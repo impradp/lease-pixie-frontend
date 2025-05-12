@@ -10,6 +10,7 @@ import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { CustomDropdown } from "@/components/ui/input/CustomDropdown";
 import { IconLinkButton } from "@/components/ui/buttons/IconLinkButton";
+import { hasRole } from "@/lib/utils/authUtils";
 
 /**
  * Form data structure for workflow stars
@@ -82,6 +83,16 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
     useState<WorkflowStarsFormData>(initialFormData); // Original form data
   const [showNewStarModal, setShowNewStarModal] = useState(false); // Controls new user modal visibility
   const [isEditMode, setIsEditMode] = useState(false); // Tracks edit mode state
+  const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
+
+  const hasAccountUserAccess = hasRole("AccountUser");
+
+  // Move the access check into useEffect to avoid infinite renders
+  useEffect(() => {
+    // TODO: Check with the API whether settings card is accessible for edit
+    // For now, setting a default value that won't cause infinite renders
+    setPortfolioUserAccess(false);
+  }, []);
 
   /**
    * Syncs form data with initial props
@@ -218,6 +229,9 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
           showEditButton={!isEditMode}
           showTextCloseButton={isEditMode}
           editDisabled={isEditDisabled}
+          cardActionContent="Portfolio User %s Edit"
+          hasAccess={portfolioUserAccess}
+          showCardActionContent={hasAccountUserAccess}
         />
 
         <CustomDropdown
@@ -242,7 +256,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("maintainenceStarThreshold", value)
             }
             isEditing={isEditMode}
-            className="w-[162px]"
+            className={"xs:w-[162px]"}
           />
         </div>
 
@@ -275,7 +289,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("accountingStarThreshold", value)
             }
             isEditing={isEditMode}
-            className="w-[162px]"
+            className={"xs:w-[162px]"}
           />
         </div>
         {isEditMode && (
@@ -307,7 +321,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("leaseStarThreshold", value)
             }
             isEditing={isEditMode}
-            className="w-[162px]"
+            className={"xs:w-[162px]"}
           />
         </div>
         {isEditMode && (
@@ -339,7 +353,7 @@ const WorkflowStars: React.FC<WorkflowStarsProps> = ({
               handleThresholdChange("billPayStarThreshold", value)
             }
             isEditing={isEditMode}
-            className="w-[162px]"
+            className={"xs:w-[162px]"}
           />
         </div>
 

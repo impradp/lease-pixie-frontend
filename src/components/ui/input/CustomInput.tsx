@@ -380,8 +380,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
           disabled={disabled}
           maxLength={maxCharLength || undefined}
           className={`flex-1 ${className} font-normal font-['Inter'] leading-normal outline-none bg-transparent placeholder:text-tertiary-slateMist ${
-            disabled ? "cursor-not-allowed" : ""
-          }`}
+            isEditing ? "" : "cursor-default"
+          } ${disabled ? "cursor-not-allowed" : ""}`}
         />
         {type === "password" && (
           <button

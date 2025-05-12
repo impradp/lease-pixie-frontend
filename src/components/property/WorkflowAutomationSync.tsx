@@ -10,6 +10,7 @@ import LinkButton from "@/components/ui/buttons/LinkButton";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { SectionHeader } from "@/components/ui/header/SectionHeader";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
+import { hasRole } from "@/lib/utils/authUtils";
 
 const PixieMonthPicker = dynamic(
   () => import("@/components/ui/datePicker/PixieMonthPicker"),
@@ -76,6 +77,16 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
+
+  const hasAccountUserAccess = hasRole("AccountUser");
+
+  // Move the access check into useEffect to avoid infinite renders
+  useEffect(() => {
+    // TODO: Check with the API whether settings card is accessible for edit
+    // For now, setting a default value that won't cause infinite renders
+    setPortfolioUserAccess(false);
+  }, []);
 
   const initialFormData: FormData = {
     syncAutomation: false,
@@ -238,6 +249,9 @@ export const WorkflowAutomationSync: React.FC<WorkflowAutomationSyncProps> = ({
           editDisabled={isEditDisabled}
           showInfo={true}
           infoContent={info ?? ""}
+          cardActionContent="Portfolio User %s Edit"
+          hasAccess={portfolioUserAccess}
+          showCardActionContent={hasAccountUserAccess}
         />
 
         <div className="flex flex-col xs:flex-row xs:items-center gap-4 xs:gap-[50px]">

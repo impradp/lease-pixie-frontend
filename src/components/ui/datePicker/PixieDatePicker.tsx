@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
+import dayjs from "dayjs";
+import { Calendar } from "lucide-react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker as MUIDatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Calendar } from "lucide-react";
-import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 interface PixieDatePickerProps {
   label?: string;
@@ -100,55 +101,18 @@ export const PixieDatePicker: React.FC<PixieDatePickerProps> = ({
               textField: {
                 variant: "standard",
                 sx: {
-                  "& .MuiInputBase-root": {
+                  "& .MuiPickersInputBase-root": {
                     width: "100%",
                     height: "44px",
                     padding: "0 14px",
                     backgroundColor: "white",
                     borderRadius: "8px",
                     border: "1px solid #cfd4dc",
-                    "&:hover": {
-                      borderColor: "#cfd4dc",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    display: "none",
-                  },
-                  "& .MuiInputBase-input": {
-                    paddingRight: "32px",
-                    color: "#475467",
-                    fontSize: 16,
-                    fontFamily: "Inter",
-                    height: "44px",
-                    boxSizing: "border-box",
-                    "&:disabled": {
-                      color: "#9CA3AF",
-                      WebkitTextFillColor: "#9CA3AF",
-                    },
-                    "&.Mui-disabled": {
-                      WebkitTextFillColor: "#475466",
-                    },
-                  },
-                  "& .MuiInput-underline": {
-                    "&:before": {
-                      borderBottomColor: "transparent",
-                    },
-                    "&:hover:not(.Mui-disabled):before": {
-                      borderBottomColor: "transparent",
-                    },
-                    "&:after": {
-                      borderBottomColor: "rgba(71, 84, 102, 1)",
-                    },
-                  },
-                  "& .MuiInputBase-colorPrimary": {
-                    "&.Mui-focused": {
-                      "& .MuiInput-underline:after": {
-                        borderBottomColor: "transparent",
-                      },
-                    },
+                    cursor: `${isEditing ? "pointer" : "default"}`,
                   },
                 },
                 InputProps: {
+                  disableUnderline: true,
                   endAdornment: (
                     <Calendar
                       className={`w-5 h-5 stroke-secondary-icon absolute right-2 top-1/2 transform -translate-y-1/2 ${
