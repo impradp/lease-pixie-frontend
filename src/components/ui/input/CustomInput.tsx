@@ -350,7 +350,9 @@ const CustomInput: React.FC<CustomInputProps> = ({
         }`}
       >
         {label}
-        {isRequired && <span className="text-[#878aa4] text-sm"> *</span>}
+        {isRequired && (
+          <span className="text-tertiary-muteBlueGray text-sm"> *</span>
+        )}
       </label>
       <div
         className={`px-3.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)_inset] outline outline-1 outline-offset-[-1px] outline-tertiary-stroke flex items-center ${

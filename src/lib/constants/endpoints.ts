@@ -91,7 +91,7 @@ export const ENDPOINTS = {
 
   PROPERTY: {
     FETCH: {
-      DEFAULT: "/api/v1/properties",
+      DEFAULT: "/api/v1/property",
       BY_ACCOUNT_ID: "/api/v1/properties/account/%s",
     },
   },

@@ -128,7 +128,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           className="text-card-input-label text-sm font-medium font-['Inter'] leading-tight"
         >
           {label}
-          {isRequired && <span className="text-[#878aa4] text-sm "> *</span>}
+          {isRequired && (
+            <span className="text-tertiary-muteBlueGray text-sm"> *</span>
+          )}
         </label>
         {showInfo && (
           <div className="relative">

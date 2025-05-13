@@ -14,31 +14,35 @@ import SpaceSettingsCard from "@/components/property/SpaceSettingsCard";
 import InvoiceSettingsCard from "@/components/property/InvoiceSettingsCard";
 import { WorkflowAutomationSync } from "@/components/property/WorkflowAutomationSync";
 import {
-  categoryOptions,
-  elevatorPlanOptions,
+  defaultPropertyInfo,
   existingInvoiceSettingsData,
-  existingPropertyInfoData,
-  floorPlanOptions,
 } from "@/data/Properties";
-import WorkflowStars from "@/components/property/WorkflowStars";
-import WorkflowSeats from "@/components/property/WorkflowSeats";
 import { sampleVendors } from "@/data/users";
-import { LoadingContext } from "@/components/ClientLoadingWrapper";
-import { useSearchParams } from "next/navigation";
 import handleToast from "@/lib/utils/toastr";
 import { hasRole } from "@/lib/utils/authUtils";
-import InsuranceCard from "@/components/property/InsuranceCard";
-import CreateSettingsCard from "@/components/property/CreateSettingsCard";
-import AmortizedExpensesCard from "@/components/property/AmortizedExpensesCard";
-import PropertyExpensesCard from "@/components/property/PropertyExpensesCard";
-import HVACUnitsCard from "@/components/property/HVACUnits";
-import MeteredUtilitiesCard from "@/components/property/MeteredUtilitiesCard";
+import handleInfo from "@/lib/utils/errorHandler";
+import { getDefaultPage } from "@/config/roleAccess";
+import { ActivityMetadata, PropertyInfoData } from "@/types/PropertyInfo";
+import { propertyService } from "@/lib/services/property";
 import MetersCard from "@/components/property/MetersCard";
-import AmortizationExpensesCard from "@/components/property/AmortizationExpensesCard";
-import CustomCategoriesCard from "@/components/property/CustomCategoriesCard";
 import VendorsCard from "@/components/property/VendorsCard";
-import RealEstateTaxesCard from "@/components/property/RealEstateTaxesCard";
+import HVACUnitsCard from "@/components/property/HVACUnits";
+import { useRouter, useSearchParams } from "next/navigation";
+import PixieButton from "@/components/ui/buttons/PixieButton";
+import WorkflowSeats from "@/components/property/WorkflowSeats";
+import InsuranceCard from "@/components/property/InsuranceCard";
+import WorkflowStars from "@/components/property/WorkflowStars";
+import { LoadingContext } from "@/components/ClientLoadingWrapper";
 import ScheduledWorkCard from "@/components/property/ScheduledWorkCard";
+import CreateSettingsCard from "@/components/property/CreateSettingsCard";
+import RealEstateTaxesCard from "@/components/property/RealEstateTaxesCard";
+import PropertyExpensesCard from "@/components/property/PropertyExpensesCard";
+import MeteredUtilitiesCard from "@/components/property/MeteredUtilitiesCard";
+import CustomCategoriesCard from "@/components/property/CustomCategoriesCard";
+import AmortizedExpensesCard from "@/components/property/AmortizedExpensesCard";
+import AmortizationExpensesCard from "@/components/property/AmortizationExpensesCard";
+import { DropdownOption } from "@/types/user";
+import { portfolioService } from "@/lib/services/portfolio";
 
 /**
  * Renders the content for the property page
@@ -47,10 +51,18 @@ import ScheduledWorkCard from "@/components/property/ScheduledWorkCard";
 function PropertyContent() {
   const [locale] = useState<Locale>("en");
   const messages = getMessages(locale);
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const { isLoading, setLoading } = useContext(LoadingContext);
   const [isReadonly, setIsReadonly] = useState(false);
+  const [isUpdatePending, setIsUpdatePending] = useState(false);
+  const [selectedProperty, setSelectedProperty] =
+    useState<PropertyInfoData>(defaultPropertyInfo);
+  const [portfolioList, setPortfolioList] = useState<DropdownOption[]>([]);
+  const [activityLogMetadata] = useState<ActivityMetadata>({
+    page: "Add Property",
+  });
 
   const isSubmitting = useCallback(
     (value: boolean) => setLoading(value),
@@ -118,10 +130,6 @@ function PropertyContent() {
     // TODO: Handle file upload
   };
 
-  const handlePropertyInfoUpdate = () => {
-    // TODO: Handle property update
-  };
-
   const handleBankSettingsUpdate = () => {
     // TODO: Handle bank settings update
   };
@@ -130,8 +138,18 @@ function PropertyContent() {
     // TODO: Handle invoice settings update
   };
 
+  /**
+   * Toggles the editing section
+   * @param section - The section to edit or null to close
+   */
+  const toggleEditingSection = (section: string | null): void => {
+    setEditingSection(section);
+  };
+
   useEffect(() => {
+    //Update metadata for edit case
     setIsReadonly(hasRole("READONLYADMINUSER"));
+    fetchPortfolios();
     handleToast(searchParams); // Display toast based on search params
   }, [searchParams]);
 
@@ -159,6 +177,78 @@ function PropertyContent() {
     billPaySeat: emptySeatOption,
   });
 
+  useEffect(() => {
+    if (isUpdatePending && selectedProperty?.id) {
+      handleUpdate(selectedProperty?.id);
+      setIsUpdatePending(false); // Clear pending update
+    }
+  }, [isUpdatePending]);
+
+  const handleUpdate = async (propertyId: number) => {
+    //TODO: Handle property update
+    return propertyId ? "handleUpdate" : "ignore";
+  };
+
+  /**
+   * Validates the portfolio form
+   * @returns boolean - Whether the form is valid
+   */
+  const validateForm = (): boolean => {
+    return (
+      !!selectedProperty.portfolioId && selectedProperty.propertyTitle !== ""
+    );
+  };
+
+  /**
+   * Handles form submission to create a portfolio
+   */
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      handleInfo({ code: 100000 });
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await propertyService.create({
+        ...selectedProperty,
+        metadata: {
+          ...activityLogMetadata,
+        },
+      });
+      if (response.status === "SUCCESS") {
+        router.push(getDefaultPage() + "?msg=101100");
+      } else {
+        handleInfo({ code: 101101 });
+        setLoading(false);
+      }
+    } catch (err) {
+      handleInfo({ code: 101102, error: err });
+      setLoading(false);
+    }
+  };
+
+  const fetchPortfolios = async () => {
+    isSubmitting(true);
+    try {
+      const response = await portfolioService.fetchAll();
+      if (response.status === "SUCCESS" && response.data) {
+        const options: DropdownOption[] = response.data
+          .filter((portfolio) => portfolio.id && portfolio.name) // Ensure id and name exist
+          .map((portfolio) => ({
+            label: portfolio.name,
+            value: portfolio.id!.toString(), // Convert id to string for dropdown
+          }));
+        setPortfolioList(options);
+      } else {
+        handleInfo({ code: 100513 });
+      }
+    } catch (err) {
+      handleInfo({ code: 100514, error: err });
+    } finally {
+      isSubmitting(false);
+    }
+  };
+
   const breadcrumbItems = [
     { href: "/account", label: "Account Dashboard" },
     { href: "#", label: "Add Property", isActive: true },
@@ -175,12 +265,16 @@ function PropertyContent() {
       <div className="max-w-[800px] mx-auto space-y-8 py-4">
         <div className="space-y-8">
           <CreateSettingsCard
-            sectionName="create-settings"
+            onEdit={handleEdit}
+            sectionId="create-settings"
             editingSection={editingSection}
-            onSectionEdit={handleSectionEdit}
-            onSectionClose={handleSectionClose}
-            isSubmitting={isSubmitting}
+            onSectionEdit={toggleEditingSection}
+            onSectionClose={() => toggleEditingSection(null)}
+            onCreateSettingsUpdate={(val) => setSelectedProperty(val)}
+            onClickUpdate={() => setIsUpdatePending(true)}
+            existingPropertyInfoData={selectedProperty}
             isEditable={!isLoading && !isReadonly}
+            portfolioOptions={portfolioList}
           />
           <SpaceSettingsCard
             onEdit={handleEdit}
@@ -200,13 +294,11 @@ function PropertyContent() {
             onEdit={handleEdit}
             sectionId="propertyInfoCard"
             editingSection={editingSection}
-            onSectionEdit={handleSectionEdit}
-            onSectionClose={handleSectionClose}
-            handlePropertyInfoUpdate={handlePropertyInfoUpdate}
-            existingPropertyInfoData={existingPropertyInfoData}
-            categoryOptions={categoryOptions}
-            floorPlanOptions={floorPlanOptions}
-            elevatorPlanOptions={elevatorPlanOptions}
+            onSectionEdit={toggleEditingSection}
+            onSectionClose={() => toggleEditingSection(null)}
+            onPropertyInfoUpdate={(val) => setSelectedProperty(val)}
+            onClickUpdate={() => setIsUpdatePending(true)}
+            existingPropertyInfoData={selectedProperty}
           />
           <InsuranceCard
             sectionName="insurance-card"
@@ -368,6 +460,17 @@ function PropertyContent() {
             onSectionEdit={handleSectionEdit}
             onSectionClose={handleSectionClose}
           />
+        </div>
+        <div className="pt-8 flex justify-center">
+          {!selectedProperty?.id && (
+            <PixieButton
+              label={"Create Property"}
+              disabled={isLoading || isReadonly}
+              onClick={handleSubmit}
+              className="w-2/3"
+              isLoading={isLoading}
+            />
+          )}
         </div>
       </div>
     </>

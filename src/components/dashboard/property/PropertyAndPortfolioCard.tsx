@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState, useMemo } from "react";
 
 import { Account } from "@/types/Account";
 import { useRouter } from "next/navigation";
-import { Property } from "@/types/Property";
 import { Portfolio } from "@/types/Portfolio";
 import { hasRole } from "@/lib/utils/authUtils";
 import handleInfo from "@/lib/utils/errorHandler";
@@ -15,6 +14,7 @@ import { portfolioService } from "@/lib/services/portfolio";
 import PixieCardHeader from "@/components/ui/header/PixieCardHeader";
 import PreConfirmationDialog from "@/components/ui/dialog/PreConfirmationDialog";
 import PropertyAndPortfolioTab from "@/components/dashboard/property/PropertyAndPortfolioTab";
+import { PropertyInfoData } from "@/types/PropertyInfo";
 
 /**
  * Props for the PropertyAndPortfolioCard component
@@ -42,7 +42,7 @@ const PropertyAndPortfolioCard = ({
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
   const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<PropertyInfoData[]>([]);
   const [showPreConfirmationDialog, setShowPreConfirmationDialog] =
     useState<boolean>(false);
   const [activeTab, setActiveTab] = useState("portfolios");
@@ -82,14 +82,14 @@ const PropertyAndPortfolioCard = ({
   );
 
   const filterProperties = useCallback(
-    (propertiesToFilter: Property[], term: string) => {
+    (propertiesToFilter: PropertyInfoData[], term: string) => {
       if (!term) return propertiesToFilter;
 
       return propertiesToFilter.filter((property) => {
         // Check all searchable fields
         const searchableFields = [
-          property.name,
-          property.address,
+          property.propertyTitle,
+          property.propertyEntityName,
           // Add any other relevant property fields here
         ].filter(Boolean); // Remove null/undefined values
 

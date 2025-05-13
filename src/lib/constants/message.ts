@@ -416,6 +416,20 @@ const target = {
     type: "error",
     message: "Exception occured removing plaid link.",
   } as LeasePixieToastMsg,
+
+  //101000 series for property handle message
+  101100: {
+    type: "success",
+    message: "Property created successfully.",
+  } as LeasePixieToastMsg,
+  101101: {
+    type: "error",
+    message: "Error occured while creating property.",
+  } as LeasePixieToastMsg,
+  101102: {
+    type: "error",
+    message: "Exception occured creating property.",
+  } as LeasePixieToastMsg,
 } as const;
 
 export type MessageCode = keyof typeof target;

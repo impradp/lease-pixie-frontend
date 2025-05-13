@@ -1,144 +1,167 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
+import { DropdownOption } from "@/types/user";
 import { hasRole } from "@/lib/utils/authUtils";
-import { CreateSettings } from "@/types/CreateSettings";
+import { PropertyInfoData } from "@/types/PropertyInfo";
+import { defaultPropertyInfo } from "@/data/Properties";
 import CustomInput from "@/components/ui/input/CustomInput";
 import LinkButton from "@/components/ui/buttons/LinkButton";
 import PixieButton from "@/components/ui/buttons/PixieButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
-import {
-  createSettingsInfo,
-  portfolioOptions,
-} from "@/data/createSettingsData";
+import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
 
 interface CreateSettingsCardProps {
-  sectionName: string;
+  onEdit?: () => void;
+  sectionId: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
   onSectionClose: () => void;
-  isSubmitting: (value: boolean) => void;
-  isEditable: boolean;
+  existingPropertyInfoData?: PropertyInfoData;
+  onCreateSettingsUpdate?: (data: PropertyInfoData) => void;
+  onClickUpdate?: () => void;
+  isEditable?: boolean;
+  portfolioOptions: DropdownOption[];
 }
 
 const CreateSettingsCard: React.FC<CreateSettingsCardProps> = ({
-  sectionName,
+  onEdit,
+  sectionId,
   editingSection,
   onSectionEdit,
   onSectionClose,
-  isSubmitting,
-  isEditable,
+  existingPropertyInfoData,
+  onCreateSettingsUpdate,
+  onClickUpdate,
+  isEditable = false,
+  portfolioOptions = [],
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<CreateSettings>(createSettingsInfo);
-  const [initialFormData, setInitialFormData] =
-    useState<CreateSettings>(createSettingsInfo);
-
   const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
+
+  const originalDataRef = useRef<PropertyInfoData>(existingPropertyInfoData);
+  const [editedData, setEditedData] = useState<PropertyInfoData>(
+    existingPropertyInfoData || defaultPropertyInfo
+  );
 
   const hasAccountUserAccess = hasRole("AccountUser");
 
-  // Move the access check into useEffect to avoid infinite renders
   useEffect(() => {
-    // TODO: Check with the API whether settings card is accessible for edit
-    // For now, setting a default value that won't cause infinite renders
-    setPortfolioUserAccess(false);
-  }, []); // Empty dependency array means this runs once on mount
+    if (existingPropertyInfoData) {
+      originalDataRef.current = { ...existingPropertyInfoData };
+      if (!isEditMode) {
+        setEditedData({ ...existingPropertyInfoData });
+      }
+    }
+  }, [existingPropertyInfoData, isEditMode]);
 
   useEffect(() => {
-    setInitialFormData(createSettingsInfo);
-    setFormData(createSettingsInfo);
-  }, [createSettingsInfo]);
+    setPortfolioUserAccess(false); // TODO: Check with API
+  }, []);
 
-  // Handle edit button click
   const handleEdit = () => {
-    if (editingSection === null || editingSection === sectionName) {
-      onSectionEdit(sectionName);
+    if (editingSection === null || editingSection === sectionId) {
       setIsEditMode(true);
+      onSectionEdit(sectionId);
+      if (onEdit) onEdit();
     }
   };
 
-  // Handle cancel button click
   const handleTextClose = () => {
-    setFormData(initialFormData); // Revert to initial values
+    if (originalDataRef.current) {
+      setEditedData({ ...originalDataRef.current });
+    }
     setIsEditMode(false);
     onSectionClose();
   };
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    isSubmitting(true);
+  const handleUpdate = async () => {
     setIsEditMode(false);
+    if (onCreateSettingsUpdate) {
+      await onCreateSettingsUpdate(editedData);
+      originalDataRef.current = { ...editedData };
+    }
+    onClickUpdate?.();
     onSectionClose();
+  };
+
+  const handleInputChange = (field: keyof PropertyInfoData, value: string) => {
+    setEditedData((prev) => ({ ...prev, [field]: value }));
   };
 
   const isEditDisabled =
-    editingSection !== null && editingSection !== sectionName;
+    editingSection !== null && editingSection !== sectionId && !isEditable;
 
   return (
-    <div
-      className={`rounded-xl p-6 ${
-        isEditMode ? "bg-card-open-fill" : "bg-card-close-fill"
-      }`}
-    >
-      <form
-        id={`form-${sectionName}`}
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4"
+    <ClientThemeWrapper>
+      <div
+        className={`rounded-xl p-6 ${
+          isEditMode ? "bg-card-open-fill" : "bg-card-close-fill"
+        }`}
       >
-        <SectionHeader
-          title={"Create Settings"}
-          onEdit={handleEdit}
-          onTextCancel={handleTextClose}
-          showEditButton={!isEditMode}
-          showTextCloseButton={isEditMode}
-          editDisabled={isEditDisabled}
-          cardActionContent="Portfolio User %s Edit"
-          hasAccess={portfolioUserAccess}
-          showCardActionContent={hasAccountUserAccess}
-          onAccessToggle={(val) => setPortfolioUserAccess(val)}
-        />
+        <form
+          id={`form-${sectionId}`}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleUpdate();
+          }}
+          className="flex flex-col gap-4"
+        >
+          <SectionHeader
+            title="Create Settings"
+            onEdit={handleEdit}
+            onTextCancel={handleTextClose}
+            showEditButton={!isEditMode}
+            showTextCloseButton={isEditMode}
+            editDisabled={isEditDisabled}
+            cardActionContent="Portfolio User %s Edit"
+            hasAccess={portfolioUserAccess}
+            showCardActionContent={hasAccountUserAccess}
+            onAccessToggle={(val) => setPortfolioUserAccess(val)}
+          />
 
-        <PixieDropdown
-          label="Portfolio"
-          options={portfolioOptions}
-          value={formData.portfolioName}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, portfolioName: value }))
-          }
-          isEditing={isEditMode}
-          type="large"
-        />
-        <CustomInput
-          label="Folder Name (no special characters, limit 25 characters)"
-          value={formData.folderName ?? ""}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, folderName: value }))
-          }
-          isEditing={isEditMode}
-          isRequired={true}
-          maxCharLength={25}
-        />
+          <PixieDropdown
+            label="Portfolio"
+            options={portfolioOptions}
+            value={editedData.portfolioId ?? ""}
+            onChange={(value) => handleInputChange("portfolioId", value)}
+            isEditing={isEditMode}
+            type="large"
+            isRequired={true}
+            placeholder="Select Portfolio"
+          />
 
-        {/* Show buttons only in edit mode */}
-        {isEditMode && (
-          <div className="flex flex-col gap-3">
-            <PixieButton
-              label={"Update"}
-              type="submit"
-              formId={`form-${sectionName}`}
-              disabled={!isEditable}
-              isLoading={!isEditable}
-              className="w-full"
-            />
-            <div className="flex justify-center">
-              <LinkButton onClick={handleTextClose} label="Cancel" />
+          <CustomInput
+            label="Folder Name (no special characters, limit 25 characters)"
+            value={editedData.folderName ?? ""}
+            onChange={(value) => handleInputChange("folderName", value)}
+            readOnly={!isEditMode}
+            isEditing={isEditMode}
+            maxCharLength={25}
+            labelClassName="text-tertiary-slateBlue text-sm font-medium"
+            containerClassName="w-full"
+          />
+
+          {isEditMode && (
+            <div className="w-full flex flex-col gap-3">
+              <PixieButton
+                label="Update"
+                disabled={!isEditable}
+                onClick={handleUpdate}
+                className="w-full"
+              />
+              <div className="flex justify-center">
+                <LinkButton
+                  onClick={handleTextClose}
+                  label="Cancel"
+                  disabled={!isEditable}
+                />
+              </div>
             </div>
-          </div>
-        )}
-      </form>
-    </div>
+          )}
+        </form>
+      </div>
+    </ClientThemeWrapper>
   );
 };
 

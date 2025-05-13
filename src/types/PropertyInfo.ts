@@ -1,5 +1,7 @@
 export type PropertyInfoData = {
-  portfolioName: string;
+  id?: number;
+  portfolioId?: string;
+  folderName?: string;
   propertyTitle: string;
   propertyEntityName: string;
   physicalPropertyAddress: string;
@@ -13,4 +15,17 @@ export type PropertyInfoData = {
   vendorPayableRemittanceAddress: string;
   floorPlan: string;
   elvatorPlan: string;
+  metadata?: ActivityMetadata;
+};
+
+export type ActivityMetadata = {
+  pageId?: number; //PageID (property dash, list, unit dashboard, invoice dash)
+  page: string;
+  sectionName?: string; //only when updating the particular section
+  itemId?: number;
+  itemName?: string;
+  reference?: string;
+  referenceId?: number;
+  devNotes?: string;
+  alteredItems?: string[];
 };

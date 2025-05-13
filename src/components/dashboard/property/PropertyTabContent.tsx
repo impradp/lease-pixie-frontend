@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { Property } from "@/types/Property"; // Adjust path
+import { PropertyInfoData } from "@/types/PropertyInfo";
 
 /**
  * Props for the PropertyTabContent component
  */
 interface PropertyTabContentProps {
-  properties?: Property[]; // List of properties to display (defaults to empty array)
+  properties?: PropertyInfoData[]; // List of properties to display (defaults to empty array)
 }
 
 /**
@@ -47,10 +47,10 @@ const PropertyTabContent: React.FC<PropertyTabContentProps> = ({
           >
             <div className="self-stretch flex flex-col justify-center items-start gap-1">
               <div className="text-secondary-light text-sm font-bold font-['Inter'] leading-[18px]">
-                {property.name}
+                {property.propertyTitle}
               </div>
               <div className="text-secondary-light text-xs font-normal font-['Inter'] leading-[18px]">
-                {property.address}
+                {property.physicalPropertyAddress}
               </div>
             </div>
             <div className="self-stretch flex flex-col justify-center items-center gap-1 max-h-0 overflow-hidden group-hover:max-h-10 transition-all duration-300 ease-in-out">

@@ -1,17 +1,4 @@
-import { Property } from "@/types/Property";
-
-export const sampleProperties: Property[] = [
-  {
-    id: "prop1",
-    name: "Waterfront Village",
-    address: "1452 Banksville Road, Pittsburgh, PA",
-  },
-  {
-    id: "prop2",
-    name: "Skyline Towers",
-    address: "789 Pine Street, Seattle, WA",
-  },
-];
+import { PropertyInfoData } from "@/types/PropertyInfo";
 
 export const categoryOptions = [
   {
@@ -45,6 +32,22 @@ export const elevatorPlanOptions = [
   { label: "Elevator Plan 2", value: "Elevator Plan 2" },
   { label: "Elevator Plan 3", value: "Elevator Plan 3" },
 ];
+
+export const defaultPropertyInfo: PropertyInfoData = {
+  propertyTitle: "",
+  propertyEntityName: "",
+  physicalPropertyAddress: "",
+  estimatedMonthlyCollection: "",
+  largestMonthlyInvoice: "",
+  requestedBuildingSize: "",
+  requestedCategory: "",
+  propertyManagementLegalEntity: "",
+  propertyManagementOfficePhoneNumber: "",
+  propertyManagementemailAddress: "",
+  vendorPayableRemittanceAddress: "",
+  floorPlan: "",
+  elvatorPlan: "",
+};
 
 export const existingPropertyInfoData = {
   portfolioName: "Portfolio 1",

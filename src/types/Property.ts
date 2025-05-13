@@ -1,16 +1,18 @@
-export interface Property {
-  id: string; // Optional unique identifier
-  name: string; // Property name
-  address: string; // Property address
-}
+import { PropertyInfoData } from "./PropertyInfo";
 
 export interface BankSettingsData {
   selectedBankAccount: string;
   pendingAccountApprovalFlag: boolean;
 }
 
+export interface PropertyResponse {
+  status: string; // Status of the response (e.g., "SUCCESS", "ERROR")
+  data: PropertyInfoData; // Array of properties
+  message?: string; // Message associated with the response
+}
+
 export interface PropertyListResponse {
   status: string; // Status of the response (e.g., "SUCCESS", "ERROR")
-  data: Property[]; // Array of properties
+  data: PropertyInfoData[]; // Array of properties
   message?: string; // Message associated with the response
 }

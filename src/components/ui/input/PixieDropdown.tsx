@@ -36,6 +36,7 @@ interface PixieDropdownProps {
   type?: "large" | "default" | "small";
   showFilterIcon?: boolean;
   disabled?: boolean;
+  isRequired?: boolean;
 }
 
 /**
@@ -61,6 +62,7 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
   type = "small",
   showFilterIcon = false,
   disabled = false,
+  isRequired = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string>(value);
@@ -210,6 +212,9 @@ export const PixieDropdown: React.FC<PixieDropdownProps> = ({
           }`}
         >
           {label}
+          {isRequired && (
+            <span className="text-tertiary-muteBlueGray text-sm"> *</span>
+          )}
         </label>
       )}
       <div

@@ -1,11 +1,3 @@
-import { CreateSettings } from "@/types/CreateSettings";
-
-export const createSettingsInfo: CreateSettings = {
-  id: "",
-  portfolioName: "",
-  folderName: "",
-};
-
 export const portfolioOptions = [
   {
     label: "Portfolio 1",

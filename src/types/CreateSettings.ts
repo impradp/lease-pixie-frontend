@@ -1,5 +1,4 @@
 export type CreateSettings = {
-  id?: string;
-  portfolioName: string;
+  portfolioId?: number;
   folderName: string;
 };

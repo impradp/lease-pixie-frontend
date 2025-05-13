@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Property } from "@/types/Property";
 import { Portfolio } from "@/types/Portfolio";
+import { PropertyInfoData } from "@/types/PropertyInfo";
 import PropertyTabContent from "@/components/dashboard/property/PropertyTabContent";
 import PortfolioTabContent from "@/components/dashboard/portfolio/PortfolioTabContent";
 
@@ -12,7 +12,7 @@ import PortfolioTabContent from "@/components/dashboard/portfolio/PortfolioTabCo
 interface PropertyAndPortfolioTabProps {
   activeTab: string; // The currently active tab ("properties" or "portfolios")
   portfolios: Portfolio[]; // List of portfolios to display
-  properties: Property[]; // List of properties to display
+  properties: PropertyInfoData[]; // List of properties to display
   isEditable?: boolean;
   onEditClick?: (portfolioId: number) => void;
 }

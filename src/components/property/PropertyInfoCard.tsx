@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 
-import { DropdownOption } from "@/types/user";
 import { hasRole } from "@/lib/utils/authUtils";
 import { PropertyInfoData } from "@/types/PropertyInfo";
 import CustomInput from "@/components/ui/input/CustomInput";
@@ -10,6 +9,11 @@ import PixieButton from "@/components/ui/buttons/PixieButton";
 import SectionHeader from "@/components/ui/header/SectionHeader";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
 import { ClientThemeWrapper } from "@/components/ui/ClientThemeWrapper";
+import {
+  categoryOptions,
+  elevatorPlanOptions,
+  floorPlanOptions,
+} from "@/data/Properties";
 
 const AddressAutocompleteInput = dynamic(
   () =>
@@ -25,12 +29,10 @@ interface PropertyInfoCardProps {
   sectionId: string;
   editingSection: string | null;
   onSectionEdit: (section: string) => void;
-  handlePropertyInfoUpdate: () => void;
   onSectionClose: () => void;
   existingPropertyInfoData?: PropertyInfoData;
-  categoryOptions: DropdownOption[];
-  floorPlanOptions: DropdownOption[];
-  elevatorPlanOptions: DropdownOption[];
+  onPropertyInfoUpdate?: (data: PropertyInfoData) => void;
+  onClickUpdate?: () => void;
 }
 
 const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
@@ -39,17 +41,48 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
   editingSection,
   onSectionEdit,
   onSectionClose,
-  handlePropertyInfoUpdate,
   existingPropertyInfoData,
-  categoryOptions,
-  floorPlanOptions,
-  elevatorPlanOptions,
+  onPropertyInfoUpdate,
+  onClickUpdate,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const isEditing = isEditMode;
   const [portfolioUserAccess, setPortfolioUserAccess] = useState(false);
 
+  // Create ref to store the original data
+  const originalDataRef = useRef<PropertyInfoData | undefined>(
+    existingPropertyInfoData
+  );
+
+  // State for edited data that will be modified during edit mode
+  const [editedData, setEditedData] = useState<PropertyInfoData>(
+    existingPropertyInfoData || {
+      propertyTitle: "",
+      propertyEntityName: "",
+      physicalPropertyAddress: "",
+      estimatedMonthlyCollection: "",
+      largestMonthlyInvoice: "",
+      requestedBuildingSize: "",
+      requestedCategory: "",
+      propertyManagementLegalEntity: "",
+      propertyManagementOfficePhoneNumber: "",
+      propertyManagementemailAddress: "",
+      vendorPayableRemittanceAddress: "",
+      floorPlan: "",
+      elvatorPlan: "",
+    }
+  );
+
   const hasAccountUserAccess = hasRole("AccountUser");
+
+  // Update refs and state when existingPropertyInfoData changes
+  useEffect(() => {
+    if (existingPropertyInfoData) {
+      originalDataRef.current = { ...existingPropertyInfoData };
+      if (!isEditMode) {
+        setEditedData({ ...existingPropertyInfoData });
+      }
+    }
+  }, [existingPropertyInfoData, isEditMode]);
 
   // Move the access check into useEffect to avoid infinite renders
   useEffect(() => {
@@ -57,66 +90,6 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
     // For now, setting a default value that won't cause infinite renders
     setPortfolioUserAccess(false);
   }, []); // Empty dependency array means this runs once on mount
-
-  const [formData, setFormData] = useState<PropertyInfoData>(
-    existingPropertyInfoData || {
-      portfolioName: "",
-      propertyTitle: "",
-      propertyEntityName: "",
-      physicalPropertyAddress: "",
-      estimatedMonthlyCollection: "",
-      largestMonthlyInvoice: "",
-      requestedBuildingSize: "",
-      requestedCategory: "",
-      propertyManagementLegalEntity: "",
-      propertyManagementOfficePhoneNumber: "",
-      propertyManagementemailAddress: "",
-      vendorPayableRemittanceAddress: "",
-      floorPlan: "",
-      elvatorPlan: "",
-    }
-  );
-
-  const [initialFormData, setInitialFormData] = useState<PropertyInfoData>(
-    existingPropertyInfoData || {
-      portfolioName: "",
-      propertyTitle: "",
-      propertyEntityName: "",
-      physicalPropertyAddress: "",
-      estimatedMonthlyCollection: "",
-      largestMonthlyInvoice: "",
-      requestedBuildingSize: "",
-      requestedCategory: "",
-      propertyManagementLegalEntity: "",
-      propertyManagementOfficePhoneNumber: "",
-      propertyManagementemailAddress: "",
-      vendorPayableRemittanceAddress: "",
-      floorPlan: "",
-      elvatorPlan: "",
-    }
-  );
-
-  // Sync initialFormData and formData with existingPropertyInfoData when it changes
-  useEffect(() => {
-    const defaultData = {
-      portfolioName: "",
-      propertyTitle: "",
-      propertyEntityName: "",
-      physicalPropertyAddress: "",
-      estimatedMonthlyCollection: "",
-      largestMonthlyInvoice: "",
-      requestedBuildingSize: "",
-      requestedCategory: "",
-      propertyManagementLegalEntity: "",
-      propertyManagementOfficePhoneNumber: "",
-      propertyManagementemailAddress: "",
-      vendorPayableRemittanceAddress: "",
-      floorPlan: "",
-      elvatorPlan: "",
-    };
-    setInitialFormData(existingPropertyInfoData || defaultData);
-    setFormData(existingPropertyInfoData || defaultData);
-  }, [existingPropertyInfoData]);
 
   const handleEdit = () => {
     if (editingSection === null || editingSection === sectionId) {
@@ -127,15 +100,27 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
   };
 
   const handleTextClose = () => {
-    setFormData(initialFormData); // Revert to initial values
+    // Reset to original values when canceling edit
+    if (originalDataRef.current) {
+      setEditedData({ ...originalDataRef.current });
+    }
     setIsEditMode(false);
     onSectionClose();
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     setIsEditMode(false);
-    handlePropertyInfoUpdate();
+    if (onPropertyInfoUpdate) {
+      await onPropertyInfoUpdate(editedData);
+      // Update the original reference after successful update
+      originalDataRef.current = { ...editedData };
+    }
+    onClickUpdate?.();
     onSectionClose();
+  };
+
+  const handleInputChange = (field: keyof PropertyInfoData, value: string) => {
+    setEditedData((prev) => ({ ...prev, [field]: value }));
   };
 
   const isEditDisabled =
@@ -150,8 +135,11 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
       >
         <form
           id="property-card"
-          onSubmit={handleUpdate}
-          className="flex items-center flex flex-col gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleUpdate();
+          }}
+          className="flex flex-col gap-4"
         >
           <SectionHeader
             title={"Property Information"}
@@ -167,53 +155,44 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
 
           <CustomInput
             label="Property title"
-            value={formData.propertyTitle}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, propertyTitle: value }))
-            }
-            readOnly={!isEditing}
-            isEditing={isEditing}
+            value={editedData.propertyTitle}
+            onChange={(value) => handleInputChange("propertyTitle", value)}
+            readOnly={!isEditMode}
+            isEditing={isEditMode}
             labelClassName="text-tertiary-slateBlue text-sm font-medium"
             containerClassName="w-full"
+            isRequired={true}
           />
 
           <CustomInput
             label="Property legal entity"
-            value={formData.propertyEntityName}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, propertyEntityName: value }))
-            }
-            readOnly={!isEditing}
-            isEditing={isEditing}
+            value={editedData.propertyEntityName}
+            onChange={(value) => handleInputChange("propertyEntityName", value)}
+            readOnly={!isEditMode}
+            isEditing={isEditMode}
             labelClassName="text-tertiary-slateBlue text-sm font-medium"
             containerClassName="w-full"
           />
 
           <AddressAutocompleteInput
             label="Physical property address"
-            value={formData.physicalPropertyAddress}
+            value={editedData.physicalPropertyAddress}
             onChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                physicalPropertyAddress: value,
-              }))
+              handleInputChange("physicalPropertyAddress", value)
             }
-            isEditing={isEditing}
+            isEditing={isEditMode}
             placeholder="Start typing address..."
             inputId="physical-property-address-input"
           />
 
           <CustomInput
             label="Property management legal entity"
-            value={formData.propertyManagementLegalEntity}
+            value={editedData.propertyManagementLegalEntity}
             onChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                propertyManagementLegalEntity: value,
-              }))
+              handleInputChange("propertyManagementLegalEntity", value)
             }
-            readOnly={!isEditing}
-            isEditing={isEditing}
+            readOnly={!isEditMode}
+            isEditing={isEditMode}
             labelClassName="text-tertiary-slateBlue text-sm font-medium"
             containerClassName="w-full"
           />
@@ -221,15 +200,12 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
             <CustomInput
               label="Property management office phone number"
-              value={formData.propertyManagementOfficePhoneNumber}
+              value={editedData.propertyManagementOfficePhoneNumber}
               onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  propertyManagementOfficePhoneNumber: value,
-                }))
+                handleInputChange("propertyManagementOfficePhoneNumber", value)
               }
-              readOnly={!isEditing}
-              isEditing={isEditing}
+              readOnly={!isEditMode}
+              isEditing={isEditMode}
               className="py-2.5 text-base text-tertiary-deepNavy"
               labelClassName="text-tertiary-slateBlue text-sm font-medium"
               placeholder="800-555-1234"
@@ -238,15 +214,12 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             />
             <CustomInput
               label="Property management email address"
-              value={formData.propertyManagementemailAddress}
+              value={editedData.propertyManagementemailAddress}
               onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  propertyManagementemailAddress: value,
-                }))
+                handleInputChange("propertyManagementemailAddress", value)
               }
-              readOnly={!isEditing}
-              isEditing={isEditing}
+              readOnly={!isEditMode}
+              isEditing={isEditMode}
               className="py-2.5 text-base text-tertiary-deepNavy"
               labelClassName="text-tertiary-slateBlue text-sm font-medium"
               containerClassName="w-full"
@@ -256,14 +229,11 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
 
           <AddressAutocompleteInput
             label="Address for vendor payables remittance"
-            value={formData.vendorPayableRemittanceAddress}
+            value={editedData.vendorPayableRemittanceAddress}
             onChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                vendorPayableRemittanceAddress: value,
-              }))
+              handleInputChange("vendorPayableRemittanceAddress", value)
             }
-            isEditing={isEditing}
+            isEditing={isEditMode}
             placeholder="Start typing address..."
             inputId="vendor-payable-remittances-address-input"
           />
@@ -272,22 +242,18 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             <PixieDropdown
               label="Floors"
               options={floorPlanOptions}
-              value={formData.floorPlan}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, floorPlan: value }))
-              }
-              isEditing={isEditing}
+              value={editedData.floorPlan}
+              onChange={(value) => handleInputChange("floorPlan", value)}
+              isEditing={isEditMode}
               type="large"
             />
 
             <PixieDropdown
               label="Elevators"
               options={elevatorPlanOptions}
-              value={formData.elvatorPlan}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, elvatorPlan: value }))
-              }
-              isEditing={isEditing}
+              value={editedData.elvatorPlan}
+              onChange={(value) => handleInputChange("elvatorPlan", value)}
+              isEditing={isEditMode}
               type="large"
             />
           </div>
@@ -295,15 +261,12 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
             <CustomInput
               label="Requested building size (sq-ft)"
-              value={formData.requestedBuildingSize}
+              value={editedData.requestedBuildingSize}
               onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  requestedBuildingSize: value,
-                }))
+                handleInputChange("requestedBuildingSize", value)
               }
-              readOnly={!isEditing}
-              isEditing={isEditing}
+              readOnly={!isEditMode}
+              isEditing={isEditMode}
               labelClassName="text-tertiary-slateBlue text-sm font-medium"
               containerClassName="w-full"
             />
@@ -311,11 +274,11 @@ const PropertyInfoCard: React.FC<PropertyInfoCardProps> = ({
             <PixieDropdown
               label="Requested category"
               options={categoryOptions}
-              value={formData.requestedCategory}
+              value={editedData.requestedCategory}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, requestedCategory: value }))
+                handleInputChange("requestedCategory", value)
               }
-              isEditing={isEditing}
+              isEditing={isEditMode}
               type="large"
             />
           </div>
