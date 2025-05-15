@@ -8,6 +8,7 @@ export const ENDPOINTS = {
   },
   SYSTEM_TABLE: {
     CLIENT_PAYMENT_PROCESSOR: "/api/v1/system-table/payment-processor",
+    PLATFORM_INVOICING: "/api/v1/system-table/platform-invoice",
   },
   USER: {
     SELF: "/api/index",

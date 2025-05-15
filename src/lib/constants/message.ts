@@ -452,6 +452,28 @@ const target = {
     type: "error",
     message: "Exception occured updating payment processors.",
   } as LeasePixieToastMsg,
+
+  //101400 series for platform invoicing handle message
+  101400: {
+    type: "success",
+    message: "Platform invoicing settings updated successfully.",
+  } as LeasePixieToastMsg,
+  101401: {
+    type: "error",
+    message: "Error occured updating platform invoicing.",
+  } as LeasePixieToastMsg,
+  101402: {
+    type: "error",
+    message: "Exception occured updating platform invoicing.",
+  } as LeasePixieToastMsg,
+  101403: {
+    type: "error",
+    message: "Error occured fetching platform invoicing.",
+  } as LeasePixieToastMsg,
+  101404: {
+    type: "error",
+    message: "Exception occured fetching platform invoicing.",
+  } as LeasePixieToastMsg,
 } as const;
 
 export type MessageCode = keyof typeof target;

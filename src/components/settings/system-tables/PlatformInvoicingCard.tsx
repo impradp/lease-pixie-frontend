@@ -1,22 +1,13 @@
-import React, { useEffect, useState } from "react";
-import CustomInput from "@/components/ui/input/CustomInput";
-import PixieButton from "@/components/ui/buttons/PixieButton";
-import LinkButton from "@/components/ui/buttons/LinkButton";
-import SectionHeader from "@/components/ui/header/SectionHeader";
-import { PlatformInvoicing } from "@/types/PlatformInvoicing";
-import { samplePlatformInvoicing } from "@/data/platformInvoicing";
+import React, { useEffect, useState, useCallback } from "react";
 
-/**
- * Props interface for the PlatformInvoicingCard component.
- *
- * @interface PlatformInvoicingCardProps
- * @property {string} sectionName - The name of the section this card represents.
- * @property {string | null} editingSection - The currently active editing section, or null if none.
- * @property {(section: string) => void} onSectionEdit - Callback to handle edit mode activation for a section.
- * @property {() => void} onSectionClose - Callback to handle closing the edit mode.
- * @property {(value: boolean) => void} isSubmitting - Callback to indicate form submission status.
- * @property {boolean} isEditable - Flag to determine if the form fields are editable.
- */
+import handleInfo from "@/lib/utils/errorHandler";
+import CustomInput from "@/components/ui/input/CustomInput";
+import LinkButton from "@/components/ui/buttons/LinkButton";
+import { PlatformInvoicing } from "@/types/PlatformInvoicing";
+import PixieButton from "@/components/ui/buttons/PixieButton";
+import { systemTableService } from "@/lib/services/systemTable";
+import SectionHeader from "@/components/ui/header/SectionHeader";
+
 interface PlatformInvoicingCardProps {
   sectionName: string;
   editingSection: string | null;
@@ -47,52 +38,84 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
   isEditable,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<PlatformInvoicing>(
-    samplePlatformInvoicing
+  const [formData, setFormData] = useState<PlatformInvoicing | undefined>(
+    undefined
   );
-  const [initialFormData, setInitialFormData] = useState<PlatformInvoicing>(
-    samplePlatformInvoicing
-  );
+  const [initialFormData, setInitialFormData] = useState<
+    PlatformInvoicing | undefined
+  >(undefined);
 
   /**
-   * Syncs form data with the sample platform invoicing data on mount or update.
+   * Fetches platform invoicing data on component mount.
    */
+  const fetchPlatformInvoicing = useCallback(async () => {
+    isSubmitting(true);
+    try {
+      const response = await systemTableService.fetchPlatformInvoicing();
+      if (response.status === "SUCCESS" && response.data) {
+        setFormData(response.data);
+        setInitialFormData(response.data);
+      } else {
+        handleInfo({ code: 101403 });
+      }
+    } catch (err) {
+      handleInfo({ code: 101404, error: err });
+    } finally {
+      isSubmitting(false);
+    }
+  }, [isSubmitting]);
+
   useEffect(() => {
-    setInitialFormData(samplePlatformInvoicing);
-    setFormData(samplePlatformInvoicing);
-  }, [samplePlatformInvoicing]);
+    fetchPlatformInvoicing();
+  }, [fetchPlatformInvoicing]);
 
   /**
    * Handles the edit button click to enable edit mode.
-   * Only activates if no other section is being edited or if this section is the target.
    */
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     if (editingSection === null || editingSection === sectionName) {
       onSectionEdit(sectionName);
       setIsEditMode(true);
     }
-  };
+  }, [editingSection, onSectionEdit, sectionName]);
 
   /**
    * Handles the cancel button click to revert form data and exit edit mode.
    */
-  const handleTextClose = () => {
-    setFormData(initialFormData); // Revert to initial values
+  const handleTextClose = useCallback(() => {
+    setFormData(initialFormData);
     setIsEditMode(false);
     onSectionClose();
-  };
+  }, [initialFormData, onSectionClose]);
 
   /**
-   * Handles form submission, triggers submission status, and exits edit mode.
-   *
-   * @param e - The form submission event.
+   * Handles form submission to update platform invoicing data via API.
    */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    isSubmitting(true);
-    setIsEditMode(false);
-    onSectionClose();
-  };
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!formData) return;
+      isSubmitting(true);
+      try {
+        const response = await systemTableService.updatePlatformInvoicing(
+          formData
+        );
+        if (response.status === "SUCCESS") {
+          setInitialFormData(formData);
+          handleInfo({ code: 101400 });
+          setIsEditMode(false);
+          onSectionClose();
+        } else {
+          handleInfo({ code: 101401 });
+        }
+      } catch (err) {
+        handleInfo({ code: 101402, error: err });
+      } finally {
+        isSubmitting(false);
+      }
+    },
+    [formData, isSubmitting, onSectionClose]
+  );
 
   const isEditDisabled =
     editingSection !== null && editingSection !== sectionName;
@@ -109,8 +132,8 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
         className="flex flex-col gap-4"
       >
         <SectionHeader
-          title={"Platform Invoicing"}
-          editLabel={"View"}
+          title="Platform Invoicing"
+          editLabel="Edit"
           onEdit={handleEdit}
           onTextCancel={handleTextClose}
           showEditButton={!isEditMode}
@@ -118,94 +141,89 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
           editDisabled={isEditDisabled}
           closeLabel="Close"
         />
-
-        <CustomInput
-          label="Payment processor UUID"
-          value={formData.paymentProcessorUUID}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, paymentProcessorUUID: value }))
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
-
         <CustomInput
           label="Billing ID"
-          value={formData.billingId}
+          value={formData?.billerId ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, billingId: value }))
+            setFormData((prev) => (prev ? { ...prev, billerId: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
         />
         <CustomInput
           label="Entity"
-          value={formData.entity}
+          value={formData?.entity ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, entity: value }))
+            setFormData((prev) => (prev ? { ...prev, entity: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
         />
         <CustomInput
           label="Street"
-          value={formData.street}
+          value={formData?.street ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, street: value }))
+            setFormData((prev) => (prev ? { ...prev, street: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
         />
         <CustomInput
           label="City"
-          value={formData.city}
+          value={formData?.city ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, city: value }))
+            setFormData((prev) => (prev ? { ...prev, city: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
         />
         <CustomInput
           label="State"
-          value={formData.state}
+          value={formData?.state ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, state: value }))
+            setFormData((prev) => (prev ? { ...prev, state: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
         />
         <CustomInput
           label="Zip code"
-          value={formData.zipCode}
+          value={formData?.zipCode ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, zipCode: value }))
+            setFormData((prev) => (prev ? { ...prev, zipCode: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
         />
         <CustomInput
           label="Office phone"
-          value={formData.officePhone}
+          value={formData?.officePhone ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, officePhone: value }))
+            setFormData((prev) =>
+              prev ? { ...prev, officePhone: value } : prev
+            )
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="mobile"
         />
         <CustomInput
           label="E-mail address"
-          value={formData.emailAddress}
+          value={formData?.email ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, emailAddress: value }))
+            setFormData((prev) => (prev ? { ...prev, email: value } : prev))
           }
           isEditing={isEditMode}
           disabled={!isEditable}
+          type="email"
         />
         <CustomInput
           label="Retail Base"
-          value={formData.retailBase}
+          value={formData?.retailBase ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, retailBase: value }))
+            setFormData((prev) =>
+              prev ? { ...prev, retailBase: value } : prev
+            )
           }
           isEditing={isEditMode}
           disabled={!isEditable}
@@ -213,28 +231,31 @@ const PlatformInvoicingCard: React.FC<PlatformInvoicingCardProps> = ({
         />
         <CustomInput
           label="Industrial Base"
-          value={formData.industrialBase}
+          value={formData?.industrialBase ?? ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, industrialBase: value }))
+            setFormData((prev) =>
+              prev ? { ...prev, industrialBase: value } : prev
+            )
           }
           isEditing={isEditMode}
           disabled={!isEditable}
           type="number"
         />
-
-        {/* Show buttons only in edit mode */}
         {isEditMode && (
           <div className="flex flex-col gap-3">
             <PixieButton
-              label={"Update"}
+              label="Update"
               type="submit"
               formId={`form-${sectionName}`}
               disabled={!isEditable}
-              isLoading={!isEditable}
               className="w-full"
             />
             <div className="flex justify-center">
-              <LinkButton onClick={handleTextClose} label="Cancel" />
+              <LinkButton
+                onClick={handleTextClose}
+                label="Cancel"
+                disabled={!isEditable}
+              />
             </div>
           </div>
         )}

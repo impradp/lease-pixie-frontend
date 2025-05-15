@@ -52,13 +52,11 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
   const [processorOptions, setProcessorOptions] = useState<DropdownOption[]>(
     []
   );
-  const [localLoading, setLocalLoading] = useState(true);
 
   /**
    * Fetches client payment processor data on component mount and sets processor options.
    */
   const fetchClientPaymentProcessor = useCallback(async () => {
-    setLocalLoading(true);
     isSubmitting(true);
     try {
       const response = await systemTableService.fetchPaymentProcessor();
@@ -94,7 +92,6 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
       handleInfo({ code: 101301, error: err });
       setProcessorOptions([]);
     } finally {
-      setLocalLoading(false);
       isSubmitting(false);
     }
   }, [isSubmitting]);
@@ -129,7 +126,6 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!formData) return;
-      setLocalLoading(true);
       isSubmitting(true);
       try {
         const response = await systemTableService.updatePaymentProcessor(
@@ -148,7 +144,6 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
       } catch (err) {
         handleInfo({ code: 101304, error: err });
       } finally {
-        setLocalLoading(false);
         isSubmitting(false);
       }
     },
@@ -157,11 +152,6 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
 
   const isEditDisabled =
     editingSection !== null && editingSection !== sectionName;
-
-  // Render nothing until data is loaded
-  if (localLoading || !formData) {
-    return null;
-  }
 
   return (
     <div
@@ -192,7 +182,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           </div>
           <PixieDropdown
             options={processorOptions}
-            value={formData.defaultProcessorId || ""}
+            value={formData?.defaultProcessorId || ""}
             onChange={(value) =>
               setFormData((prev) =>
                 prev ? { ...prev, defaultProcessorId: value } : prev
@@ -209,7 +199,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
 
         <CustomInput
           label="First tenant processor ID"
-          value={formData.firstProcessor?.id || ""}
+          value={formData?.firstProcessor?.id || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -221,11 +211,11 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
         />
         <CustomInput
           label="First tenant processor UUID"
-          value={formData.firstProcessor?.uuid || ""}
+          value={formData?.firstProcessor?.uuid || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -237,12 +227,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="text"
         />
         <CustomInput
           label="First tenant processor email"
-          value={formData.firstProcessor?.email || ""}
+          value={formData?.firstProcessor?.email || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -254,12 +244,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="email"
         />
         <CustomInput
           label="Second tenant processor ID"
-          value={formData.secondProcessor?.id || ""}
+          value={formData?.secondProcessor?.id || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -271,11 +261,11 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
         />
         <CustomInput
           label="Second tenant processor UUID"
-          value={formData.secondProcessor?.uuid || ""}
+          value={formData?.secondProcessor?.uuid || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -287,12 +277,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="text"
         />
         <CustomInput
           label="Second tenant processor email"
-          value={formData.secondProcessor?.email || ""}
+          value={formData?.secondProcessor?.email || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -304,12 +294,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="email"
         />
         <CustomInput
           label="Third tenant processor ID"
-          value={formData.thirdProcessor?.id || ""}
+          value={formData?.thirdProcessor?.id || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -321,11 +311,11 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
         />
         <CustomInput
           label="Third tenant processor UUID"
-          value={formData.thirdProcessor?.uuid || ""}
+          value={formData?.thirdProcessor?.uuid || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -337,12 +327,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="text"
         />
         <CustomInput
           label="Third tenant processor email"
-          value={formData.thirdProcessor?.email || ""}
+          value={formData?.thirdProcessor?.email || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -354,12 +344,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="email"
         />
         <CustomInput
           label="Platform tenant processor ID"
-          value={formData.platformProcessor?.id || ""}
+          value={formData?.platformProcessor?.id || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -371,11 +361,11 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
         />
         <CustomInput
           label="Platform tenant processor UUID"
-          value={formData.platformProcessor?.uuid || ""}
+          value={formData?.platformProcessor?.uuid || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -390,12 +380,12 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="text"
         />
         <CustomInput
           label="Platform tenant processor email"
-          value={formData.platformProcessor?.email || ""}
+          value={formData?.platformProcessor?.email || ""}
           onChange={(value) =>
             setFormData((prev) =>
               prev
@@ -410,7 +400,7 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
             )
           }
           isEditing={isEditMode}
-          disabled={!isEditable || localLoading}
+          disabled={!isEditable}
           type="email"
         />
 
@@ -420,15 +410,14 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
               label="Update"
               type="submit"
               formId={`form-${sectionName}`}
-              disabled={!isEditable || localLoading}
-              isLoading={localLoading}
+              disabled={!isEditable}
               className="w-full"
             />
             <div className="flex justify-center">
               <LinkButton
                 onClick={handleTextClose}
                 label="Cancel"
-                disabled={localLoading}
+                disabled={!isEditable}
               />
             </div>
           </div>

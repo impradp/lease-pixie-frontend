@@ -59,10 +59,6 @@ const SystemTablesContent: React.FC = () => {
     { href: "#", label: "System Tables", isActive: true },
   ];
 
-  if (isLoading) {
-    return <LoadingOverlay />;
-  }
-
   return (
     <>
       <Breadcrumbs items={breadcrumbItems} />

@@ -6,6 +6,10 @@ import {
   ClientPaymentProcessor,
   ClientPaymentProcessorResponse,
 } from "@/types/ClientPaymentProcessor";
+import {
+  PlatformInvoicing,
+  PlatformInvoicingResponse,
+} from "@/types/PlatformInvoicing";
 
 class SystemTableService {
   /**
@@ -31,6 +35,32 @@ class SystemTableService {
   async fetchPaymentProcessor(): Promise<ClientPaymentProcessorResponse> {
     return await apiService.get<ClientPaymentProcessorResponse>(
       ENDPOINTS.SYSTEM_TABLE.CLIENT_PAYMENT_PROCESSOR
+    );
+  }
+
+  /**
+   * Updates the platform invoicing information.
+   *
+   * @param payload - The payload containing the platform invoicing information to be updated.
+   * @returns The response from the API after updating the platform invoicing.
+   */
+  async updatePlatformInvoicing(
+    payload: PlatformInvoicing
+  ): Promise<PlatformInvoicingResponse> {
+    return await apiService.post<PlatformInvoicingResponse>(
+      ENDPOINTS.SYSTEM_TABLE.PLATFORM_INVOICING,
+      payload
+    );
+  }
+
+  /**
+   * Fetches the platform invoicing information.
+   *
+   * @returns The response from the API containing the platform invoicing information.
+   */
+  async fetchPlatformInvoicing(): Promise<PlatformInvoicingResponse> {
+    return await apiService.get<PlatformInvoicingResponse>(
+      ENDPOINTS.SYSTEM_TABLE.PLATFORM_INVOICING
     );
   }
 }
