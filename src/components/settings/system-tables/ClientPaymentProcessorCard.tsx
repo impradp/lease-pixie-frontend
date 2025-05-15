@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+
+import { DropdownOption } from "@/types/user";
+import handleInfo from "@/lib/utils/errorHandler";
+import LinkButton from "@/components/ui/buttons/LinkButton";
 import CustomInput from "@/components/ui/input/CustomInput";
 import PixieButton from "@/components/ui/buttons/PixieButton";
-import LinkButton from "@/components/ui/buttons/LinkButton";
+import { systemTableService } from "@/lib/services/systemTable";
 import SectionHeader from "@/components/ui/header/SectionHeader";
-import { ClientPaymentProcessor } from "@/types/ClientPaymentProcessor";
-import {
-  processorOptions,
-  sampleClientPaymentProcessor,
-} from "@/data/clientPaymentProcessors";
 import { PixieDropdown } from "@/components/ui/input/PixieDropdown";
+import { ClientPaymentProcessor } from "@/types/ClientPaymentProcessor";
 
+/**
+ * Props for the ClientPaymentProcessorCard component.
+ */
 interface ClientPaymentProcessorCardProps {
   sectionName: string;
   editingSection: string | null;
@@ -40,54 +43,125 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
   isEditable,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<ClientPaymentProcessor>(
-    sampleClientPaymentProcessor
+  const [formData, setFormData] = useState<ClientPaymentProcessor | undefined>(
+    undefined
   );
-  const [initialFormData, setInitialFormData] =
-    useState<ClientPaymentProcessor>(sampleClientPaymentProcessor);
+  const [initialFormData, setInitialFormData] = useState<
+    ClientPaymentProcessor | undefined
+  >(undefined);
+  const [processorOptions, setProcessorOptions] = useState<DropdownOption[]>(
+    []
+  );
+  const [localLoading, setLocalLoading] = useState(true);
 
   /**
-   * Syncs form data with the sample client payment processor data on mount or update.
+   * Fetches client payment processor data on component mount and sets processor options.
    */
+  const fetchClientPaymentProcessor = useCallback(async () => {
+    setLocalLoading(true);
+    isSubmitting(true);
+    try {
+      const response = await systemTableService.fetchPaymentProcessor();
+      if (response.status === "SUCCESS" && response.data) {
+        setFormData(response.data);
+        setInitialFormData(response.data);
+        // Generate processor options from first, second, and third processors
+        const options: DropdownOption[] = [];
+        if (response.data.firstProcessor?.id) {
+          options.push({
+            label: "Processor 1",
+            value: response.data.firstProcessor.id,
+          });
+        }
+        if (response.data.secondProcessor?.id) {
+          options.push({
+            label: "Processor 2",
+            value: response.data.secondProcessor.id,
+          });
+        }
+        if (response.data.thirdProcessor?.id) {
+          options.push({
+            label: "Processor 3",
+            value: response.data.thirdProcessor.id,
+          });
+        }
+        setProcessorOptions(options);
+      } else {
+        handleInfo({ code: 101301 });
+        setProcessorOptions([]);
+      }
+    } catch (err) {
+      handleInfo({ code: 101301, error: err });
+      setProcessorOptions([]);
+    } finally {
+      setLocalLoading(false);
+      isSubmitting(false);
+    }
+  }, [isSubmitting]);
+
   useEffect(() => {
-    setInitialFormData(sampleClientPaymentProcessor);
-    setFormData(sampleClientPaymentProcessor);
-  }, [sampleClientPaymentProcessor]);
+    fetchClientPaymentProcessor();
+  }, [fetchClientPaymentProcessor]);
 
   /**
    * Handles the edit button click to enable edit mode.
-   * Only activates if no other section is being edited or if this section is the target.
    */
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     if (editingSection === null || editingSection === sectionName) {
       onSectionEdit(sectionName);
       setIsEditMode(true);
     }
-  };
+  }, [editingSection, onSectionEdit, sectionName]);
 
   /**
    * Handles the cancel button click to revert form data and exit edit mode.
    */
-  const handleTextClose = () => {
-    setFormData(initialFormData); // Revert to initial values
+  const handleTextClose = useCallback(() => {
+    setFormData(initialFormData);
     setIsEditMode(false);
     onSectionClose();
-  };
+  }, [initialFormData, onSectionClose]);
 
   /**
-   * Handles form submission, triggers submission status, and exits edit mode.
-   *
-   * @param e - The form submission event.
+   * Handles form submission to update payment processor data via API.
    */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    isSubmitting(true);
-    setIsEditMode(false);
-    onSectionClose();
-  };
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!formData) return;
+      setLocalLoading(true);
+      isSubmitting(true);
+      try {
+        const response = await systemTableService.updatePaymentProcessor(
+          formData
+        );
+        if (response.status === "SUCCESS") {
+          setInitialFormData(formData);
+          handleInfo({ code: 101300 });
+          setIsEditMode(false);
+          onSectionClose();
+          // Refresh processor options after update
+          await fetchClientPaymentProcessor();
+        } else {
+          handleInfo({ code: 101303 });
+        }
+      } catch (err) {
+        handleInfo({ code: 101304, error: err });
+      } finally {
+        setLocalLoading(false);
+        isSubmitting(false);
+      }
+    },
+    [formData, isSubmitting, onSectionClose, fetchClientPaymentProcessor]
+  );
 
   const isEditDisabled =
     editingSection !== null && editingSection !== sectionName;
+
+  // Render nothing until data is loaded
+  if (localLoading || !formData) {
+    return null;
+  }
 
   return (
     <div
@@ -101,8 +175,8 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
         className="flex flex-col gap-4"
       >
         <SectionHeader
-          title={"Client Payment Processors"}
-          editLabel={"View"}
+          title="Payment Processors"
+          editLabel="Edit"
           onEdit={handleEdit}
           onTextCancel={handleTextClose}
           showEditButton={!isEditMode}
@@ -114,13 +188,15 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
           <div
             className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
           >
-            Default processor ID
+            Active on-boarding tenant processor ID
           </div>
           <PixieDropdown
             options={processorOptions}
-            value={formData.defaultProcessorId}
+            value={formData.defaultProcessorId || ""}
             onChange={(value) =>
-              setFormData((prev) => ({ ...prev, defaultProcessorId: value }))
+              setFormData((prev) =>
+                prev ? { ...prev, defaultProcessorId: value } : prev
+              )
             }
             isEditing={isEditMode}
             placeholder="Select processor"
@@ -132,106 +208,228 @@ const ClientPaymentProcessorCard: React.FC<ClientPaymentProcessorCardProps> = ({
         </div>
 
         <CustomInput
-          label="First processor ID"
-          value={formData.firstProcessorId}
+          label="First tenant processor ID"
+          value={formData.firstProcessor?.id || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, firstProcessorId: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    firstProcessor: { ...prev.firstProcessor, id: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
+          disabled={!isEditable || localLoading}
         />
         <CustomInput
-          label="First processor UUID"
-          value={formData.firstProcessorUUID}
+          label="First tenant processor UUID"
+          value={formData.firstProcessor?.uuid || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, firstProcessorUUID: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    firstProcessor: { ...prev.firstProcessor, uuid: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
-          type="number"
+          disabled={!isEditable || localLoading}
+          type="text"
         />
         <CustomInput
-          label="First processor email"
-          value={formData.firstProcessorEmail}
+          label="First tenant processor email"
+          value={formData.firstProcessor?.email || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, firstProcessorEmail: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    firstProcessor: { ...prev.firstProcessor, email: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
+          disabled={!isEditable || localLoading}
           type="email"
         />
         <CustomInput
-          label="Second processor ID"
-          value={formData.secondProcessorId}
+          label="Second tenant processor ID"
+          value={formData.secondProcessor?.id || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, secondProcessorId: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    secondProcessor: { ...prev.secondProcessor, id: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
+          disabled={!isEditable || localLoading}
         />
         <CustomInput
-          label="Second processor UUID"
-          value={formData.secondProcessorUUID}
+          label="Second tenant processor UUID"
+          value={formData.secondProcessor?.uuid || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, secondProcessorUUID: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    secondProcessor: { ...prev.secondProcessor, uuid: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
-          type="number"
+          disabled={!isEditable || localLoading}
+          type="text"
         />
         <CustomInput
-          label="Second processor email"
-          value={formData.secondProcessorEmail}
+          label="Second tenant processor email"
+          value={formData.secondProcessor?.email || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, secondProcessorEmail: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    secondProcessor: { ...prev.secondProcessor, email: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
+          disabled={!isEditable || localLoading}
           type="email"
         />
         <CustomInput
-          label="Third processor ID"
-          value={formData.thirdProcessorId}
+          label="Third tenant processor ID"
+          value={formData.thirdProcessor?.id || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, thirdProcessorId: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    thirdProcessor: { ...prev.thirdProcessor, id: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
+          disabled={!isEditable || localLoading}
         />
         <CustomInput
-          label="Third processor UUID"
-          value={formData.thirdProcessorUUID}
+          label="Third tenant processor UUID"
+          value={formData.thirdProcessor?.uuid || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, thirdProcessorUUID: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    thirdProcessor: { ...prev.thirdProcessor, uuid: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
-          type="number"
+          disabled={!isEditable || localLoading}
+          type="text"
         />
         <CustomInput
-          label="Third processor email"
-          value={formData.thirdProcessorEmail}
+          label="Third tenant processor email"
+          value={formData.thirdProcessor?.email || ""}
           onChange={(value) =>
-            setFormData((prev) => ({ ...prev, thirdProcessorEmail: value }))
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    thirdProcessor: { ...prev.thirdProcessor, email: value },
+                  }
+                : prev
+            )
           }
           isEditing={isEditMode}
-          disabled={!isEditable}
+          disabled={!isEditable || localLoading}
+          type="email"
+        />
+        <CustomInput
+          label="Platform tenant processor ID"
+          value={formData.platformProcessor?.id || ""}
+          onChange={(value) =>
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    platformProcessor: { ...prev.platformProcessor, id: value },
+                  }
+                : prev
+            )
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable || localLoading}
+        />
+        <CustomInput
+          label="Platform tenant processor UUID"
+          value={formData.platformProcessor?.uuid || ""}
+          onChange={(value) =>
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    platformProcessor: {
+                      ...prev.platformProcessor,
+                      uuid: value,
+                    },
+                  }
+                : prev
+            )
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable || localLoading}
+          type="text"
+        />
+        <CustomInput
+          label="Platform tenant processor email"
+          value={formData.platformProcessor?.email || ""}
+          onChange={(value) =>
+            setFormData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    platformProcessor: {
+                      ...prev.platformProcessor,
+                      email: value,
+                    },
+                  }
+                : prev
+            )
+          }
+          isEditing={isEditMode}
+          disabled={!isEditable || localLoading}
           type="email"
         />
 
-        {/* Show buttons only in edit mode */}
         {isEditMode && (
           <div className="flex flex-col gap-3">
             <PixieButton
-              label={"Update"}
+              label="Update"
               type="submit"
               formId={`form-${sectionName}`}
-              disabled={!isEditable}
-              isLoading={!isEditable}
+              disabled={!isEditable || localLoading}
+              isLoading={localLoading}
               className="w-full"
             />
             <div className="flex justify-center">
-              <LinkButton onClick={handleTextClose} label="Cancel" />
+              <LinkButton
+                onClick={handleTextClose}
+                label="Cancel"
+                disabled={localLoading}
+              />
             </div>
           </div>
         )}

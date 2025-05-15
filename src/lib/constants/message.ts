@@ -430,6 +430,28 @@ const target = {
     type: "error",
     message: "Exception occured creating property.",
   } as LeasePixieToastMsg,
+
+  //101300 series for client payment processor handle message
+  101300: {
+    type: "success",
+    message: "Payment processors updated successfully.",
+  } as LeasePixieToastMsg,
+  101301: {
+    type: "error",
+    message: "Error occured fetching payment processors.",
+  } as LeasePixieToastMsg,
+  101302: {
+    type: "error",
+    message: "Exception occured fetching payment processors.",
+  } as LeasePixieToastMsg,
+  101303: {
+    type: "error",
+    message: "Error occured updating payment processors.",
+  } as LeasePixieToastMsg,
+  101304: {
+    type: "error",
+    message: "Exception occured updating payment processors.",
+  } as LeasePixieToastMsg,
 } as const;
 
 export type MessageCode = keyof typeof target;

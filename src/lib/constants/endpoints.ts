@@ -6,6 +6,9 @@ export const ENDPOINTS = {
     RESET_VERIFY: "/api/v1/verify-reset-code",
     RESOLVE_CONSENT: "/api/v1/consent",
   },
+  SYSTEM_TABLE: {
+    CLIENT_PAYMENT_PROCESSOR: "/api/v1/system-table/payment-processor",
+  },
   USER: {
     SELF: "/api/index",
     ADMIN: {

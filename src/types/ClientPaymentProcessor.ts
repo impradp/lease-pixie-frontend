@@ -1,13 +1,20 @@
 export interface ClientPaymentProcessor {
   id?: string;
   defaultProcessorId: string;
-  firstProcessorId: string;
-  firstProcessorUUID: string;
-  firstProcessorEmail: string;
-  secondProcessorId: string;
-  secondProcessorUUID: string;
-  secondProcessorEmail: string;
-  thirdProcessorId: string;
-  thirdProcessorUUID: string;
-  thirdProcessorEmail: string;
+  firstProcessor: ProcessorInfo;
+  secondProcessor: ProcessorInfo;
+  thirdProcessor: ProcessorInfo;
+  platformProcessor: ProcessorInfo;
+}
+
+interface ProcessorInfo {
+  id: string;
+  uuid: string;
+  email: string;
+}
+
+export interface ClientPaymentProcessorResponse {
+  data: ClientPaymentProcessor;
+  status: string;
+  message: string;
 }
