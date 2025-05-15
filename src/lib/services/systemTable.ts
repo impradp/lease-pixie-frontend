@@ -2,6 +2,7 @@
 
 import { apiService } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/constants/endpoints";
+import { AISettingsV2, AISettingsV2Response } from "@/types/AISettings";
 import {
   ClientPaymentProcessor,
   ClientPaymentProcessorResponse,
@@ -61,6 +62,30 @@ class SystemTableService {
   async fetchPlatformInvoicing(): Promise<PlatformInvoicingResponse> {
     return await apiService.get<PlatformInvoicingResponse>(
       ENDPOINTS.SYSTEM_TABLE.PLATFORM_INVOICING
+    );
+  }
+
+  /**
+   * Updates the AI settings.
+   *
+   * @param payload - The payload containing the AI settings to be updated.
+   * @returns The response from the API after updating the AI settings.
+   */
+  async updateAISettings(payload: AISettingsV2): Promise<AISettingsV2Response> {
+    return await apiService.post<AISettingsV2Response>(
+      ENDPOINTS.SYSTEM_TABLE.AI_SETTINGS,
+      payload
+    );
+  }
+
+  /**
+   * Fetches the AI settings.
+   *
+   * @returns The response from the API containing the AI settings.
+   */
+  async fetchAISettings(): Promise<AISettingsV2Response> {
+    return await apiService.get<AISettingsV2Response>(
+      ENDPOINTS.SYSTEM_TABLE.AI_SETTINGS
     );
   }
 }

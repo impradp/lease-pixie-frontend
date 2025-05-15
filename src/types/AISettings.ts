@@ -69,3 +69,47 @@ export interface AICosts {
   customForm: string;
   plaid: PlaidContext;
 }
+
+export interface AISettingsV2 {
+  temperature?: number | string | string;
+  topP?: number | string | string;
+  leaseMaxTokens?: number | string;
+  leaseValuesModel: string;
+  leaseValuesReasoning: string;
+  leaseValuesInstruction: string;
+  leasePagesModel: string;
+  leasePagesReasoning: string;
+  leasePagesInstruction: string;
+  leaseSentencesModel: string;
+  leaseSentencesReasoning: string;
+  leaseSentencesInstruction: string;
+  leaseSummaryModel: string;
+  leaseSummaryReasoning: string;
+  leaseSummaryInstruction: string;
+  workflowMaxToken?: number | string;
+  workflowModel: string;
+  workflowInstruction: string;
+  workflowTenantVectorStorageId: string;
+  workflowInquiryVectorStorageId: string;
+  workflowMaintenanceVectorStorageId: string;
+  workflowPropertyVectorStorageId: string;
+  workflowLeaseVectorStorageId: string;
+  workflowAccountingVectorStorageId: string;
+  workflowBillPayVectorStorageId: string;
+  vendorMaxToken: number | string | null;
+  vendorModel: string;
+  vendorInstruction: string;
+  tenantMaxToken?: number | string;
+  tenantModel: string;
+  tenantInstruction: string;
+  bankingMaxToken?: number | string;
+  bankingModel: string;
+  bankingReasoning: string;
+  bankingInstruction: string;
+}
+
+export interface AISettingsV2Response {
+  status: string;
+  message: string;
+  data: AISettingsV2;
+}

@@ -474,6 +474,28 @@ const target = {
     type: "error",
     message: "Exception occured fetching platform invoicing.",
   } as LeasePixieToastMsg,
+
+  //101500 series for AI settings handle message
+  101500: {
+    type: "success",
+    message: "AI settings updated successfully.",
+  } as LeasePixieToastMsg,
+  101501: {
+    type: "error",
+    message: "Error occured updating AI settings.",
+  } as LeasePixieToastMsg,
+  101502: {
+    type: "error",
+    message: "Exception occured updating AI settings.",
+  } as LeasePixieToastMsg,
+  101503: {
+    type: "error",
+    message: "Error occured fetching AI settings.",
+  } as LeasePixieToastMsg,
+  101504: {
+    type: "error",
+    message: "Exception occured fetching AI settings.",
+  } as LeasePixieToastMsg,
 } as const;
 
 export type MessageCode = keyof typeof target;
