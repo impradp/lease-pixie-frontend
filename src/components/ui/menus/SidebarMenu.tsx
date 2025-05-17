@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import React, { useState, useContext, useEffect, useRef } from "react";
+
 import { ChevronRight } from "lucide-react";
 import { hasRole } from "@/lib/utils/authUtils";
 import { MenuItemWrapper, MenuItem } from "@/types/menuItems";
@@ -139,71 +140,71 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div
-        ref={menuRef}
-        className="sidebar-menu absolute top-full left-0 z-50 
-          px-6 pt-4 pb-5 bg-tertiary-periWinkleBlue rounded-xl
-          shadow-[0px_4px_4px_-1px_rgba(12,12,13,0.05),0px_4px_4px_-1px_rgba(12,12,13,0.10)]
-          inline-flex justify-start items-start gap-1"
-        style={{ minWidth: "156px" }}
-      >
-        <div className="w-[156px] inline-flex flex-col justify-start items-start gap-6">
-          <div className="self-stretch flex flex-col justify-start items-start gap-3">
-            <div className="self-stretch pr-6 inline-flex justify-start items-start">
-              <span
-                className="text-tertiary-midnightBlue text-base font-normal"
-                style={{ fontFamily: "Inter", lineHeight: "normal" }}
-              >
-                {menuWrapper?.userType}
-              </span>
-            </div>
-            <div className="self-stretch h-px bg-tertiary-duskyBlue" />
-            {menuItems.map((item, index) => (
-              <div key={item.title} className="flex flex-col gap-3">
-                <div
-                  className="w-[155px] inline-flex justify-between items-start cursor-pointer"
-                  onClick={() => toggleMenuItem(index)}
-                >
-                  <span
-                    className={`text-tertiary-midnightBlue text-base font-bold`}
-                    style={{ fontFamily: "Inter", lineHeight: "normal" }}
-                  >
-                    {item.title}
-                  </span>
-                  <ChevronRight
-                    className={`w-4 h-4 text-tertiary-midnightBlue transition-transform duration-300 ${
-                      item.isExpanded ? "rotate-90" : ""
-                    }`}
-                  />
-                </div>
-                {item.isExpanded && item.subItems && (
-                  <div className="flex flex-col gap-3">
-                    {item.subItems.map((subItem, subIndex) => (
-                      <div
-                        key={subItem}
-                        className="self-stretch pr-6 inline-flex justify-start items-start cursor-pointer"
-                        onClick={() =>
-                          handleSubItemClick(subItem, index, subIndex)
-                        }
-                      >
-                        <span
-                          className="text-tertiary-midnightBlue text-base font-normal hover:text-blue-600"
-                          style={{ fontFamily: "Inter", lineHeight: "normal" }}
-                        >
-                          {subItem}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+    <div
+      ref={menuRef}
+      className="sidebar-menu absolute top-full left-0 z-50 
+        px-6 pt-4 pb-5 bg-tertiary-periWinkleBlue rounded-xl
+        shadow-[0px_4px_4px_-1px_rgba(12,12,13,0.05),0px_4px_4px_-1px_rgba(12,12,13,0.10)]
+        inline-flex justify-start items-start gap-1"
+      style={{ minWidth: "156px" }}
+    >
+      <div className="w-[156px] inline-flex flex-col justify-start items-start gap-6">
+        <div className="self-stretch flex flex-col justify-start items-start gap-3">
+          <div className="self-stretch pr-6 inline-flex justify-start items-start">
+            <button
+              className="text-tertiary-midnightBlue text-base font-normal  hover:text-blue-600"
+              style={{ fontFamily: "Inter", lineHeight: "normal" }}
+              onClick={() => handleNavigation(menuWrapper?.defaultRoute || "")}
+            >
+              {menuWrapper?.userType}
+            </button>
           </div>
+          <div className="self-stretch h-px bg-tertiary-duskyBlue" />
+          {menuItems.map((item, index) => (
+            <div key={item.title} className="flex flex-col gap-3">
+              <button
+                className="w-[155px] inline-flex justify-between items-start"
+                onClick={() => toggleMenuItem(index)}
+                aria-expanded={item.isExpanded}
+                aria-controls={`submenu-${index}`}
+              >
+                <span
+                  className={`text-tertiary-midnightBlue text-base font-bold`}
+                  style={{ fontFamily: "Inter", lineHeight: "normal" }}
+                >
+                  {item.title}
+                </span>
+                <ChevronRight
+                  className={`w-4 h-4 text-tertiary-midnightBlue transition-transform duration-300 ${
+                    item.isExpanded ? "rotate-90" : ""
+                  }`}
+                />
+              </button>
+              {item.isExpanded && item.subItems && (
+                <div className="flex flex-col gap-3">
+                  {item.subItems.map((subItem, subIndex) => (
+                    <button
+                      key={subItem}
+                      className="self-stretch pr-6 inline-flex justify-start items-start cursor-pointer"
+                      onClick={() =>
+                        handleSubItemClick(subItem, index, subIndex)
+                      }
+                    >
+                      <span
+                        className="text-tertiary-midnightBlue text-base font-normal hover:text-blue-600 ml-2"
+                        style={{ fontFamily: "Inter", lineHeight: "normal" }}
+                      >
+                        {subItem}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

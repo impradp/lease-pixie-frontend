@@ -66,7 +66,8 @@ const config: Config = {
           muteBlueGray: "#878aa4",
           lightPeach: "#fef6ee",
           duskyBlue: "#7894ba",
-          periWinkleBlue: "#97adce",
+          periWinkleBlue: "#A9C2E8",
+          steelBlueDusk: "#637289",
         },
         card: {
           open: {

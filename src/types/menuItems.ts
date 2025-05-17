@@ -7,5 +7,6 @@ export type MenuItem = {
 
 export type MenuItemWrapper = {
   userType: string;
+  defaultRoute: string;
   menu: MenuItem[];
 };

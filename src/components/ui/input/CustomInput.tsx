@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 /**
  * Props for the CustomInput component
@@ -399,7 +399,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             {showPassword ? (
               <Eye className="h-4 w-4 text-gray-500" />
             ) : (
-              <EyeClosed className="h-4 w-4 text-gray-500" />
+              <EyeOff className="h-4 w-4 text-gray-500" />
             )}
           </button>
         )}

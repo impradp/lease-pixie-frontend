@@ -131,24 +131,23 @@ function LoginCard({
   };
 
   return (
-    <div className="w-full h-[1262px] max-xs:h-[932px] bg-tertiary-ghostWhite/50 border border-tertiary-fill rounded-[10px] flex flex-col items-center p-5 relative">
+    <div className="w-full h-[1262px] max-xs:h-[932px] bg-tertiary-ghostWhite/50 border border-tertiary-fill rounded-[10px] flex flex-col items-center pt-14 relative">
       <div className="w-full flex flex-col justify-center items-center">
         {/* Security shield logo */}
         <Image
           src="/security-shield.svg"
           alt="Logo"
-          width={154}
-          height={155}
-          className="object-contain w-24 sm:w-32 md:w-40 lg:w-[154px]"
+          width={100}
+          height={100}
           priority
         />
         {/* Login form */}
         <form
           onSubmit={handleSubmit}
-          className="self-stretch flex flex-col justify-end items-end gap-4"
+          className="self-stretch flex flex-col justify-end items-end"
         >
           {/* Form title */}
-          <div className="w-full flex flex-col items-center py-[28px]">
+          <div className="w-full flex flex-col items-center py-7">
             <h1 className="w-full text-center text-tertiary-deepNavy text-xl sm:text-2xl md:text-3xl font-semibold font-['Inter'] leading-tight sm:leading-8 md:leading-[38px]">
               Log in to your account
             </h1>
@@ -180,12 +179,12 @@ function LoginCard({
 
             {/* Generate User ID link */}
             <div className="w-[358px] flex flex-col justify-center items-end ">
-              <span
+              <button
                 className="text-secondary-light text-sm font-normal font-['Inter'] underline cursor-pointer"
                 onClick={switchToReset}
               >
-                Generate User ID
-              </span>
+                New User ID
+              </button>
             </div>
 
             {/* Submit button */}

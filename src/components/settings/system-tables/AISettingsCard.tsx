@@ -120,13 +120,13 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
       >
         <SectionHeader
           title={"AI Settings"}
-          editLabel={"View"}
+          editLabel={"Edit"}
           onEdit={handleEdit}
           onTextCancel={handleTextClose}
           showEditButton={!isEditMode}
           showTextCloseButton={isEditMode}
           editDisabled={isEditDisabled}
-          closeLabel="Close"
+          closeLabel="Cancel"
         />
 
         <CustomInput
@@ -547,17 +547,29 @@ const AISettingsCard: React.FC<AISettingsCardProps> = ({
           disabled={!isEditable}
         />
 
-        <CustomInput
-          label="Banking: Reasoning"
-          value={formData?.bankingReasoning ?? ""}
-          onChange={(value) =>
-            setFormData((prev) =>
-              prev ? { ...prev, bankingReasoning: value } : prev
-            )
-          }
-          isEditing={isEditMode}
-          disabled={!isEditable}
-        />
+        <div className="self-stretch flex flex-col justify-center items-start gap-1">
+          <div
+            className={`justify-start text-secondary-light text-sm font-medium font-['Inter'] leading-[18px]`}
+          >
+            Banking: Reasoning
+          </div>
+          <PixieDropdown
+            options={reasoningOptions}
+            value={formData?.bankingReasoning ?? ""}
+            onChange={(value) =>
+              setFormData((prev) =>
+                prev ? { ...prev, bankingReasoning: value } : prev
+              )
+            }
+            isEditing={isEditMode}
+            placeholder="Select reasoning"
+            className="w-full"
+            containerClassName="w-full"
+            type="large"
+            labelClassName="hidden"
+          />
+        </div>
+
         <PixieTextArea
           label="Banking: Instructions"
           value={formData?.bankingInstruction ?? ""}

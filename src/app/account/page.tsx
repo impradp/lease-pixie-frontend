@@ -91,7 +91,7 @@ function AccountContent() {
         setLoading(false); // Reset loading state
       }
     },
-    [router, setLoading]
+    [router]
   );
 
   // Effect to handle toast notifications and fetch account details on mount or search param change

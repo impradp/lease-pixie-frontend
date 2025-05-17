@@ -2,6 +2,7 @@ import { MenuItemWrapper } from "@/types/menuItems";
 
 export const adminMenu: MenuItemWrapper = {
   userType: "Admin",
+  defaultRoute: "/dashboard",
   menu: [
     {
       title: "Lists",
@@ -20,6 +21,7 @@ export const adminMenu: MenuItemWrapper = {
 
 export const readOnlyAdminMenu: MenuItemWrapper = {
   userType: "Admin",
+  defaultRoute: "/dashboard",
   menu: [
     {
       title: "Lists",
@@ -38,6 +40,7 @@ export const readOnlyAdminMenu: MenuItemWrapper = {
 
 export const accountMenu: MenuItemWrapper = {
   userType: "Account",
+  defaultRoute: "/account",
   menu: [
     {
       title: "Lists",
@@ -56,6 +59,7 @@ export const accountMenu: MenuItemWrapper = {
 
 export const defaultMenu: MenuItemWrapper = {
   userType: "User",
+  defaultRoute: "/portfolio",
   menu: [
     {
       title: "Settings",
